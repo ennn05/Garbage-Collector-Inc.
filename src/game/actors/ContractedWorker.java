@@ -13,22 +13,36 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.ConsumeFlaskAction;
 import game.actions.UnlockDoorAction;
+import game.economy.Wallet;
+import game.economy.WalletHolder;
 import game.enums.Ability;
 import game.interfaces.Unlockable;
 import game.items.AccessCard;
 import game.items.Flask;
 import game.world.FacilityAlarmSystem;
-import edu.monash.fit2099.engine.positions.Location;
 
 /**
  * This brave soul is capable of performing complex tasks such as picking up trash
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends Actor {
+public class ContractedWorker extends Actor implements WalletHolder {
+    private final Wallet wallet;
+
     public ContractedWorker(String name, char displayChar, int hitPoints, Inventory inventory) {
         super(name, displayChar, hitPoints, inventory);
         this.enableAbility(Ability.WORKER);
+        this.wallet = new Wallet();
+    }
+
+    /**
+     * Get the wallet owned by this worker.
+     *
+     * @return the worker's wallet
+     */
+    @Override
+    public Wallet getWallet() {
+        return wallet;
     }
 
     /**
