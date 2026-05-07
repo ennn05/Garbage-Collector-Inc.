@@ -1,5 +1,8 @@
 package game;
 
+import game.world.EclipseNebula;
+import game.world.FancyMessage;
+
 import edu.monash.fit2099.engine.displays.Display;
 
 /**

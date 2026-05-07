@@ -1,8 +1,9 @@
-package game;
+package game.inventory;
 
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
+import game.enums.ItemStatistics;
 
 /**
  * At its core, this is just an oversized {@code ArrayList}.
@@ -12,7 +13,7 @@ import edu.monash.fit2099.engine.items.Item;
  * @author Adrian Kristanto
  */
 public class WeightLimitedInventory extends Inventory {
-    private int weightLimit;
+    private final int weightLimit;
     private int weight;
 
     public WeightLimitedInventory(int weightLimit) {
@@ -30,9 +31,11 @@ public class WeightLimitedInventory extends Inventory {
     @Override
     public boolean add(Item item) {
         Display display = new Display();
+
         if (item.hasStatistic(ItemStatistics.WEIGHT)) {
-            int itemWeight =  item.getStatistic(ItemStatistics.WEIGHT);
-            if (weight + itemWeight < this.weightLimit) {
+            int itemWeight = item.getStatistic(ItemStatistics.WEIGHT);
+
+            if (weight + itemWeight <= this.weightLimit) {
                 items.add(item);
                 this.weight += itemWeight;
                 display.println(String.format("%s added successfully. Current inventory weight (%d/%d)", item, weight, weightLimit));
@@ -56,10 +59,14 @@ public class WeightLimitedInventory extends Inventory {
     @Override
     public boolean remove(Item item) {
         if (item.hasStatistic(ItemStatistics.WEIGHT)) {
-            int itemWeight =  item.getStatistic(ItemStatistics.WEIGHT);
-            items.remove(item);
-            this.weight -= itemWeight;
-            return true;
+            int itemWeight = item.getStatistic(ItemStatistics.WEIGHT);
+
+            if (items.remove(item)) {
+                this.weight -= itemWeight;
+                return true;
+            }
+
+            return false;
         } else {
             String msg = String.format("%s does not have a weight statistic", item);
             throw new IllegalArgumentException(msg);

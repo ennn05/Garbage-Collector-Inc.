@@ -1,10 +1,11 @@
-package game;
+package game.actions;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+import game.items.Flask;
 
 /**
  * An action representing the desperate, mid-combat decision to chug whatever
@@ -16,8 +17,9 @@ import edu.monash.fit2099.engine.positions.GameMap;
 public class ConsumeFlaskAction extends Action {
 
     /**
-     * When executed, it will check for the actor's inventory whether they are carrying the flask.
-     * If so, it will decrease the flask content and heal the actor.
+     * When executed, it will check the actor's inventory for a Flask.
+     * If a Flask is found and still has uses remaining, it will consume one use
+     * and heal the actor by 1 point.
      *
      * @param actor The actor consuming the flask.
      * @param map The map the actor is on.
@@ -26,17 +28,18 @@ public class ConsumeFlaskAction extends Action {
     @Override
     public String execute(Actor actor, GameMap map) {
         Inventory inventory = actor.getInventory();
-        Flask flask = null;
+
         for (Item item : inventory.getItems()) {
-            if (item instanceof Flask) {
-                flask = (Flask) item;
+            if (item instanceof Flask flask) {
+                if (flask.hasUsesRemaining()) {
+                    flask.consume(actor);
+                    return actor + " drinks flask, which heals them by 1 point of health. Remaining uses: "
+                            + flask.getRemainingUses();
+                }
+                return actor + " tries to drink from an empty flask.";
             }
         }
-        if (flask != null) {
-            flask.totalUsable -= 1;
-            actor.heal(1);
-            return actor + " drinks flask, which heals them by 1 point of health.";
-        }
+
         return actor + " does not carry a flask.";
     }
 
