@@ -9,16 +9,20 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.UseFirstAidKitAction;
+import game.economy.Wallet;
 import game.enums.ItemStatistics;
+import game.interfaces.Purchasable;
 import game.interfaces.Sterilisable;
+
 /**
  * A reusable first aid kit that permanently increases maximum health
  * and fully restores health when used.
  */
-public class FirstAidKit extends Item implements Sterilisable {
+public class FirstAidKit extends Item implements Sterilisable, Purchasable {
     private static final int WEIGHT = 25;
     private static final int MAX_HEALTH_INCREASE = 1;
     private static final int COOLDOWN_TURNS = 20;
+    private static final int PURCHASE_PRICE = 1000;
 
     private boolean sterilised = false;
     private int cooldownTurnsRemaining;
@@ -102,5 +106,57 @@ public class FirstAidKit extends Item implements Sterilisable {
     @Override
     public void sterilise() {
         this.sterilised = true;
+    }
+
+    /**
+     * Get the purchase price of the first aid kit.
+     *
+     * @return purchase price in credits
+     */
+    @Override
+    public int getPurchasePrice() {
+        return PURCHASE_PRICE;
+    }
+
+    /**
+     * Create a new first aid kit after purchase.
+     *
+     * @return purchased first aid kit
+     */
+    @Override
+    public Item createPurchasedItem() {
+        return new FirstAidKit();
+    }
+
+    /**
+     * Apply the successful purchase effect.
+     * First Aid Kit has no extra effect when successfully purchased.
+     *
+     * @param buyer the actor buying this item
+     * @param map the map where the transaction happens
+     * @param terminalLocation the location of the Supercomputer
+     * @param wallet the buyer's wallet
+     * @return result description
+     */
+    @Override
+    public String onPurchased(Actor buyer, GameMap map, Location terminalLocation, Wallet wallet) {
+        return "";
+    }
+
+    /**
+     * Apply the failed purchase effect.
+     * Trying to buy a First Aid Kit without enough credits kills the buyer.
+     *
+     * @param buyer the actor attempting to buy this item
+     * @param map the map where the transaction happens
+     * @return result description
+     */
+    @Override
+    public String onInsufficientCredits(Actor buyer, GameMap map) {
+        buyer.hurt(buyer.getStatistic(ActorStatistics.HEALTH));
+
+        return buyer + " attempts to buy a First Aid Kit without enough credits."
+                + "\nThe Supercomputer is deeply upset and kills " + buyer + " on the spot."
+                + "\n" + buyer.unconscious(map);
     }
 }

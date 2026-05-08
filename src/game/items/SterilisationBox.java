@@ -7,15 +7,24 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import game.actions.SteriliseAction;
+import game.economy.Wallet;
 import game.enums.Ability;
 import game.enums.ItemStatistics;
+import game.interfaces.Purchasable;
 import game.interfaces.Sterilisable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * A portable sterilisation box used to sterilise suitable targets.
  */
-public class SterilisationBox extends Item {
+public class SterilisationBox extends Item implements Purchasable {
     private static final int WEIGHT = 7;
+    private static final int PURCHASE_PRICE = 750;
+
+    private final Random random = new Random();
 
     public SterilisationBox() {
         super("Sterilisation Box", '▣');
@@ -59,5 +68,63 @@ public class SterilisationBox extends Item {
         }
 
         return actions;
+    }
+
+    /**
+     * Get the purchase price of the sterilisation box.
+     *
+     * @return purchase price in credits
+     */
+    @Override
+    public int getPurchasePrice() {
+        return PURCHASE_PRICE;
+    }
+
+    /**
+     * Create a new sterilisation box after purchase.
+     *
+     * @return purchased sterilisation box
+     */
+    @Override
+    public Item createPurchasedItem() {
+        return new SterilisationBox();
+    }
+
+    /**
+     * Apply the successful purchase effect.
+     * One random item from the buyer's inventory is permanently erased.
+     *
+     * @param buyer the actor buying this item
+     * @param map the map where the transaction happens
+     * @param terminalLocation the location of the Supercomputer
+     * @param wallet the buyer's wallet
+     * @return result description
+     */
+    @Override
+    public String onPurchased(Actor buyer, GameMap map, Location terminalLocation, Wallet wallet) {
+        List<Item> carriedItems = new ArrayList<>(buyer.getInventory().getItems());
+
+        if (carriedItems.isEmpty()) {
+            return "The Sterilisation Box emits radiation, but there is no item to erase.";
+        }
+
+        Item erasedItem = carriedItems.get(random.nextInt(carriedItems.size()));
+        buyer.getInventory().remove(erasedItem);
+
+        return "The Sterilisation Box emits intense radiation and permanently erases "
+                + erasedItem + " from " + buyer + "'s inventory.";
+    }
+
+    /**
+     * Apply the failed purchase effect.
+     * Sterilisation Box has no special insufficient-credit punishment.
+     *
+     * @param buyer the actor attempting to buy this item
+     * @param map the map where the transaction happens
+     * @return result description
+     */
+    @Override
+    public String onInsufficientCredits(Actor buyer, GameMap map) {
+        return buyer + " does not have enough credits to buy a Sterilisation Box.";
     }
 }
