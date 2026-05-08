@@ -12,7 +12,29 @@ import edu.monash.fit2099.engine.items.Item;
  * @author Adrian Kristanto
  */
 public class AccessCard extends Item {
-    public AccessCard() {
+    private ClearanceLevel clearanceLevel;
+
+    /**
+     * Constructor for AccessCard with a specified clearance level.
+     * @param clearanceLevel the clearance level this card grants
+     */
+    public AccessCard(ClearanceLevel clearanceLevel) {
         super("Access Card", '▤');
+        this.clearanceLevel = clearanceLevel;
+    }
+
+    /**
+     * Default constructor with LEVEL_1 clearance.
+     */
+    public AccessCard() {
+        this(ClearanceLevel.LEVEL_1);
+    }
+
+    /**
+     * Get the clearance level of this access card.
+     * @return the clearance level
+     */
+    public ClearanceLevel getClearanceLevel() {
+        return clearanceLevel;
     }
 }
