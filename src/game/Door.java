@@ -7,13 +7,33 @@ import edu.monash.fit2099.engine.positions.Ground;
  * Its primary purpose in the universe is to halt the progress of underpaid
  * {@code ContractedWorker}s until they can produce the correct rectangular
  * piece of plastic.
+ * 
+ * This is now an abstract class that requires subclasses to implement
+ * the required clearance level and unlock behavior.
  */
-public class Door extends Ground {
-    boolean isUnlocked = false;
+public abstract class Door extends Ground {
+    protected boolean isUnlocked = false;
 
-    public Door() {
-        super('=', "Door");
+    /**
+     * Constructor for Door.
+     * @param displayChar the character to display
+     * @param name the name of the door
+     */
+    public Door(char displayChar, String name) {
+        super(displayChar, name);
     }
+
+    /**
+     * Get the clearance level required to open this door.
+     * @return the required ClearanceLevel
+     */
+    public abstract ClearanceLevel getRequiredClearance();
+
+    /**
+     * Execute the unlock effect of this door on the actor.
+     * @param actor the actor unlocking the door
+     */
+    public abstract void onUnlock(Actor actor);
 
     /**
      * if the door is unlocked, any actor can step into the door
