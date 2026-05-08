@@ -7,36 +7,25 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 
 /**
- * A poison status that damages an entity over multiple turns.
+ * A burn status that damages an entity over multiple turns.
  */
-public class PoisonStatus implements Status {
-    private static final int DEFAULT_DAMAGE_PER_TURN = 1;
-
+public class BurnStatus implements Status {
     private final int damagePerTurn;
     private int turnsRemaining;
 
     /**
-     * Constructor using the default poison damage.
+     * Constructor.
      *
-     * @param turnsRemaining number of turns the poison lasts
-     */
-    public PoisonStatus(int turnsRemaining) {
-        this(turnsRemaining, DEFAULT_DAMAGE_PER_TURN);
-    }
-
-    /**
-     * Constructor using a custom poison damage.
-     *
-     * @param turnsRemaining number of turns the poison lasts
+     * @param turnsRemaining number of turns the burn lasts
      * @param damagePerTurn damage dealt each turn
      */
-    public PoisonStatus(int turnsRemaining, int damagePerTurn) {
+    public BurnStatus(int turnsRemaining, int damagePerTurn) {
         this.turnsRemaining = turnsRemaining;
         this.damagePerTurn = damagePerTurn;
     }
 
     /**
-     * Apply poison damage and reduce the remaining duration.
+     * Apply burn damage and reduce the remaining duration.
      *
      * @param currEntity the entity affected by this status
      * @param location the location of the entity
@@ -50,9 +39,9 @@ public class PoisonStatus implements Status {
     }
 
     /**
-     * Check whether the poison is still active.
+     * Check whether the burn is still active.
      *
-     * @return true if the poison has turns remaining
+     * @return true if the burn has turns remaining
      */
     @Override
     public boolean isStatusActive() {

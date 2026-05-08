@@ -2,15 +2,19 @@ package game.items;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.economy.Wallet;
 import game.enums.Ability;
 import game.enums.ItemStatistics;
+import game.interfaces.Sellable;
 
 /**
  * A pack of cookies that can be consumed five times.
  */
-public class Cookies extends ConsumableItem {
+public class Cookies extends ConsumableItem implements Sellable {
     private static final int WEIGHT = 2;
     private static final int TOTAL_COOKIES = 5;
     private static final int HEAL_AMOUNT = 1;
@@ -115,6 +119,33 @@ public class Cookies extends ConsumableItem {
     @Override
     public boolean shouldRemoveAfterGroundConsume() {
         return remainingCookies == 0;
+    }
+
+    /**
+     * Get the selling price of the cookies.
+     * Each remaining cookie is worth 1 credit.
+     *
+     * @return selling price in credits
+     */
+    @Override
+    public int getSellPrice() {
+        return remainingCookies;
+    }
+
+    /**
+     * Apply the organic processing fee after selling cookies.
+     *
+     * @param seller the actor selling this item
+     * @param map the map where the transaction happens
+     * @param terminalLocation the location of the Supercomputer
+     * @param wallet the seller's wallet
+     * @return result description
+     */
+    @Override
+    public String onSold(Actor seller, GameMap map, Location terminalLocation, Wallet wallet) {
+        seller.hurt(remainingCookies);
+        return seller + " pays an organic processing fee and loses "
+                + remainingCookies + " health point(s).";
     }
 
     @Override
