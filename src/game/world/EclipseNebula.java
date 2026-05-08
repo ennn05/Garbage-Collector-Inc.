@@ -24,6 +24,7 @@ import game.items.Flask;
 import game.items.FloppyDisk;
 import game.items.Lantern;
 import game.items.SterilisationBox;
+import game.grounds.Supercomputer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -83,6 +84,8 @@ public class EclipseNebula extends World {
 
         GameMap moon99DeprecatedMap = new GameMap("99-Deprecated", groundCreator, moon99Deprecated);
         this.addGameMap(moon99DeprecatedMap);
+
+        moon99DeprecatedMap.at(5, 3).setGround(new Supercomputer());
 
         FacilityAlarmSystem.register(moon99DeprecatedMap); // each map register one alarm system
 
