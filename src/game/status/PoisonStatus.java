@@ -46,6 +46,10 @@ public class PoisonStatus implements Status {
         if (turnsRemaining > 0) {
             currEntity.modifyStatistic(ActorStatistics.HEALTH, StatisticOperations.DECREASE, damagePerTurn);
             turnsRemaining--;
+
+            System.out.println(currEntity + " suffers " + damagePerTurn
+                    + " poison damage. Poison has " + turnsRemaining
+                    + " turn(s) remaining.");
         }
     }
 

@@ -2,6 +2,7 @@ package game.utility;
 
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Fire;
+import game.interfaces.FireHazard;
 
 /**
  * Utility class for spawning fire around a location.
@@ -15,7 +16,9 @@ public class FireSpawner {
      */
     public void spawnAround(Location location) {
         for (Location surroundingLocation : location.getNearbyLocations(1)) {
-            if (!(surroundingLocation.getGround() instanceof Fire)) {
+            FireHazard fireHazard = surroundingLocation.getGroundAs(FireHazard.class);
+
+            if (fireHazard == null) {
                 surroundingLocation.setGround(new Fire(surroundingLocation.getGround()));
             }
         }

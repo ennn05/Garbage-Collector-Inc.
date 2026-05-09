@@ -35,6 +35,10 @@ public class BurnStatus implements Status {
         if (turnsRemaining > 0) {
             currEntity.modifyStatistic(ActorStatistics.HEALTH, StatisticOperations.DECREASE, damagePerTurn);
             turnsRemaining--;
+
+            System.out.println(currEntity + " suffers " + damagePerTurn
+                    + " burn damage. Burn has " + turnsRemaining
+                    + " turn(s) remaining.");
         }
     }
 

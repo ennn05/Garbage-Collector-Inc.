@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.grounds.Fire;
+import game.interfaces.FireHazard;
 import game.interfaces.Sellable;
 import game.status.BurnStatus;
 import game.utility.FireSpawner;
@@ -60,13 +61,15 @@ public class Lantern extends Item implements Sellable {
             return;
         }
 
-        if (currentLocation.getGround() instanceof Fire) {
+        FireHazard fireHazard = currentLocation.getGroundAs(FireHazard.class);
+        if (fireHazard != null) {
             return;
         }
 
         if (random.nextInt(100) < LEAK_CHANCE_PERCENT) {
             oilFuel--;
             currentLocation.setGround(new Fire(currentLocation.getGround()));
+            System.out.println(actor + "'s Lantern leaks oil and creates fire. Oil remaining: " + oilFuel + ".");
         }
     }
 

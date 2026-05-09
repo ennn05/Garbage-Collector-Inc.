@@ -3,11 +3,12 @@ package game.grounds;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.FireHazard;
 
 /**
  * A temporary fire that burns actors standing on it and disappears after a few turns.
  */
-public class Fire extends Ground {
+public class Fire extends Ground implements FireHazard {
     private static final int FIRE_DURATION = 5;
     private static final int DAMAGE_PER_TURN = 1;
 
@@ -31,12 +32,18 @@ public class Fire extends Ground {
         if (location.containsAnActor()) {
             Actor actor = location.getActor();
             actor.hurt(DAMAGE_PER_TURN);
+            System.out.println(actor + " is burned by fire for " + DAMAGE_PER_TURN + " damage.");
         }
 
         turnsRemaining--;
 
+        if (turnsRemaining > 0) {
+            System.out.println("Fire at " + location + " has " + turnsRemaining + " turn(s) remaining.");
+        }
+
         if (turnsRemaining <= 0) {
             location.setGround(previousGround);
+            System.out.println("Fire at " + location + " has disappeared.");
         }
     }
 }
