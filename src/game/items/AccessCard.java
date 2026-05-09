@@ -8,14 +8,16 @@ import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import game.economy.Wallet;
 import game.enums.AccessLevel;
 import game.enums.ItemStatistics;
+import game.interfaces.DoorUnlocker;
 import game.interfaces.Purchasable;
+import game.interfaces.Unlockable;
 
 import java.util.Random;
 
 /**
  * A portable access card with a security clearance level.
  */
-public class AccessCard extends Item implements Purchasable {
+public class AccessCard extends Item implements Purchasable, DoorUnlocker {
     private static final int LEVEL_1_PRICE = 50;
     private static final int LEVEL_2_PRICE = 100;
     private static final int LEVEL_3_PRICE = 200;
@@ -53,6 +55,31 @@ public class AccessCard extends Item implements Purchasable {
      */
     public AccessLevel getLevel() {
         return level;
+    }
+
+    /**
+     * Check whether this card can unlock the given target.
+     * For REQ1, all access cards can unlock current unlockable targets.
+     * More detailed clearance checks can be added in REQ2.
+     *
+     * @param unlockable the target to be unlocked
+     * @return true if the target is locked and can be unlocked
+     */
+    @Override
+    public boolean canUnlock(Unlockable unlockable) {
+        return unlockable != null && !unlockable.isUnlocked();
+    }
+
+    /**
+     * Unlock the given target.
+     *
+     * @param unlockable the target to be unlocked
+     */
+    @Override
+    public void unlock(Unlockable unlockable) {
+        if (canUnlock(unlockable)) {
+            unlockable.unlock();
+        }
     }
 
     /**

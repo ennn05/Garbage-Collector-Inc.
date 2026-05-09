@@ -7,7 +7,6 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.displays.Menu;
 import edu.monash.fit2099.engine.items.Inventory;
-import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -16,9 +15,9 @@ import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
+import game.interfaces.DoorUnlocker;
 import game.interfaces.Drinkable;
 import game.interfaces.Unlockable;
-import game.items.AccessCard;
 import game.world.FacilityAlarmSystem;
 
 /**
@@ -46,11 +45,33 @@ public class ContractedWorker extends Actor implements WalletHolder {
     }
 
     /**
+     * Check whether a door unlocker can unlock a nearby unlockable ground.
+     *
+     * @param doorUnlocker the item that can unlock doors
+     * @param map the map containing the actor
+     * @return true if there is a nearby locked unlockable ground that can be unlocked
+     */
+    private boolean canUnlockNearbyDoor(DoorUnlocker doorUnlocker, GameMap map) {
+        Location location = map.locationOf(this);
+
+        for (Exit exit : location.getExits()) {
+            Location surroundingLocation = exit.getDestination();
+            Unlockable unlockable = surroundingLocation.getGroundAs(Unlockable.class);
+
+            if (unlockable != null && doorUnlocker.canUnlock(unlockable)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * The playTurn method checks whether the current actor is unconscious due to environmental hazards.
-     * Next, it will check if the player is carrying an access card. If so, they can open nearby unlockable grounds.
-     * If a drinkable item is available in the inventory, the player will be able to drink from it.
-     * Additionally, it will also handle multi-turn actions by getting the subsequent action returned by the previous action.
-     * Finally, it adds all possible actions that the actor can perform in the current turn and show it on the
+     * Next, it checks whether the actor is carrying an item that can unlock nearby unlockable grounds.
+     * If a drinkable item is available in the inventory, the actor will be able to drink from it.
+     * Additionally, it handles multi-turn actions by getting the subsequent action returned by the previous action.
+     * Finally, it adds all possible actions that the actor can perform in the current turn and shows them on the
      * console menu for the player to choose.
      *
      * @param actions collection of possible Actions for this Actor
@@ -66,28 +87,13 @@ public class ContractedWorker extends Actor implements WalletHolder {
             return new DoNothingAction();
         }
 
-        boolean isAccessCardAvailable = false;
-        for (Item item : this.getInventory().getItems()) {
-            if (item instanceof AccessCard) {
-                isAccessCardAvailable = true;
-                break;
-            }
-        }
+        FacilityAlarmSystem alarmSystem = FacilityAlarmSystem.forMap(map);
 
-        if (isAccessCardAvailable) {
-            FacilityAlarmSystem alarmSystem = FacilityAlarmSystem.forMap(map);
-
-            if (alarmSystem == null || alarmSystem.canDoorsBeUnlocked()) {
-                Location location = map.locationOf(this);
-
-                for (Exit exit : location.getExits()) {
-                    Location surroundingLocation = exit.getDestination();
-                    Unlockable unlockable = surroundingLocation.getGroundAs(Unlockable.class);
-
-                    if (unlockable != null && !unlockable.isUnlocked()) {
-                        actions.add(new UnlockDoorAction());
-                        break;
-                    }
+        if (alarmSystem == null || alarmSystem.canDoorsBeUnlocked()) {
+            for (DoorUnlocker doorUnlocker : this.getInventory().getItemsAs(DoorUnlocker.class)) {
+                if (canUnlockNearbyDoor(doorUnlocker, map)) {
+                    actions.add(new UnlockDoorAction(doorUnlocker));
+                    break;
                 }
             }
         }

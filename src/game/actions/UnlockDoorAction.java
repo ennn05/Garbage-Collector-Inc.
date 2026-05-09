@@ -5,16 +5,27 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.DoorUnlocker;
 import game.interfaces.Unlockable;
 import game.world.FacilityAlarmSystem;
 
 /**
- * The bureaucratic process of asking a piece of the environment for permission to pass.
+ * An action that unlocks a nearby unlockable ground using a door unlocker.
  */
 public class UnlockDoorAction extends Action {
+    private final DoorUnlocker doorUnlocker;
 
     /**
-     * When executed, it will search for a nearby locked unlockable ground and unlock it.
+     * Constructor.
+     *
+     * @param doorUnlocker the object used to unlock a door
+     */
+    public UnlockDoorAction(DoorUnlocker doorUnlocker) {
+        this.doorUnlocker = doorUnlocker;
+    }
+
+    /**
+     * When executed, it searches for a nearby locked unlockable ground and unlocks it.
      *
      * @param actor The actor performing the action.
      * @param map The map the actor is on.
@@ -35,19 +46,17 @@ public class UnlockDoorAction extends Action {
             Location surroundingLocation = exit.getDestination();
             Unlockable unlockable = surroundingLocation.getGroundAs(Unlockable.class);
 
-            if (unlockable != null) {
-                if (!unlockable.isUnlocked()) {
-                    unlockable.unlock();
-                    return actor + " unlocked " + surroundingLocation.getGround() + " at " + surroundingLocation;
-                }
+            if (unlockable != null && doorUnlocker.canUnlock(unlockable)) {
+                doorUnlocker.unlock(unlockable);
+                return actor + " unlocked " + surroundingLocation.getGround() + " at " + surroundingLocation;
             }
         }
 
-        return "There is no locked door to unlock.";
+        return "There is no locked door this item can unlock.";
     }
 
     @Override
     public String menuDescription(Actor actor) {
-        return actor + " unlocks door";
+        return actor + " unlocks a nearby door";
     }
 }
