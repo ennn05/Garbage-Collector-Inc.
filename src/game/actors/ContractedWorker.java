@@ -16,9 +16,9 @@ import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
+import game.interfaces.Drinkable;
 import game.interfaces.Unlockable;
 import game.items.AccessCard;
-import game.items.Flask;
 import game.world.FacilityAlarmSystem;
 
 /**
@@ -48,7 +48,7 @@ public class ContractedWorker extends Actor implements WalletHolder {
     /**
      * The playTurn method checks whether the current actor is unconscious due to environmental hazards.
      * Next, it will check if the player is carrying an access card. If so, they can open nearby unlockable grounds.
-     * If the flask is available in the inventory, the player will be able to consume its content.
+     * If a drinkable item is available in the inventory, the player will be able to drink from it.
      * Additionally, it will also handle multi-turn actions by getting the subsequent action returned by the previous action.
      * Finally, it adds all possible actions that the actor can perform in the current turn and show it on the
      * console menu for the player to choose.
@@ -92,16 +92,11 @@ public class ContractedWorker extends Actor implements WalletHolder {
             }
         }
 
-        boolean canConsumeFlask = false;
-        for (Item item : this.getInventory().getItems()) {
-            if (item instanceof Flask flask && flask.hasUsesRemaining()) {
-                canConsumeFlask = true;
+        for (Drinkable drinkable : this.getInventory().getItemsAs(Drinkable.class)) {
+            if (drinkable.canDrink()) {
+                actions.add(new ConsumeFlaskAction(drinkable));
                 break;
             }
-        }
-
-        if (canConsumeFlask) {
-            actions.add(new ConsumeFlaskAction());
         }
 
         if (lastAction.getNextAction() != null) {
