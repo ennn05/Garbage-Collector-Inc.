@@ -50,7 +50,8 @@ public class Supercomputer extends Ground {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
 
-        if (!(actor instanceof WalletHolder)) {
+        WalletHolder walletHolder = actor.asCapability(WalletHolder.class).orElse(null);
+        if (walletHolder == null) {
             return actions;
         }
 

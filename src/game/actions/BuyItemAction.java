@@ -34,11 +34,12 @@ public class BuyItemAction extends TransactionAction {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        if (!hasWallet(actor)) {
+        Wallet wallet = getWallet(actor);
+
+        if (wallet == null) {
             return noWalletMessage(actor);
         }
 
-        Wallet wallet = getWallet(actor);
         int price = purchasable.getPurchasePrice();
 
         if (!wallet.canAfford(price)) {
