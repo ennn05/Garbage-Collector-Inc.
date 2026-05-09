@@ -37,7 +37,9 @@ public class SellItemAction extends TransactionAction {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        if (!hasWallet(actor)) {
+        Wallet wallet = getWallet(actor);
+
+        if (wallet == null) {
             return noWalletMessage(actor);
         }
 
@@ -45,7 +47,6 @@ public class SellItemAction extends TransactionAction {
             return actor + " is no longer carrying " + item + ".";
         }
 
-        Wallet wallet = getWallet(actor);
         int sellingPrice = sellable.getSellPrice();
 
         if (!actor.getInventory().remove(item)) {

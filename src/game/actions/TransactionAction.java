@@ -11,24 +11,19 @@ import game.economy.WalletHolder;
 public abstract class TransactionAction extends Action {
 
     /**
-     * Check whether the actor can participate in a wallet transaction.
-     *
-     * @param actor the actor performing the transaction
-     * @return true if the actor owns a wallet
-     */
-    protected boolean hasWallet(Actor actor) {
-        return actor instanceof WalletHolder;
-    }
-
-    /**
      * Get the wallet owned by the actor.
-     * This method should only be called after hasWallet(actor) returns true.
+     * This uses WalletHolder capability instead of checking a concrete actor class.
      *
      * @param actor the actor performing the transaction
-     * @return the actor's wallet
+     * @return the actor's wallet, or null if the actor has no wallet
      */
     protected Wallet getWallet(Actor actor) {
-        WalletHolder walletHolder = (WalletHolder) actor;
+        WalletHolder walletHolder = actor.asCapability(WalletHolder.class).orElse(null);
+
+        if (walletHolder == null) {
+            return null;
+        }
+
         return walletHolder.getWallet();
     }
 
