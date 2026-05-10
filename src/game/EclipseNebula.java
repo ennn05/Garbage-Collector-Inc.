@@ -28,7 +28,13 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('#', Wall::new);
         groundCreator.registerGround('~', Puddle::new);
         groundCreator.registerGround('_', Floor::new);
-        groundCreator.registerGround('=', Door::new);
+        groundCreator.registerGround('=', AluminiumDoor::new);
+        groundCreator.registerGround('N', IronDoor::new);
+        groundCreator.registerGround('M', TitaniumDoor::new);
+        groundCreator.registerGround('≈', ToxicWaste::new);
+        groundCreator.registerGround('Φ', TeleportationTube::new);
+        groundCreator.registerGround('◎', MagicCircle::new);
+        groundCreator.registerGround('◈', Floor::new); // AlienCube placed as items, not grounds
 
         List<String> moon99Deprecated = Arrays.asList(
                 "....................########################################",
@@ -56,7 +62,64 @@ public class EclipseNebula extends World {
         GameMap moon99DeprecatedMap = new GameMap("99-Deprecated", groundCreator, moon99Deprecated);
         this.addGameMap(moon99DeprecatedMap);
 
-        moon99DeprecatedMap.at(7, 2).addItem(new AccessCard());
+        // Starting AccessCard with LEVEL_1 clearance
+        moon99DeprecatedMap.at(7, 2).addItem(new AccessCard(ClearanceLevel.LEVEL_1));
+
+        // Set up TeleportationTube in the ship (if present - located around position 5,3)
+        // Find and configure the tube if it exists
+        if (moon99DeprecatedMap.at(5, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube tube99 = (TeleportationTube) moon99DeprecatedMap.at(5, 3).getGround();
+            // Add destinations (same map and cross-map when 20-overflow is created)
+            tube99.addDestination(moon99DeprecatedMap.at(7, 3));
+            tube99.addDestination(moon99DeprecatedMap.at(9, 3));
+        }
+
+        // Create 20-overflow map
+        List<String> moon20Overflow = Arrays.asList(
+                ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
+                "...#######...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈##################≈≈≈≈≈≈≈",
+                "...#≡____#...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈#________________#≈≈≈≈≈≈≈",
+                "...#__Φ__=...........≈≈≈≈≈≈≈≈#######_______◈________#≈≈≈≈≈≈≈",
+                "...#_____#...........≈≈≈≈≈≈≈≈#_____=________________#≈≈≈≈≈≈≈",
+                "...#######...≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_◎___###########=######≈≈≈≈≈≈≈",
+                ".............≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_____#≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈#########=#####≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈#_____________#≈≈≈≈≈≈≈≈≈#___◎__#≈≈≈≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈#______o______#≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
+                ".............≈≈≈≈≈≈≈≈######=########≈≈≈≈≈≈≈≈≈####=###≈≈≈≈≈≈≈",
+                "...≈≈≈≈≈≈≈≈≈.≈≈≈≈≈≈≈≈≈≈≈≈≈#_#≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_#≈≈≈≈≈≈≈≈≈",
+                "...≈≈≈≈≈≈≈≈≈.≈≈≈≈≈≈≈≈≈≈≈≈≈#_#≈≈≈≈≈###############_#######≈≈≈",
+                ".............≈≈≈≈≈≈≈≈≈≈≈≈≈#_____________________________#≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈≈≈≈≈≈#_______=__________◈__≈≈≈≈____#≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈≈≈≈≈≈#___◎___#_____________≈≈≈≈≈≈__≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈≈≈≈≈≈######################≈≈≈≈≈≈≈≈≈≈≈≈",
+                ".............≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
+                ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
+                ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
+        );
+
+        GameMap moon20OverflowMap = new GameMap("20-Overflow", groundCreator, moon20Overflow);
+        this.addGameMap(moon20OverflowMap);
+
+        // Place AlienCubes (◈ positions)
+        moon20OverflowMap.at(33, 3).addItem(new AlienCube());
+        moon20OverflowMap.at(28, 14).addItem(new AlienCube());
+
+        // Set up cross-map TeleportationTube destinations
+        if (moon99DeprecatedMap.at(5, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube tube99 = (TeleportationTube) moon99DeprecatedMap.at(5, 3).getGround();
+            // Add cross-map destination
+            tube99.addDestination(moon20OverflowMap.at(3, 3));
+        }
+
+        if (moon20OverflowMap.at(6, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube tube20 = (TeleportationTube) moon20OverflowMap.at(6, 3).getGround();
+            // Add within-map destinations
+            tube20.addDestination(moon20OverflowMap.at(8, 9));
+            tube20.addDestination(moon20OverflowMap.at(5, 14));
+            // Add cross-map destination
+            tube20.addDestination(moon99DeprecatedMap.at(7, 3));
+        }
 
         Inventory inventory1 = new BasicInventory();
         inventory1.add(new Flask());
