@@ -114,7 +114,7 @@ public class TeleportationTube extends Ground implements Teleportable {
     /**
      * Get all locations in a map for random destination selection.
      * @param map the game map
-     * @return list of all locations in the map
+     * @return list of all traversable locations in the map
      */
     private List<Location> getAllLocationInMap(GameMap map) {
         List<Location> allLocations = new ArrayList<>();
@@ -122,7 +122,7 @@ public class TeleportationTube extends Ground implements Teleportable {
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 Location loc = map.at(x, y);
-                if (loc != null && loc.canActorEnter(null)) {
+                if (loc != null && loc.getGround() instanceof Floor) {
                     allLocations.add(loc);
                 }
             }

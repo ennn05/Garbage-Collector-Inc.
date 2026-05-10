@@ -65,30 +65,27 @@ public class MagicCircle extends Ground implements Teleportable {
             circles.remove(thisLocation);
         }
         
-        return circles;
+        // Return only 1 randomly-selected destination
+        List<Location> result = new ArrayList<>();
+        if (!circles.isEmpty()) {
+            result.add(circles.get(random.nextInt(circles.size())));
+        }
+        return result;
     }
 
     /**
-     * When teleported via MagicCircle, randomly pick one destination from the list
-     * (actor has no choice) and spawn a Flask on an adjacent empty tile.
+     * When teleported via MagicCircle, spawn a Flask on an adjacent empty tile.
+     * Note: The destination is already randomly selected by getDestinations() and the actor
+     * has already been moved by DestinationChoiceAction.execute().
      * @param actor the actor being teleported
      * @param source the source location
-     * @param destination the destination location (first in the list if multiple)
+     * @param destination the destination location (already randomly selected and actor moved here)
      * @param map the current game map
      */
     @Override
     public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
-        // Get all possible destinations and randomly pick one
-        List<Location> allCircles = getDestinations(map);
-        if (!allCircles.isEmpty()) {
-            Location randomDestination = allCircles.get(random.nextInt(allCircles.size()));
-            
-            // Move actor to the randomly selected circle (not the initially passed destination)
-            map.moveActor(actor, randomDestination);
-            
-            // Spawn a Flask on an adjacent empty tile
-            spawnFlaskOnAdjacentTile(randomDestination, map);
-        }
+        // Spawn a Flask on an adjacent empty tile at the destination
+        spawnFlaskOnAdjacentTile(destination, map);
     }
 
     /**
