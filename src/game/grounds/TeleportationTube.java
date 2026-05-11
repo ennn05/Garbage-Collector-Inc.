@@ -116,8 +116,8 @@ public class TeleportationTube extends Ground implements Teleportable {
      */
     private List<Location> getAllLocationInMap(GameMap map) {
         List<Location> allLocations = new ArrayList<>();
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
+        for (int x : map.getXRange()) {
+            for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
                 if (loc != null && loc.getGround() instanceof Floor) {
                     allLocations.add(loc);

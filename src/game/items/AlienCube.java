@@ -26,7 +26,8 @@ public class AlienCube extends Item implements Teleportable {
      * Constructor for AlienCube.
      */
     public AlienCube() {
-        super("Alien Cube", 'Ã', true, 3);
+        super("Alien Cube", 'Ã');
+        this.makePortable();
     }
 
     /**
@@ -40,8 +41,8 @@ public class AlienCube extends Item implements Teleportable {
         List<Location> validDestinations = new ArrayList<>();
         
         // Collect all valid destination tiles (Floor)
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
+        for (int x : map.getXRange()) {
+            for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
                 if (loc != null && loc.getGround() instanceof game.grounds.Floor) {
                     validDestinations.add(loc);

@@ -52,12 +52,11 @@ public class TeleportAction extends Action {
     }
 
     /**
-     * Override getAlternativeActions to present destination choices as a menu.
+     * Provide alternative actions to present destination choices as a menu.
      * @param actor the actor performing the action
      * @param map the current game map
      * @return a list of actions for each available destination
      */
-    @Override
     public List<Action> getAlternativeActions(Actor actor, GameMap map) {
         List<Action> actions = new ArrayList<>();
         Location currentLocation = map.locationOf(actor);

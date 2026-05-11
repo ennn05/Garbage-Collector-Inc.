@@ -40,8 +40,8 @@ public class MagicCircle extends Ground implements Teleportable {
         List<Location> circles = new ArrayList<>();
         
         // Find all magic circle locations on the map
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
+        for (int x : map.getXRange()) {
+            for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
                 if (loc != null && loc.getGround() instanceof MagicCircle) {
                     circles.add(loc);
@@ -51,8 +51,8 @@ public class MagicCircle extends Ground implements Teleportable {
         
         // Remove this circle if it's in the list
         Location thisLocation = null;
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
+        for (int x : map.getXRange()) {
+            for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
                 if (loc != null && loc.getGround() == this) {
                     thisLocation = loc;
@@ -93,10 +93,11 @@ public class MagicCircle extends Ground implements Teleportable {
      * Get actions available at this location.
      * @param actor the actor
      * @param location the location of this ground
+     * @param direction the direction of this ground from the actor
      * @return action list containing TeleportAction
      */
     @Override
-    public ActionList allowableActions(Actor actor, Location location) {
+    public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
         actions.add(new TeleportAction(this));
         return actions;
