@@ -61,8 +61,8 @@ public class TeleportationTube extends Ground implements Teleportable {
 
         // 50% chance of malfunction
         if (random.nextDouble() < 0.5) {
-            // Random destination within the destination map
-            List<Location> randomLocs = getAllLocationInMap(map);
+            // Random destination within the chosen destination map
+            List<Location> randomLocs = getAllLocationInMap(destination.map());
             if (!randomLocs.isEmpty()) {
                 finalDestination = randomLocs.get(random.nextInt(randomLocs.size()));
             }
@@ -82,7 +82,11 @@ public class TeleportationTube extends Ground implements Teleportable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
-        actions.add(new TeleportAction(this));
+        for (Location destination : getDestinations(location.map())) {
+            if (destination != null && destination.canActorEnter(actor)) {
+                actions.add(new TeleportAction(this, destination));
+            }
+        }
         return actions;
     }
 
@@ -104,7 +108,7 @@ public class TeleportationTube extends Ground implements Teleportable {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
             if (adjacent.getGround() instanceof Floor) {
-                adjacent.setGround(new Fire(new Floor()));
+                adjacent.setGround(new Fire(adjacent.getGround()));
             }
         }
     }
@@ -119,7 +123,7 @@ public class TeleportationTube extends Ground implements Teleportable {
         for (int x : map.getXRange()) {
             for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
-                if (loc != null && loc.getGround() instanceof Floor) {
+                if (loc != null && !loc.containsAnActor() && loc.getGround() instanceof Floor) {
                     allLocations.add(loc);
                 }
             }

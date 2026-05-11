@@ -8,8 +8,11 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.Exit;
-import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
+import game.actors.Undead;
+import game.economy.Wallet;
+import game.grounds.Floor;
+import game.interfaces.Sellable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,9 +21,9 @@ import java.util.Random;
  * An alien cube item that allows teleportation to 3 random locations on the map.
  * Each use by an actor randomly selects one of 3 possible destinations.
  */
-public class AlienCube extends Item implements Teleportable {
-    private List<Location> cachedDestinations = new ArrayList<>();
-    private Random random = new Random();
+public class AlienCube extends Item implements Teleportable, Sellable {
+    private static final int SELL_PRICE = 25;
+    private final Random random = new Random();
 
     /**
      * Constructor for AlienCube.
@@ -44,7 +47,7 @@ public class AlienCube extends Item implements Teleportable {
         for (int x : map.getXRange()) {
             for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
-                if (loc != null && loc.getGround() instanceof game.grounds.Floor) {
+                if (loc != null && !loc.containsAnActor() && loc.getGround() instanceof game.grounds.Floor) {
                     validDestinations.add(loc);
                 }
             }
@@ -89,17 +92,37 @@ public class AlienCube extends Item implements Teleportable {
         }
     }
 
-    /**
-     * Get actions available for the player using this item.
-     * @param actor the actor (presumed to be the player holding the item)
-     * @param location the location of the actor
-     * @return action list containing TeleportAction
-     */
     @Override
-    public ActionList allowableActions(Actor actor, Location location) {
+    public ActionList allowableActions(Actor owner, GameMap map) {
         ActionList actions = new ActionList();
-        actions.add(new TeleportAction(this));
+        for (Location destination : getDestinations(map)) {
+            if (destination != null && destination.canActorEnter(owner)) {
+                actions.add(new TeleportAction(this, destination));
+            }
+        }
         return actions;
+    }
+
+    @Override
+    public int getSellPrice() {
+        return SELL_PRICE;
+    }
+
+    @Override
+    public String onSold(Actor seller, GameMap map, Location terminalLocation, Wallet wallet) {
+        Location sellerLocation = map.locationOf(seller);
+        for (Exit exit : sellerLocation.getExits()) {
+            Location candidate = exit.getDestination();
+            if (!candidate.containsAnActor() && candidate.getGround() instanceof Floor) {
+                try {
+                    map.addActor(new Undead(), candidate);
+                    return "Reality shudders. An Undead emerges beside " + seller + ".";
+                } catch (Exception ignored) {
+                    break;
+                }
+            }
+        }
+        return "Reality warps briefly, but nothing manifests nearby.";
     }
 
     @Override

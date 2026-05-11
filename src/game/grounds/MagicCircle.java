@@ -43,7 +43,7 @@ public class MagicCircle extends Ground implements Teleportable {
         for (int x : map.getXRange()) {
             for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
-                if (loc != null && loc.getGround() instanceof MagicCircle) {
+                if (loc != null && !loc.containsAnActor() && loc.getGround() instanceof MagicCircle) {
                     circles.add(loc);
                 }
             }
@@ -99,7 +99,15 @@ public class MagicCircle extends Ground implements Teleportable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
-        actions.add(new TeleportAction(this));
+        // Random within-map teleportation: choose 1 destination circle now and expose a single action.
+        // If there are no other circles, no action is offered.
+        List<Location> destinations = getDestinations(location.map());
+        if (!destinations.isEmpty()) {
+            Location destination = destinations.get(0);
+            if (destination != null && destination.canActorEnter(actor)) {
+                actions.add(new TeleportAction(this, destination));
+            }
+        }
         return actions;
     }
 

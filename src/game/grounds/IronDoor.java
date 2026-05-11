@@ -44,7 +44,7 @@ public class IronDoor extends Door {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
             if (adjacent.getGround() instanceof Floor) {
-                adjacent.setGround(new Fire(new Floor()));
+                adjacent.setGround(new Fire(adjacent.getGround()));
             }
         }
     }

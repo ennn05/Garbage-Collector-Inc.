@@ -191,5 +191,12 @@ public class EclipseNebula extends World {
             // Can also teleport to 99-deprecated map if wanted
             mainTube.addDestination(moon99DeprecatedMap.at(30, 10));
         }
+
+        // Add a cross-map destination to the ship tube in 99-deprecated.
+        // This ensures the tubes support both within-map and between-maps movement.
+        if (moon99DeprecatedMap.at(7, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(7, 3).getGround();
+            ship99Tube.addDestination(overflow20Map.at(6, 3));
+        }
     }
 }
