@@ -105,8 +105,8 @@ public class EclipseNebula extends World {
         FacilityAlarmSystem.register(moon99DeprecatedMap); // each map register one alarm system
 
         // Set up Teleportation Tube in the ship with destinations
-        if (moon99DeprecatedMap.at(4, 3).getGround() instanceof TeleportationTube) {
-            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(4, 3).getGround();
+        if (moon99DeprecatedMap.at(7, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(7, 3).getGround();
             ship99Tube.addDestination(moon99DeprecatedMap.at(30, 10));
             ship99Tube.addDestination(moon99DeprecatedMap.at(45, 10));
         }

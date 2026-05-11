@@ -62,6 +62,13 @@ public class UnlockDoorAction extends Action {
                     // Execute the unlock
                     doorUnlocker.unlock(unlockable);
                     door.onUnlock(actor);
+                    
+                    // Handle special door effects
+                    if (door instanceof game.grounds.IronDoor) {
+                        game.grounds.IronDoor ironDoor = (game.grounds.IronDoor) door;
+                        ironDoor.setAdjacentTilesOnFire(surroundingLocation);
+                    }
+                    
                     return actor + " unlocked " + surroundingLocation.getGround() + " at " + surroundingLocation;
                 } else {
                     // For other unlockables, just unlock them

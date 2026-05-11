@@ -62,7 +62,7 @@ public class TeleportationTube extends Ground implements Teleportable {
         // 50% chance of malfunction
         if (random.nextDouble() < 0.5) {
             // Random destination within the destination map
-            List<Location> randomLocs = getAllLocationInMap(destination.map);
+            List<Location> randomLocs = getAllLocationInMap(map);
             if (!randomLocs.isEmpty()) {
                 finalDestination = randomLocs.get(random.nextInt(randomLocs.size()));
             }
@@ -76,10 +76,11 @@ public class TeleportationTube extends Ground implements Teleportable {
      * Get all actions available for an actor at this location.
      * @param actor the actor
      * @param location the location of this ground
+     * @param direction the direction of this ground from the actor
      * @return action list containing TeleportAction
      */
     @Override
-    public ActionList allowableActions(Actor actor, Location location) {
+    public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
         actions.add(new TeleportAction(this));
         return actions;
