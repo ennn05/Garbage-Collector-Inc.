@@ -13,9 +13,12 @@ import game.grounds.Floor;
 import game.grounds.Hole;
 import game.grounds.Puddle;
 import game.grounds.Trap;
-import game.grounds.Wall;
-import game.inventory.WeightLimitedInventory;
-import game.items.AccessCard;
+import game.grounds.AluminiumDoor;
+import game.grounds.IronDoor;
+import game.grounds.MagicCircle;
+import game.grounds.TeleportationTube;
+import game.grounds.TitaniumDoor;
+import game.grounds.ToxicWaste;
 import game.items.Apple;
 import game.items.Cookies;
 import game.items.CRTMonitor;
@@ -25,6 +28,16 @@ import game.items.FloppyDisk;
 import game.items.Lantern;
 import game.items.SterilisationBox;
 import game.grounds.Supercomputer;
+import game.inventory.WeightLimitedInventory;
+import game.items.AccessCard;
+import game.items.AlienCube;
+import game.enums.AccessLevel;
+import game.grounds.Wall;
+import game.flora.FleshySprout;
+import game.flora.FleshySapling;
+import game.flora.FleshyMatureTree;
+import game.flora.WarperSapling;
+import game.flora.WarperMatureTree;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,16 +67,31 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('#', Wall::new);
         groundCreator.registerGround('~', Puddle::new);
         groundCreator.registerGround('_', Floor::new);
-        groundCreator.registerGround('=', Door::new);
+        groundCreator.registerGround('=', AluminiumDoor::new);
         groundCreator.registerGround('^', () -> new Fire(new Floor()));
         groundCreator.registerGround('ò', Hole::new);
         groundCreator.registerGround('!', Trap::new);
+        
+        // REQ2 ground types
+        groundCreator.registerGround('≡', Supercomputer::new);
+        groundCreator.registerGround('≈', ToxicWaste::new);
+        groundCreator.registerGround('Φ', TeleportationTube::new);
+        groundCreator.registerGround('◎', MagicCircle::new);
+        groundCreator.registerGround('◈', Floor::new);  // Alien Cube marker - becomes Floor with item placed on it
+        groundCreator.registerGround('o', Floor::new);  // placeholder for 20-overflow structures
+
+        // REQ3 flora ground types
+        groundCreator.registerGround('y', FleshySprout::new);
+        groundCreator.registerGround('v', FleshySapling::new);
+        groundCreator.registerGround('Y', FleshyMatureTree::new);
+        groundCreator.registerGround('w', WarperSapling::new);
+        groundCreator.registerGround('W', WarperMatureTree::new);
 
         List<String> moon99Deprecated = Arrays.asList(
                 "....................########################################",
                 "...#######..........#__________________#___________________#",
                 "...#_____#..........=__________________=___________________#",
-                "...#_____=...~......#__________________#___________________#",
+                "...#___Φ_=...~......#__________________#___________________#",
                 "...#_____#..~~~.....########=#####=#####___#############___#",
                 "...#######.~~~~.....#______#_#_________#___#___________#___#",
                 ".........~~~~.......#______#_#_________#####___________#####",
@@ -89,7 +117,14 @@ public class EclipseNebula extends World {
 
         FacilityAlarmSystem.register(moon99DeprecatedMap); // each map register one alarm system
 
-        AccessCard accessCard = new AccessCard();
+        // Set up Teleportation Tube in the ship with destinations
+        if (moon99DeprecatedMap.at(7, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(7, 3).getGround();
+            ship99Tube.addDestination(moon99DeprecatedMap.at(30, 10));
+            ship99Tube.addDestination(moon99DeprecatedMap.at(45, 10));
+        }
+
+        AccessCard accessCard = new AccessCard(AccessLevel.LEVEL_1);
         FirstAidKit firstAidKit = new FirstAidKit();
         SterilisationBox sterilisationBox = new SterilisationBox();
 
@@ -122,5 +157,78 @@ public class EclipseNebula extends World {
         this.addPlayer(contractedWorker3, moon99DeprecatedMap.at(8, 2));
         this.addPlayer(contractedWorker4, moon99DeprecatedMap.at(6, 4));
         this.addPlayer(contractedWorker5, moon99DeprecatedMap.at(8, 4));
+        
+        // Create 20-Overflow map (20 rows x ~39 columns) - massive flooded factory complex
+        List<String> overflow20 = Arrays.asList(
+                ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
+                "...#######...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈##################≈≈≈≈≈≈≈",
+                "...#≡____#...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈#________________#≈≈≈≈≈≈≈",
+                "...#__Φ__=...........≈≈≈≈≈≈≈≈#######_______◈________#≈≈≈≈≈≈≈",
+                "...#_____#...........≈≈≈≈≈≈≈≈#_____=________________#≈≈≈≈≈≈≈",
+                "...#######...≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_◎___###########=######≈≈≈≈≈≈≈",
+                ".............≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_____#≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈#########=#####≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈#_____________#≈≈≈≈≈≈≈≈≈#___◎__#≈≈≈≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈#______o______#≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
+                ".............≈≈≈≈≈≈≈≈######=########≈≈≈≈≈≈≈≈≈####=###≈≈≈≈≈≈≈",
+                "...≈≈≈≈≈≈≈≈≈.≈≈≈≈≈≈≈≈≈≈≈≈≈#_#≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_#≈≈≈≈≈≈≈≈≈",
+                "...≈≈≈≈≈≈≈≈≈.≈≈≈≈≈≈≈≈≈≈≈≈≈#_#≈≈≈≈≈###############_#######≈≈≈",
+                ".............≈≈≈≈≈≈≈≈≈≈≈≈≈#_____________________________#≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈≈≈≈≈≈#_______=__________◈__≈≈≈≈____#≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈≈≈≈≈≈#___◎___#_____________≈≈≈≈≈≈__≈≈≈≈",
+                "....≈≈≈≈≈≈...≈≈≈≈≈≈≈≈≈≈≈≈≈######################≈≈≈≈≈≈≈≈≈≈≈≈",
+                ".............≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
+                ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
+                ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
+        );
+        
+        GameMap overflow20Map = new GameMap("20-Overflow", groundCreator, overflow20);
+        this.addGameMap(overflow20Map);
+        
+        FacilityAlarmSystem.register(overflow20Map);
+        
+        // Place Alien Cubes at marked locations (◈ in the map, but represented as items on Floor tiles)
+        // Row 3: one alien cube at approximately (17, 3)
+        overflow20Map.at(17, 3).addItem(new AlienCube());
+        // Row 14: one alien cube at approximately (18, 14)
+        overflow20Map.at(18, 14).addItem(new AlienCube());
+        
+        // Set up Teleportation Tube at (6, 3) with destinations
+        if (overflow20Map.at(6, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube mainTube = (TeleportationTube) overflow20Map.at(6, 3).getGround();
+            // Can teleport to various locations within the map
+            mainTube.addDestination(overflow20Map.at(15, 3));  // Right corridor
+            mainTube.addDestination(overflow20Map.at(15, 8));  // Center area
+            mainTube.addDestination(overflow20Map.at(15, 14)); // Lower area
+            // Can also teleport to 99-deprecated map if wanted
+            mainTube.addDestination(moon99DeprecatedMap.at(30, 10));
+        }
+
+        // REQ3: Populate the 20-Overflow moon with mutated flora (on dirt tiles)
+        overflow20Map.at(1, 0).setGround(new FleshySprout());
+        overflow20Map.at(5, 0).setGround(new FleshySprout());
+        overflow20Map.at(9, 0).setGround(new FleshySprout());
+        overflow20Map.at(1, 6).setGround(new FleshySprout());
+        overflow20Map.at(1, 10).setGround(new FleshySprout());
+
+        overflow20Map.at(13, 0).setGround(new FleshySapling());
+        overflow20Map.at(5, 6).setGround(new FleshySapling());
+
+        overflow20Map.at(17, 0).setGround(new FleshyMatureTree());
+        overflow20Map.at(9, 6).setGround(new FleshyMatureTree());
+
+        overflow20Map.at(1, 17).setGround(new WarperSapling());
+        overflow20Map.at(5, 17).setGround(new WarperSapling());
+        overflow20Map.at(1, 19).setGround(new WarperSapling());
+
+        overflow20Map.at(5, 19).setGround(new WarperMatureTree());
+        overflow20Map.at(9, 19).setGround(new WarperMatureTree());
+
+        // Add a cross-map destination to the ship tube in 99-deprecated.
+        // This ensures the tubes support both within-map and between-maps movement.
+        if (moon99DeprecatedMap.at(7, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(7, 3).getGround();
+            ship99Tube.addDestination(overflow20Map.at(6, 3));
+        }
     }
 }

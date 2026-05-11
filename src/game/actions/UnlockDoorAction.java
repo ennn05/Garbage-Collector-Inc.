@@ -5,8 +5,10 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.grounds.Door;
 import game.interfaces.DoorUnlocker;
 import game.interfaces.Unlockable;
+import game.items.AccessCard;
 import game.world.FacilityAlarmSystem;
 
 /**
@@ -47,12 +49,54 @@ public class UnlockDoorAction extends Action {
             Unlockable unlockable = surroundingLocation.getGroundAs(Unlockable.class);
 
             if (unlockable != null && doorUnlocker.canUnlock(unlockable)) {
-                doorUnlocker.unlock(unlockable);
-                return actor + " unlocked " + surroundingLocation.getGround() + " at " + surroundingLocation;
+                // For Doors, check clearance and execute unlock effects
+                if (unlockable instanceof Door) {
+                    Door door = (Door) unlockable;
+                    
+                    // Check if actor has a card with sufficient clearance
+                    AccessCard card = findAccessCard(actor, door);
+                    if (card == null) {
+                        return "Insufficient clearance to unlock " + surroundingLocation.getGround() + ".";
+                    }
+                    
+                    // Execute the unlock
+                    doorUnlocker.unlock(unlockable);
+                    door.onUnlock(actor);
+                    
+                    // Handle special door effects
+                    if (door instanceof game.grounds.IronDoor) {
+                        game.grounds.IronDoor ironDoor = (game.grounds.IronDoor) door;
+                        ironDoor.setAdjacentTilesOnFire(surroundingLocation);
+                    }
+                    
+                    return actor + " unlocked " + surroundingLocation.getGround() + " at " + surroundingLocation;
+                } else {
+                    // For other unlockables, just unlock them
+                    doorUnlocker.unlock(unlockable);
+                    return actor + " unlocked " + surroundingLocation.getGround() + " at " + surroundingLocation;
+                }
             }
         }
 
         return "There is no locked door this item can unlock.";
+    }
+
+    /**
+     * Find an access card in the actor's inventory with sufficient clearance for the door.
+     * @param actor the actor to check
+     * @param door the door that needs to be unlocked
+     * @return the access card with sufficient clearance, or null if not found
+     */
+    private AccessCard findAccessCard(Actor actor, Door door) {
+        for (Object item : actor.getInventory().getItems()) {
+            if (item instanceof AccessCard) {
+                AccessCard card = (AccessCard) item;
+                if (card.getLevel().getWeight() >= door.getRequiredClearance().getWeight()) {
+                    return card;
+                }
+            }
+        }
+        return null;
     }
 
     @Override

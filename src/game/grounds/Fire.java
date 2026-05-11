@@ -4,13 +4,17 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.FireHazard;
+import game.status.BurnStatus;
 
 /**
  * A temporary fire that burns actors standing on it and disappears after a few turns.
  */
 public class Fire extends Ground implements FireHazard {
-    private static final int FIRE_DURATION = 5;
-    private static final int DAMAGE_PER_TURN = 1;
+    private static final int FIRE_DURATION = 2;
+
+    // "Standard burn effect" used elsewhere in this codebase (e.g. Lantern sale).
+    private static final int BURN_TURNS = 3;
+    private static final int BURN_DAMAGE = 2;
 
     private final Ground previousGround;
     private int turnsRemaining;
@@ -31,8 +35,9 @@ public class Fire extends Ground implements FireHazard {
     public void tick(Location location) {
         if (location.containsAnActor()) {
             Actor actor = location.getActor();
-            actor.hurt(DAMAGE_PER_TURN);
-            System.out.println(actor + " is burned by fire for " + DAMAGE_PER_TURN + " damage.");
+            if (!actor.hasStatus(BurnStatus.class)) {
+                actor.addStatus(new BurnStatus(BURN_TURNS, BURN_DAMAGE));
+            }
         }
 
         turnsRemaining--;
@@ -43,7 +48,6 @@ public class Fire extends Ground implements FireHazard {
 
         if (turnsRemaining <= 0) {
             location.setGround(previousGround);
-            System.out.println("Fire at " + location + " has disappeared.");
         }
     }
 }
