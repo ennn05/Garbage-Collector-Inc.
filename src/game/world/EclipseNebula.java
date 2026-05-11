@@ -33,6 +33,11 @@ import game.items.AccessCard;
 import game.items.AlienCube;
 import game.enums.AccessLevel;
 import game.grounds.Wall;
+import game.flora.FleshySprout;
+import game.flora.FleshySapling;
+import game.flora.FleshyMatureTree;
+import game.flora.WarperSapling;
+import game.flora.WarperMatureTree;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,6 +79,13 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('◎', MagicCircle::new);
         groundCreator.registerGround('◈', Floor::new);  // Alien Cube marker - becomes Floor with item placed on it
         groundCreator.registerGround('o', Floor::new);  // placeholder for 20-overflow structures
+
+        // REQ3 flora ground types
+        groundCreator.registerGround('y', FleshySprout::new);
+        groundCreator.registerGround('v', FleshySapling::new);
+        groundCreator.registerGround('Y', FleshyMatureTree::new);
+        groundCreator.registerGround('w', WarperSapling::new);
+        groundCreator.registerGround('W', WarperMatureTree::new);
 
         List<String> moon99Deprecated = Arrays.asList(
                 "....................########################################",
@@ -191,6 +203,26 @@ public class EclipseNebula extends World {
             // Can also teleport to 99-deprecated map if wanted
             mainTube.addDestination(moon99DeprecatedMap.at(30, 10));
         }
+
+        // REQ3: Populate the 20-Overflow moon with mutated flora (on dirt tiles)
+        overflow20Map.at(1, 0).setGround(new FleshySprout());
+        overflow20Map.at(5, 0).setGround(new FleshySprout());
+        overflow20Map.at(9, 0).setGround(new FleshySprout());
+        overflow20Map.at(1, 6).setGround(new FleshySprout());
+        overflow20Map.at(1, 10).setGround(new FleshySprout());
+
+        overflow20Map.at(13, 0).setGround(new FleshySapling());
+        overflow20Map.at(5, 6).setGround(new FleshySapling());
+
+        overflow20Map.at(17, 0).setGround(new FleshyMatureTree());
+        overflow20Map.at(9, 6).setGround(new FleshyMatureTree());
+
+        overflow20Map.at(1, 17).setGround(new WarperSapling());
+        overflow20Map.at(5, 17).setGround(new WarperSapling());
+        overflow20Map.at(1, 19).setGround(new WarperSapling());
+
+        overflow20Map.at(5, 19).setGround(new WarperMatureTree());
+        overflow20Map.at(9, 19).setGround(new WarperMatureTree());
 
         // Add a cross-map destination to the ship tube in 99-deprecated.
         // This ensures the tubes support both within-map and between-maps movement.
