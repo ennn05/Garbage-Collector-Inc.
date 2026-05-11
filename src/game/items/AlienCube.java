@@ -2,10 +2,12 @@ package game.items;
 
 import game.interfaces.Teleportable;
 import game.actions.TeleportAction;
+import game.grounds.ToxicWaste;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class AlienCube extends Item implements Teleportable {
 
     /**
      * Handle teleportation side effects.
+     * Ripping a hole in reality corrupts all adjacent ground tiles to Toxic Waste.
      * @param actor the actor being teleported
      * @param source the source location
      * @param destination the destination location
@@ -67,8 +70,22 @@ public class AlienCube extends Item implements Teleportable {
      */
     @Override
     public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
-        // AlienCube has no special effects, just teleports the actor
-        // The teleportation itself is handled by the teleport action
+        // Corrupt all adjacent tiles at source location to Toxic Waste
+        corruptAdjacentTiles(source);
+    }
+
+    /**
+     * Turn all adjacent floor tiles to Toxic Waste.
+     * @param location the source location whose adjacent tiles to corrupt
+     */
+    private void corruptAdjacentTiles(Location location) {
+        for (Exit exit : location.getExits()) {
+            Location adjacent = exit.getDestination();
+            // Only corrupt floor-like tiles (not walls, etc.)
+            if (adjacent.getGround() instanceof game.grounds.Floor) {
+                adjacent.setGround(new ToxicWaste());
+            }
+        }
     }
 
     /**
