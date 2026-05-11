@@ -43,7 +43,8 @@ public class TeleportAction extends Action {
         }
         destinationMap.moveActor(actor, destination);
         device.onTeleport(actor, source, destination, map);
-        return actor + " teleported to " + destination;
+        Location finalLocation = destinationMap.locationOf(actor);
+        return actor + " teleported to " + finalLocation;
     }
 
     @Override

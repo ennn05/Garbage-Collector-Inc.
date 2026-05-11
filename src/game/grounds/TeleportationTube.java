@@ -68,6 +68,12 @@ public class TeleportationTube extends Ground implements Teleportable {
             }
         }
 
+        // If malfunction selected a different location, move the actor there.
+        // (At this point the actor has already been moved to the intended destination by TeleportAction.)
+        if (finalDestination != destination && finalDestination.canActorEnter(actor)) {
+            finalDestination.map().moveActor(actor, finalDestination);
+        }
+
         // Set adjacent tiles on fire
         setAdjacentTilesOnFire(finalDestination);
     }
