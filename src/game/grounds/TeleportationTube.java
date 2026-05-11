@@ -1,6 +1,6 @@
-package game;
+package game.grounds;
 
-import game.actions.Teleportable;
+import game.interfaces.Teleportable;
 import game.actions.TeleportAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
@@ -70,9 +70,6 @@ public class TeleportationTube extends Ground implements Teleportable {
 
         // Set adjacent tiles on fire
         setAdjacentTilesOnFire(finalDestination);
-
-        // Apply burn status to actor
-        actor.addCapability(new BurnStatus(2, 1));
     }
 
     /**
@@ -106,7 +103,7 @@ public class TeleportationTube extends Ground implements Teleportable {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
             if (adjacent.getGround() instanceof Floor) {
-                adjacent.setGround(new Fire(2));
+                adjacent.setGround(new Fire(new Floor()));
             }
         }
     }
@@ -118,7 +115,6 @@ public class TeleportationTube extends Ground implements Teleportable {
      */
     private List<Location> getAllLocationInMap(GameMap map) {
         List<Location> allLocations = new ArrayList<>();
-        // Get width and height from map
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 Location loc = map.at(x, y);

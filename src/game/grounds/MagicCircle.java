@@ -1,6 +1,6 @@
-package game;
+package game.grounds;
 
-import game.actions.Teleportable;
+import game.interfaces.Teleportable;
 import game.actions.TeleportAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
+import game.items.Flask;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -29,9 +30,10 @@ public class MagicCircle extends Ground implements Teleportable {
     }
 
     /**
-     * Get all other magic circles on the map (excluding this one).
+     * Get a single randomly-selected other magic circle on the map (excluding this one).
+     * Per REQ2, the game randomly teleports the actor - they have no choice.
      * @param map the current game map
-     * @return list of other magic circles on the map
+     * @return list with a single random magic circle, or empty list if none found
      */
     @Override
     public List<Location> getDestinations(GameMap map) {
@@ -49,7 +51,6 @@ public class MagicCircle extends Ground implements Teleportable {
         
         // Remove this circle if it's in the list
         Location thisLocation = null;
-        // We need to find which location has this ground object
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 Location loc = map.at(x, y);
@@ -85,7 +86,7 @@ public class MagicCircle extends Ground implements Teleportable {
     @Override
     public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
         // Spawn a Flask on an adjacent empty tile at the destination
-        spawnFlaskOnAdjacentTile(destination, map);
+        spawnFlaskOnAdjacentTile(destination);
     }
 
     /**
@@ -114,9 +115,8 @@ public class MagicCircle extends Ground implements Teleportable {
     /**
      * Spawn a Flask on an adjacent empty tile.
      * @param location the location to search for an adjacent empty tile
-     * @param map the current game map
      */
-    private void spawnFlaskOnAdjacentTile(Location location, GameMap map) {
+    private void spawnFlaskOnAdjacentTile(Location location) {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
             

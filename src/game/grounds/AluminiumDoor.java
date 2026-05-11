@@ -1,9 +1,11 @@
-package game;
+package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import game.enums.AccessLevel;
+import game.interfaces.Unlockable;
 
 /**
- * An aluminium door that requires Clearance Level 1 or higher to open.
+ * An aluminium door that requires Access Level 1 or higher to open.
  * When unlocked, it delivers a faulty electrical shock dealing 2 damage to the actor.
  */
 public class AluminiumDoor extends Door {
@@ -16,12 +18,12 @@ public class AluminiumDoor extends Door {
     }
 
     /**
-     * Get the required clearance level for this door.
-     * @return ClearanceLevel.LEVEL_1
+     * Get the required access level for this door.
+     * @return AccessLevel.LEVEL_1
      */
     @Override
-    public ClearanceLevel getRequiredClearance() {
-        return ClearanceLevel.LEVEL_1;
+    public AccessLevel getRequiredClearance() {
+        return AccessLevel.LEVEL_1;
     }
 
     /**
@@ -30,6 +32,6 @@ public class AluminiumDoor extends Door {
      */
     @Override
     public void onUnlock(Actor actor) {
-        actor.takeDamage(2);
+        actor.hurt(2);
     }
 }

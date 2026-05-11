@@ -1,8 +1,7 @@
-package game;
+package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 
 /**
@@ -24,13 +23,9 @@ public class ToxicWaste extends Ground {
      */
     @Override
     public void tick(Location location) {
-        // Deal damage to any actor on this tile
-        GameMap map = location.map;
-        if (map != null && map.isAnActorAt(location)) {
-            Actor actor = map.getActorAt(location);
-            if (actor != null) {
-                actor.takeDamage(1);
-            }
+        if (location.containsAnActor()) {
+            Actor actor = location.getActor();
+            actor.hurt(1);
         }
     }
 

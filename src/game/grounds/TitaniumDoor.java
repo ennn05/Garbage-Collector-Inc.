@@ -1,9 +1,10 @@
-package game;
+package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import game.enums.AccessLevel;
 
 /**
- * A titanium door that requires Clearance Level 3 to open.
+ * A titanium door that requires Access Level 3 to open.
  * When unlocked, it triggers a decontamination sequence that heals the actor for 5 health points.
  */
 public class TitaniumDoor extends Door {
@@ -16,12 +17,12 @@ public class TitaniumDoor extends Door {
     }
 
     /**
-     * Get the required clearance level for this door.
-     * @return ClearanceLevel.LEVEL_3
+     * Get the required access level for this door.
+     * @return AccessLevel.LEVEL_3
      */
     @Override
-    public ClearanceLevel getRequiredClearance() {
-        return ClearanceLevel.LEVEL_3;
+    public AccessLevel getRequiredClearance() {
+        return AccessLevel.LEVEL_3;
     }
 
     /**
