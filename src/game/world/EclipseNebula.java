@@ -62,7 +62,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('#', Wall::new);
         groundCreator.registerGround('~', Puddle::new);
         groundCreator.registerGround('_', Floor::new);
-        groundCreator.registerGround('=', Door::new);
+        groundCreator.registerGround('=', AluminiumDoor::new);
         groundCreator.registerGround('^', () -> new Fire(new Floor()));
         groundCreator.registerGround('ò', Hole::new);
         groundCreator.registerGround('!', Trap::new);
@@ -78,7 +78,7 @@ public class EclipseNebula extends World {
                 "....................########################################",
                 "...#######..........#__________________#___________________#",
                 "...#_____#..........=__________________=___________________#",
-                "...#_____=...~......#__________________#___________________#",
+                "...#___Φ_=...~......#__________________#___________________#",
                 "...#_____#..~~~.....########=#####=#####___#############___#",
                 "...#######.~~~~.....#______#_#_________#___#___________#___#",
                 ".........~~~~.......#______#_#_________#####___________#####",
@@ -104,7 +104,14 @@ public class EclipseNebula extends World {
 
         FacilityAlarmSystem.register(moon99DeprecatedMap); // each map register one alarm system
 
-        AccessCard accessCard = new AccessCard();
+        // Set up Teleportation Tube in the ship with destinations
+        if (moon99DeprecatedMap.at(4, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(4, 3).getGround();
+            ship99Tube.addDestination(moon99DeprecatedMap.at(30, 10));
+            ship99Tube.addDestination(moon99DeprecatedMap.at(45, 10));
+        }
+
+        AccessCard accessCard = new AccessCard(AccessLevel.LEVEL_1);
         FirstAidKit firstAidKit = new FirstAidKit();
         SterilisationBox sterilisationBox = new SterilisationBox();
 
