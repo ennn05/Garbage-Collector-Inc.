@@ -72,6 +72,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('≈', ToxicWaste::new);
         groundCreator.registerGround('Φ', TeleportationTube::new);
         groundCreator.registerGround('◎', MagicCircle::new);
+        groundCreator.registerGround('◈', Floor::new);  // Alien Cube marker - becomes Floor with item placed on it
         groundCreator.registerGround('o', Floor::new);  // placeholder for 20-overflow structures
 
         List<String> moon99Deprecated = Arrays.asList(
