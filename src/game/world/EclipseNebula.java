@@ -64,7 +64,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('_', Floor::new);
         groundCreator.registerGround('=', AluminiumDoor::new);
         groundCreator.registerGround('^', () -> new Fire(new Floor()));
-        groundCreator.registerGround('ò', Hole::new);
+        groundCreator.registerGround('o', Hole::new);
         groundCreator.registerGround('!', Trap::new);
         
         // REQ2 ground types
