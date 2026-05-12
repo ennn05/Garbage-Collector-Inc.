@@ -7,12 +7,10 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Parasite;
 import game.actors.Slime;
 import game.actors.Undead;
+import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A hole that periodically spawns moon creatures.
@@ -47,6 +45,7 @@ public class Hole extends Ground implements Spawner {
         try {
             if (!location.containsAnActor()) { // empty then generate
                 location.addActor(this.spawn(location));
+                Objects.requireNonNull(location.getActorAs(Spawnable.class)).spawnEffect(location);
                 if (random.nextDouble() < GROW_CHANCE) {
                     List<Location> adj = new ArrayList<>(location.getNearbyLocations(SPAWN_CHECK_RADIUS));
                     Collections.shuffle(adj); // shuffle for random adjacent
@@ -58,7 +57,7 @@ public class Hole extends Ground implements Spawner {
                     }
                 }
             }
-        } catch (GameEngineException e) {
+        } catch (GameEngineException | NullPointerException e) {
             throw new RuntimeException(e);
         }
 
