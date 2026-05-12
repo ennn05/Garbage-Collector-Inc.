@@ -3,7 +3,9 @@ package game.flora;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Slime;
+import game.interfaces.Spawnable;
 
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -20,7 +22,10 @@ public class FleshySprout extends FleshyTree {
     private static final double GROW_CHANCE = 0.25;
     private static final Random random = new Random();
 
-    /** Constructor. */
+    /**
+     * Creates a Fleshy Sprout, the first growth stage of a Fleshy Tree,
+     * displayed as 'y' on the map.
+     */
     public FleshySprout() {
         super('y', "Fleshy Sprout");
     }
@@ -35,7 +40,9 @@ public class FleshySprout extends FleshyTree {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
             if (!adjacent.containsAnActor() && adjacent.getGround().canActorEnter(new Slime())) {
-                location.map().addActor(new Slime(), adjacent);
+                Slime slime = new Slime();
+                location.map().addActor(slime, adjacent);
+                Objects.requireNonNull(adjacent.getActorAs(Spawnable.class)).spawnEffect(adjacent);
                 return;
             }
         }

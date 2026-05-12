@@ -15,9 +15,8 @@ import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
-import game.interfaces.DoorUnlocker;
-import game.interfaces.Drinkable;
-import game.interfaces.Unlockable;
+import game.interfaces.*;
+import game.status.HiveStatus;
 import game.world.FacilityAlarmSystem;
 
 /**
@@ -25,7 +24,10 @@ import game.world.FacilityAlarmSystem;
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends Actor implements WalletHolder {
+public class ContractedWorker extends Actor implements WalletHolder, Host {
+    private static final int HIVE_SPAWN_INTERVAL = 4;
+    private static final int HOST_DAMAGE = 1;
+
     private final Wallet wallet;
 
     public ContractedWorker(String name, char displayChar, int hitPoints, Inventory inventory) {
@@ -111,5 +113,22 @@ public class ContractedWorker extends Actor implements WalletHolder {
 
         Menu menu = new Menu(actions);
         return menu.showMenu(this, display);
+    }
+
+    @Override
+    public String infect(Actor otherActor, GameMap gameMap) {
+        Spawner spawner = (Spawner) otherActor;
+        return otherActor + " infected " + this + "\n" + this.hive(spawner);
+    }
+
+    @Override
+    public String hive(Spawner spawner) {
+        this.addStatus(new HiveStatus(spawner, HIVE_SPAWN_INTERVAL));
+        return this + " becomes a living hive.";
+    }
+
+    @Override
+    public void hiveEffect() {
+        this.hurt(HOST_DAMAGE);
     }
 }

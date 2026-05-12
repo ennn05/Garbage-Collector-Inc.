@@ -3,6 +3,9 @@ package game.flora;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Undead;
+import game.interfaces.Spawnable;
+
+import java.util.Objects;
 
 /**
  * Stage 3 of the Fleshy Tree (display: 'Y').
@@ -14,7 +17,10 @@ import game.actors.Undead;
  */
 public class FleshyMatureTree extends FleshyTree {
 
-    /** Constructor. */
+    /**
+     * Creates a Fleshy Mature Tree, the final growth stage of a Fleshy Tree,
+     * displayed as 'Y' on the map.
+     */
     public FleshyMatureTree() {
         super('Y', "Fleshy Mature Tree");
     }
@@ -29,7 +35,9 @@ public class FleshyMatureTree extends FleshyTree {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
             if (!adjacent.containsAnActor() && adjacent.getGround().canActorEnter(new Undead())) {
-                location.map().addActor(new Undead(), adjacent);
+                Undead undead = new Undead();
+                location.map().addActor(undead, adjacent);
+                Objects.requireNonNull(adjacent.getActorAs(Spawnable.class)).spawnEffect(adjacent);
                 return;
             }
         }
