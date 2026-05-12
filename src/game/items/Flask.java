@@ -3,6 +3,7 @@ package game.items;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.enums.ItemStatistics;
 import game.interfaces.Drinkable;
 import game.interfaces.Sterilisable;
@@ -18,11 +19,11 @@ public class Flask extends Item implements Sterilisable, Drinkable {
     private static final int TOTAL_USABLE = 5;
 
     private boolean sterilised = false;
-    private int totalUsable = TOTAL_USABLE;
 
     public Flask() {
         super("Flask", 'u');
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
+        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(TOTAL_USABLE));
     }
 
     /**
@@ -31,7 +32,7 @@ public class Flask extends Item implements Sterilisable, Drinkable {
      * @return true if the flask can still be consumed, false otherwise
      */
     public boolean hasUsesRemaining() {
-        return totalUsable > 0;
+        return this.getRemainingUses() > 0;
     }
 
     /**
@@ -40,7 +41,7 @@ public class Flask extends Item implements Sterilisable, Drinkable {
      * @return remaining uses
      */
     public int getRemainingUses() {
-        return totalUsable;
+        return this.getStatistic(ItemStatistics.DURABILITY);
     }
 
     /**
@@ -65,11 +66,11 @@ public class Flask extends Item implements Sterilisable, Drinkable {
             return actor + " tries to drink from an empty flask.";
         }
 
-        totalUsable--;
+        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
         actor.heal(HEAL_AMOUNT);
 
         return actor + " drinks flask, which heals them by " + HEAL_AMOUNT
-                + " point of health. Remaining uses: " + totalUsable;
+                + " point of health. Remaining uses: " + this.getRemainingUses();
     }
 
     /**
