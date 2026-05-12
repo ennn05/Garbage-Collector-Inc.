@@ -18,7 +18,9 @@ import java.util.Optional;
  * the configured {@link Spawner} is spawned into the first available adjacent location.
  */
 public class HiveStatus implements Status {
-    private final Spawnable spawnable;
+    private static final int SPAWNER_CHECK_RADIUS = 1;
+
+    private final Spawner spawner;
     private final int spawnInterval;
     private int spawnCounter;
 
@@ -55,8 +57,8 @@ public class HiveStatus implements Status {
                 for (Location nearby : location.getNearbyLocations(SPAWNER_CHECK_RADIUS)) {
                     if (!nearby.containsAnActor()) {
                         try {
-                            destination.addActor(spawnable.spawn());
                             nearby.addActor(spawner.spawn(nearby));
+                            Objects.requireNonNull(location.getActorAs(Spawnable.class)).spawnEffect(nearby);
                             spawned = true;
                             break;
                         } catch (GameEngineException | NullPointerException e) {
