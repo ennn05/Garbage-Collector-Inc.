@@ -21,7 +21,10 @@ public class FleshySapling extends Tree {
     private static final double GROW_CHANCE = 0.50;
     private static final Random random = new Random();
 
-    /** Constructor. */
+    /**
+     * Creates a Fleshy Sapling, the second growth stage of a Fleshy Tree,
+     * displayed as 'v' on the map.
+     */
     public FleshySapling() {
         super('v', "Fleshy Sapling");
     }

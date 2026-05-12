@@ -22,7 +22,10 @@ public class FleshySprout extends FleshyTree {
     private static final double GROW_CHANCE = 0.25;
     private static final Random random = new Random();
 
-    /** Constructor. */
+    /**
+     * Creates a Fleshy Sprout, the first growth stage of a Fleshy Tree,
+     * displayed as 'y' on the map.
+     */
     public FleshySprout() {
         super('y', "Fleshy Sprout");
     }

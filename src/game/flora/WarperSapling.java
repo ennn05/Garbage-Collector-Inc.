@@ -18,7 +18,10 @@ public class WarperSapling extends Tree {
     private static final double GROW_CHANCE = 0.25;
     private static final Random random = new Random();
 
-    /** Constructor. */
+    /**
+     * Creates a Warper Sapling, the first growth stage of a Warper Tree,
+     * displayed as 'w' on the map.
+     */
     public WarperSapling() {
         super('w', "Warper Sapling");
     }

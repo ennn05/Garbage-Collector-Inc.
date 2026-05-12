@@ -17,7 +17,10 @@ import java.util.Objects;
  */
 public class FleshyMatureTree extends FleshyTree {
 
-    /** Constructor. */
+    /**
+     * Creates a Fleshy Mature Tree, the final growth stage of a Fleshy Tree,
+     * displayed as 'Y' on the map.
+     */
     public FleshyMatureTree() {
         super('Y', "Fleshy Mature Tree");
     }

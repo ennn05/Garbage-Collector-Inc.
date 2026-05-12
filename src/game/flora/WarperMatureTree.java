@@ -16,7 +16,10 @@ import game.actions.WarpAction;
  */
 public class WarperMatureTree extends Tree {
 
-    /** Constructor. */
+    /**
+     * Creates a Warper Mature Tree, the final growth stage of a Warper Tree,
+     * displayed as 'W' on the map.
+     */
     public WarperMatureTree() {
         super('W', "Warper Mature Tree");
     }
