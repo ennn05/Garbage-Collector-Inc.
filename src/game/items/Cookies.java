@@ -9,17 +9,21 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.economy.Wallet;
 import game.enums.Ability;
 import game.enums.ItemStatistics;
+import game.interfaces.Host;
 import game.interfaces.Sellable;
+import game.interfaces.Spawnable;
+import game.status.HiveStatus;
+import game.status.ItemDegradeStatus;
 
 /**
  * A pack of cookies that can be consumed five times.
  */
-public class Cookies extends ConsumableItem implements Sellable {
+public class Cookies extends ConsumableItem implements Sellable, Host {
     private static final int WEIGHT = 2;
     private static final int TOTAL_COOKIES = 5;
     private static final int HEAL_AMOUNT = 1;
     private static final int MAX_HP_DECREASE = 1;
-
+    private static final int HIVE_SPAWN_INTERVAL = 0;
 
     public Cookies() {
         super("Cookies", '◍');
@@ -159,5 +163,22 @@ public class Cookies extends ConsumableItem implements Sellable {
     @Override
     public String menuDescription(Actor actor) {
         return actor + " eats a Cookie";
+    }
+
+    @Override
+    public String infect(Actor otherActor, GameMap gameMap) {
+        Spawnable spawnable = (Spawnable) otherActor;
+        this.addStatus(new ItemDegradeStatus());
+        return otherActor + " infects " + this + "\n" + this.hive(spawnable);
+    }
+
+    @Override
+    public String hive(Spawnable spawnable) {
+        this.addStatus(new HiveStatus(spawnable, HIVE_SPAWN_INTERVAL));
+        return this + " becomes a living hive.";
+    }
+
+    @Override
+    public void spawnEffect() {
     }
 }
