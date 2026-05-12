@@ -11,7 +11,7 @@ import game.enums.Ability;
 import game.enums.ItemStatistics;
 import game.interfaces.Host;
 import game.interfaces.Sellable;
-import game.interfaces.Spawnable;
+import game.interfaces.Spawner;
 import game.status.HiveStatus;
 import game.status.ItemDegradeStatus;
 
@@ -168,18 +168,18 @@ public class Cookies extends ConsumableItem implements Sellable, Host {
 
     @Override
     public String infect(Actor otherActor, GameMap gameMap) {
-        Spawnable spawnable = (Spawnable) otherActor;
+        Spawner spawner = (Spawner) otherActor;
         this.addStatus(new ItemDegradeStatus());
-        return otherActor + " infects " + this + "\n" + this.hive(spawnable);
+        return otherActor + " infects " + this + "\n" + this.hive(spawner);
     }
 
     @Override
-    public String hive(Spawnable spawnable) {
-        this.addStatus(new HiveStatus(spawnable, HIVE_SPAWN_INTERVAL));
+    public String hive(Spawner spawner) {
+        this.addStatus(new HiveStatus(spawner, HIVE_SPAWN_INTERVAL));
         return this + " becomes a living hive.";
     }
 
     @Override
-    public void spawnEffect() {
+    public void hiveEffect() {
     }
 }

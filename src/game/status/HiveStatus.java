@@ -3,18 +3,19 @@ package game.status;
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.capabilities.Status;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.Host;
 import game.interfaces.Spawnable;
+import game.interfaces.Spawner;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * A status effect that causes a host to periodically spawn a new entity into an adjacent empty location.
  * <p>
  * Each tick, the host's spawn effect is triggered. Once the spawn counter reaches zero,
- * the configured {@link Spawnable} is spawned into the first available adjacent location.
+ * the configured {@link Spawner} is spawned into the first available adjacent location.
  */
 public class HiveStatus implements Status {
     private final Spawnable spawnable;
@@ -24,11 +25,11 @@ public class HiveStatus implements Status {
     /**
      * Creates a hive status that spawns the supplied entity at the given interval.
      *
-     * @param spawnable the entity factory used when spawning a new entity
+     * @param spawner the entity factory used when spawning a new entity
      * @param spawnInterval the number of ticks between spawn attempts
      */
-    public HiveStatus(Spawnable spawnable, int spawnInterval) {
-        this.spawnable = spawnable;
+    public HiveStatus(Spawner spawner, int spawnInterval) {
+        this.spawner = spawner;
         this.spawnInterval = spawnInterval;
         this.spawnCounter = spawnInterval;
     }
@@ -48,22 +49,25 @@ public class HiveStatus implements Status {
         Optional<Host> host = currEntity.asCapability(Host.class);
         if (host.isPresent()) {
             Host hostEntity = host.get();
-            hostEntity.spawnEffect();
+            hostEntity.hiveEffect();
             if (spawnCounter <= 0) {
                 boolean spawned = false;
-                for (Exit exit : location.getExits()) {
-                    Location destination = exit.getDestination();
-                    if (!destination.containsAnActor()) {
+                for (Location nearby : location.getNearbyLocations(SPAWNER_CHECK_RADIUS)) {
+                    if (!nearby.containsAnActor()) {
                         try {
                             destination.addActor(spawnable.spawn());
+                            nearby.addActor(spawner.spawn(nearby));
                             spawned = true;
                             break;
-                        } catch (GameEngineException e) {
+                        } catch (GameEngineException | NullPointerException e) {
                             System.out.println("Failed to spawn entity: " + e.getMessage());
                         }
                     }
                 }
-                if (spawned) spawnCounter = spawnInterval;
+                if (spawned) {
+                    spawnCounter = spawnInterval;
+                    System.out.println(currEntity + " spawned a new entity due to being a host.");
+                }
             } else {
                 spawnCounter--;
             }

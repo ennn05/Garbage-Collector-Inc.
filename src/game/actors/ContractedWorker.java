@@ -117,18 +117,18 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
 
     @Override
     public String infect(Actor otherActor, GameMap gameMap) {
-        Spawnable spawnable = (Spawnable) otherActor;
-        return otherActor + " infected " + this + "\n" + this.hive(spawnable);
+        Spawner spawner = (Spawner) otherActor;
+        return otherActor + " infected " + this + "\n" + this.hive(spawner);
     }
 
     @Override
-    public String hive(Spawnable spawnable) {
-        this.addStatus(new HiveStatus(spawnable, HIVE_SPAWN_INTERVAL));
+    public String hive(Spawner spawner) {
+        this.addStatus(new HiveStatus(spawner, HIVE_SPAWN_INTERVAL));
         return this + " becomes a living hive.";
     }
 
     @Override
-    public void spawnEffect() {
+    public void hiveEffect() {
         this.hurt(HOST_DAMAGE);
     }
 }
