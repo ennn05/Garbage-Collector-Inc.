@@ -10,8 +10,10 @@ import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.grounds.Fire;
 import game.interfaces.FireHazard;
+import game.interfaces.Infectable;
 import game.interfaces.Sellable;
 import game.status.BurnStatus;
+import game.status.ItemDegradeStatus;
 import game.utility.FireSpawner;
 
 import java.util.Random;
@@ -19,7 +21,7 @@ import java.util.Random;
 /**
  * An unstable lantern that may leak oil and ignite the ground while being carried.
  */
-public class Lantern extends Item implements Sellable {
+public class Lantern extends Item implements Sellable, Infectable {
     private static final int WEIGHT = 7;
     private static final int INITIAL_FUEL = 10;
     private static final int LEAK_CHANCE_PERCENT = 5;
@@ -119,5 +121,11 @@ public class Lantern extends Item implements Sellable {
         }
 
         return result;
+    }
+
+    @Override
+    public String infect(Actor otherActor, GameMap gameMap) {
+        this.addStatus(new ItemDegradeStatus());
+        return otherActor + " infects " + this;
     }
 }
