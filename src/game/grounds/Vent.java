@@ -14,6 +14,12 @@ import game.status.PoisonStatus;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * A ground tile that spawns a hostile creature when a contracted worker is nearby.
+ * <p>
+ * When activated, the vent creates either a slime or a parasite, places it on the
+ * current location, triggers its spawn effect, and poisons nearby actors.
+ */
 public class Vent extends Ground implements Spawner {
     private static final int SPAWN_POISON_DURATION = 5;
     private static final int SPAWN_POISON_DAMAGE = 1;
@@ -21,10 +27,22 @@ public class Vent extends Ground implements Spawner {
 
     private final Random random = new Random();
 
+    /**
+     * Creates a vent ground tile.
+     */
     public Vent() {
         super('v', "Vent");
     }
 
+    /**
+     * Spawns a hostile creature when a contracted worker is nearby.
+     * <p>
+     * If a worker is detected within the spawn-check radius, the vent creates a
+     * random spawnable actor, places it at this location, invokes its spawn effect,
+     * and then applies poison to nearby actors.
+     *
+     * @param location the location containing this vent
+     */
     @Override
     public void tick(Location location) {
         boolean spawned = false;
@@ -48,6 +66,12 @@ public class Vent extends Ground implements Spawner {
         }
     }
 
+    /**
+     * Creates a random spawnable actor for this vent.
+     *
+     * @param location the location where the actor will be spawned
+     * @return either a new slime or a new parasite
+     */
     @Override
     public Actor spawn(Location location) {
         if (random.nextBoolean()) {

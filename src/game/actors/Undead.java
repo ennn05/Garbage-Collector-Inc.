@@ -34,6 +34,11 @@ public class Undead extends Creature implements Infectable, Spawnable {
         addBehaviour(999, new WanderBehaviour());
     }
 
+    /**
+     * Spawns a fresh Undead instance.
+     *
+     * @return a new Undead
+     */
     public static Actor getUndeadSpawn() {
         return new Undead();
     }
@@ -43,6 +48,11 @@ public class Undead extends Creature implements Infectable, Spawnable {
         return otherActor + " infected " + this + "\n" + this.unconscious(gameMap);
     }
 
+    /**
+     * Undead will increase its max health based on the number of creatures adjacent to it.
+     *
+     * @param location the location of the entity that is spawned on
+     */
     @Override
     public void spawnEffect(Location location) {
         int nearbyCreatures = 0;

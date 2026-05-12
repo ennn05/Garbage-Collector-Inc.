@@ -39,6 +39,11 @@ public class Parasite extends Creature implements Spawner, Spawnable {
         return getParasiteSpawn();
     }
 
+    /**
+     * Parasite hurts adjacent workers on spawn.
+     *
+     * @param location the location of the entity that is spawned on
+     */
     @Override
     public void spawnEffect(Location location) {
         for (Location nearby : location.getNearbyLocations(SPAWN_EFFECT_RADIUS)) {

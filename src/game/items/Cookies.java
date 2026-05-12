@@ -166,6 +166,13 @@ public class Cookies extends ConsumableItem implements Sellable, Host {
         return actor + " eats a Cookie";
     }
 
+    /**
+     * Infects this cookie pack and turns it into a living hive.
+     *
+     * @param otherActor the actor causing the infection
+     * @param gameMap the map where the infection occurs
+     * @return a description of the infection and hive transformation
+     */
     @Override
     public String infect(Actor otherActor, GameMap gameMap) {
         Spawner spawner = (Spawner) otherActor;
@@ -173,12 +180,23 @@ public class Cookies extends ConsumableItem implements Sellable, Host {
         return otherActor + " infects " + this + "\n" + this.hive(spawner);
     }
 
+    /**
+     * Turns this cookie pack into a hive that can spawn the provided spawner.
+     *
+     * @param spawner the spawn source used by the hive
+     * @return a description of the hive transformation
+     */
     @Override
     public String hive(Spawner spawner) {
         this.addStatus(new HiveStatus(spawner, HIVE_SPAWN_INTERVAL));
         return this + " becomes a living hive.";
     }
 
+    /**
+     * Performs any hive side effects for this item.
+     * <p>
+     * Cookies do not have an additional hive side effect beyond their status changes.
+     */
     @Override
     public void hiveEffect() {
     }

@@ -64,6 +64,13 @@ public class Hole extends Ground implements Spawner {
         turnsElapsed = 0; // 20rounds attempt happened
     }
 
+    /**
+     * Spawns either an Undead or Slime if the map is 99-Deprecated.
+     * Spawns either an Undead or Parasite if the map is 20-Overflow.
+     *
+     * @param location the location of the spawner
+     * @return the spawned actor
+     */
     @Override
     public Actor spawn(Location location) {
         if (random.nextBoolean()) {

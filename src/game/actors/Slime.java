@@ -25,10 +25,20 @@ public class Slime extends Creature implements Spawnable {
         addBehaviour(999, new WanderBehaviour());
     }
 
+    /**
+     * Spawns a fresh Slime instance.
+     *
+     * @return a new Slime
+     */
     public static Actor getSlimeSpawn() {
         return new Slime();
     }
 
+    /**
+     * Slime forces nearby workers to drop their items on spawn.
+     *
+     * @param location the location of the entity that is spawned on
+     */
     @Override
     public void spawnEffect(Location location) {
         for (Location nearby : location.getNearbyLocations(SPAWN_EFFECT_RADIUS)) {
