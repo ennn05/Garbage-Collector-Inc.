@@ -27,6 +27,7 @@ public class Cookies extends ConsumableItem implements Sellable, Host {
 
     public Cookies() {
         super("Cookies", '◍');
+        this.makePortable();
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
         this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(TOTAL_COOKIES));
     }

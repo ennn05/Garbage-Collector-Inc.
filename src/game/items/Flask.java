@@ -22,6 +22,7 @@ public class Flask extends Item implements Sterilisable, Drinkable {
 
     public Flask() {
         super("Flask", 'u');
+        this.makePortable();
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
         this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(TOTAL_USABLE));
     }

@@ -24,6 +24,7 @@ public class Apple extends ConsumableItem implements Sellable {
 
     public Apple() {
         super("Apple", 'ó');
+        this.makePortable();
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
     }
 
