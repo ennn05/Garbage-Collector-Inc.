@@ -5,12 +5,15 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.grounds.Fire;
 import game.interfaces.FireHazard;
+import game.interfaces.Infectable;
 import game.interfaces.Sellable;
 import game.status.BurnStatus;
+import game.status.ItemDegradeStatus;
 import game.utility.FireSpawner;
 
 import java.util.Random;
@@ -18,7 +21,7 @@ import java.util.Random;
 /**
  * An unstable lantern that may leak oil and ignite the ground while being carried.
  */
-public class Lantern extends Item implements Sellable {
+public class Lantern extends Item implements Sellable, Infectable {
     private static final int WEIGHT = 7;
     private static final int INITIAL_FUEL = 10;
     private static final int LEAK_CHANCE_PERCENT = 5;
@@ -29,7 +32,6 @@ public class Lantern extends Item implements Sellable {
     private static final int SALE_BURN_TURNS = 3;
     private static final int SALE_BURN_DAMAGE = 2;
 
-    private int oilFuel;
     private final Random random = new Random();
     private final FireSpawner fireSpawner = new FireSpawner();
 
@@ -37,7 +39,7 @@ public class Lantern extends Item implements Sellable {
         super("Lantern", '&');
         this.makePortable();
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
-        this.oilFuel = INITIAL_FUEL;
+        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(INITIAL_FUEL));
     }
 
     /**
@@ -46,7 +48,7 @@ public class Lantern extends Item implements Sellable {
      * @return remaining oil fuel
      */
     public int getOilFuel() {
-        return oilFuel;
+        return this.getStatistic(ItemStatistics.DURABILITY);
     }
 
     /**
@@ -57,7 +59,7 @@ public class Lantern extends Item implements Sellable {
      */
     @Override
     public void tick(Location currentLocation, Actor actor) {
-        if (oilFuel <= 0) {
+        if (this.getOilFuel() <= 0) {
             return;
         }
 
@@ -67,9 +69,9 @@ public class Lantern extends Item implements Sellable {
         }
 
         if (random.nextInt(100) < LEAK_CHANCE_PERCENT) {
-            oilFuel--;
+            this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
             currentLocation.setGround(new Fire(currentLocation.getGround()));
-            System.out.println(actor + "'s Lantern leaks oil and creates fire. Oil remaining: " + oilFuel + ".");
+            System.out.println(actor + "'s Lantern leaks oil and creates fire. Oil remaining: " + this.getOilFuel() + ".");
         }
     }
 
@@ -81,7 +83,7 @@ public class Lantern extends Item implements Sellable {
      */
     @Override
     public int getSellPrice() {
-        return oilFuel * SELL_PRICE_PER_OIL;
+        return this.getOilFuel() * SELL_PRICE_PER_OIL;
     }
 
     /**
@@ -119,5 +121,11 @@ public class Lantern extends Item implements Sellable {
         }
 
         return result;
+    }
+
+    @Override
+    public String infect(Actor otherActor, GameMap gameMap) {
+        this.addStatus(new ItemDegradeStatus());
+        return otherActor + " infects " + this;
     }
 }

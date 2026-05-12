@@ -9,23 +9,36 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.economy.Wallet;
 import game.enums.Ability;
 import game.enums.ItemStatistics;
+import game.interfaces.Host;
 import game.interfaces.Sellable;
+import game.interfaces.Spawner;
+import game.status.HiveStatus;
+import game.status.ItemDegradeStatus;
 
 /**
  * A pack of cookies that can be consumed five times.
  */
-public class Cookies extends ConsumableItem implements Sellable {
+public class Cookies extends ConsumableItem implements Sellable, Host {
     private static final int WEIGHT = 2;
     private static final int TOTAL_COOKIES = 5;
     private static final int HEAL_AMOUNT = 1;
     private static final int MAX_HP_DECREASE = 1;
-
-    private int remainingCookies;
+    private static final int HIVE_SPAWN_INTERVAL = 0;
 
     public Cookies() {
         super("Cookies", '◍');
+        this.makePortable();
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
-        this.remainingCookies = TOTAL_COOKIES;
+        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(TOTAL_COOKIES));
+    }
+
+    /**
+     * Get the remaining cookies.
+     *
+     * @return remaining cookies
+     */
+    public int getRemainingCookies() {
+        return this.getStatistic(ItemStatistics.DURABILITY);
     }
 
     /**
@@ -37,7 +50,7 @@ public class Cookies extends ConsumableItem implements Sellable {
      */
     @Override
     public boolean canConsume(Actor actor) {
-        return actor.getInventory().getItems().contains(this) && remainingCookies > 0;
+        return actor.getInventory().getItems().contains(this) && this.getRemainingCookies() > 0;
     }
 
     /**
@@ -47,7 +60,7 @@ public class Cookies extends ConsumableItem implements Sellable {
      * @return result description
      */
     private String applyCookieEffect(Actor actor) {
-        remainingCookies--;
+        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
 
         String result;
         if (actor.hasAbility(Ability.STERILISING)) {
@@ -58,8 +71,8 @@ public class Cookies extends ConsumableItem implements Sellable {
             result = actor + " eats a cookie and permanently loses " + MAX_HP_DECREASE + " maximum health point.";
         }
 
-        if (remainingCookies > 0) {
-            result += " Remaining cookies: " + remainingCookies + ".";
+        if (this.getRemainingCookies() > 0) {
+            result += " Remaining cookies: " + this.getRemainingCookies() + ".";
         }
 
         return result;
@@ -75,7 +88,7 @@ public class Cookies extends ConsumableItem implements Sellable {
     public String consume(Actor actor) {
         String result = applyCookieEffect(actor);
 
-        if (remainingCookies == 0) {
+        if (this.getRemainingCookies() == 0) {
             actor.getInventory().remove(this);
             result += " The Cookies are now fully consumed and removed from inventory.";
         }
@@ -91,7 +104,7 @@ public class Cookies extends ConsumableItem implements Sellable {
      */
     @Override
     public boolean canConsumeFromGround(Actor actor) {
-        return remainingCookies > 0;
+        return this.getRemainingCookies() > 0;
     }
 
     /**
@@ -104,7 +117,7 @@ public class Cookies extends ConsumableItem implements Sellable {
     public String consumeFromGround(Actor actor) {
         String result = applyCookieEffect(actor);
 
-        if (remainingCookies == 0) {
+        if (this.getRemainingCookies() == 0) {
             result += " The Cookies are now fully consumed.";
         }
 
@@ -118,7 +131,7 @@ public class Cookies extends ConsumableItem implements Sellable {
      */
     @Override
     public boolean shouldRemoveAfterGroundConsume() {
-        return remainingCookies == 0;
+        return this.getRemainingCookies() == 0;
     }
 
     /**
@@ -129,7 +142,7 @@ public class Cookies extends ConsumableItem implements Sellable {
      */
     @Override
     public int getSellPrice() {
-        return remainingCookies;
+        return this.getRemainingCookies();
     }
 
     /**
@@ -143,13 +156,30 @@ public class Cookies extends ConsumableItem implements Sellable {
      */
     @Override
     public String onSold(Actor seller, GameMap map, Location terminalLocation, Wallet wallet) {
-        seller.hurt(remainingCookies);
+        seller.hurt(this.getRemainingCookies());
         return seller + " pays an organic processing fee and loses "
-                + remainingCookies + " health point(s).";
+                + this.getRemainingCookies() + " health point(s).";
     }
 
     @Override
     public String menuDescription(Actor actor) {
         return actor + " eats a Cookie";
+    }
+
+    @Override
+    public String infect(Actor otherActor, GameMap gameMap) {
+        Spawner spawner = (Spawner) otherActor;
+        this.addStatus(new ItemDegradeStatus());
+        return otherActor + " infects " + this + "\n" + this.hive(spawner);
+    }
+
+    @Override
+    public String hive(Spawner spawner) {
+        this.addStatus(new HiveStatus(spawner, HIVE_SPAWN_INTERVAL));
+        return this + " becomes a living hive.";
+    }
+
+    @Override
+    public void hiveEffect() {
     }
 }
