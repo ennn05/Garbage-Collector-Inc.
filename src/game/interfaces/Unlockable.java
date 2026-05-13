@@ -20,4 +20,17 @@ public interface Unlockable {
      * Lock the object again.
      */
     void lock();
+
+    /**
+     * Apply the immediate effect that occurs when this object is unlocked.
+     * By default, unlocking has no extra effect.
+     *
+     * @param actor the actor unlocking this object
+     * @param location the location of this unlockable object
+     * @return result description
+     */
+    default String onUnlocked(edu.monash.fit2099.engine.actors.Actor actor,
+                              edu.monash.fit2099.engine.positions.Location location) {
+        return "";
+    }
 }
