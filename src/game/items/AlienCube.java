@@ -29,7 +29,7 @@ public class AlienCube extends Item implements Teleportable, Sellable {
      * Constructor for AlienCube.
      */
     public AlienCube() {
-        super("Alien Cube", 'Ã');
+        super("Alien Cube", '◈');
         this.makePortable();
     }
 
