@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.ConsumeGroundConsumableBehaviour;
 import game.behaviours.WanderBehaviour;
+import game.enums.Ability;
 import game.interfaces.Spawnable;
 import game.inventory.BasicInventory;
 
@@ -42,8 +43,9 @@ public class Slime extends Creature implements Spawnable {
     @Override
     public void spawnEffect(Location location) {
         for (Location nearby : location.getNearbyLocations(SPAWN_EFFECT_RADIUS)) {
-            Actor worker = nearby.getActorAs(ContractedWorker.class);
-            if (worker != null) {
+            if (nearby.containsAnActor() && nearby.getActor().hasAbility(Ability.WORKER)) {
+                Actor worker = nearby.getActor();
+
                 for (Item item : new ArrayList<>(worker.getInventory().getItems())) {
                     new DropAction(item).execute(worker, location.map());
                 }

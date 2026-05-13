@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.InfectBehaviour;
 import game.behaviours.WanderBehaviour;
+import game.enums.Ability;
 import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
 import game.inventory.BasicInventory;
@@ -25,6 +26,11 @@ public class Parasite extends Creature implements Spawner, Spawnable {
         addBehaviour(999, new WanderBehaviour());
     }
 
+    /**
+     * Spawns a fresh parasite instance.
+     *
+     * @return a new parasite
+     */
     public static Actor getParasiteSpawn() {
         return new Parasite();
     }
@@ -32,6 +38,7 @@ public class Parasite extends Creature implements Spawner, Spawnable {
     /**
      * Spawns a fresh parasite instance.
      *
+     * @param location the location where the actor will be spawned
      * @return a new parasite
      */
     @Override
@@ -47,9 +54,8 @@ public class Parasite extends Creature implements Spawner, Spawnable {
     @Override
     public void spawnEffect(Location location) {
         for (Location nearby : location.getNearbyLocations(SPAWN_EFFECT_RADIUS)) {
-            Actor worker = nearby.getActorAs(ContractedWorker.class);
-            if (worker != null) {
-                worker.hurt(SPAWN_DAMAGE);
+            if (nearby.containsAnActor() && nearby.getActor().hasAbility(Ability.WORKER)) {
+                nearby.getActor().hurt(SPAWN_DAMAGE);
             }
         }
     }
