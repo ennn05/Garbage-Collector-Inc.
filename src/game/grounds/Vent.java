@@ -4,14 +4,13 @@ import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.ContractedWorker;
 import game.actors.Parasite;
 import game.actors.Slime;
+import game.enums.Ability;
 import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
 import game.status.PoisonStatus;
 
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -45,21 +44,59 @@ public class Vent extends Ground implements Spawner {
      */
     @Override
     public void tick(Location location) {
+        if (!hasWorkerNearby(location)) {
+            return;
+        }
+
+        if (location.containsAnActor()) {
+            return;
+        }
+
+        Actor spawnedActor = spawn(location);
         boolean spawned = false;
+
+        try {
+            location.addActor(spawnedActor);
+
+            Spawnable spawnable = spawnedActor.asCapability(Spawnable.class).orElse(null);
+            if (spawnable != null) {
+                spawnable.spawnEffect(location);
+            }
+
+            spawned = true;
+        } catch (GameEngineException e) {
+            System.out.println("Vent failed to spawn an actor: " + e.getMessage());
+        }
+
+        if (spawned) {
+            poisonNearbyActors(location);
+        }
+    }
+
+    /**
+     * Check whether a worker is nearby.
+     *
+     * @param location the location containing this vent
+     * @return true if a worker is within the check radius
+     */
+    private boolean hasWorkerNearby(Location location) {
         for (Location nearby : location.getNearbyLocations(SPAWN_CHECK_RADIUS)) {
-            if (nearby.getActorAs(ContractedWorker.class) != null) {
-                try {
-                    location.addActor(this.spawn(location));
-                    Objects.requireNonNull(location.getActorAs(Spawnable.class)).spawnEffect(location);
-                    spawned = true;
-                } catch (GameEngineException | NullPointerException e) {
-                    throw new RuntimeException(e);
-                }
-                break;
+            if (nearby.containsAnActor() && nearby.getActor().hasAbility(Ability.WORKER)) {
+                return true;
             }
         }
-        if (spawned) {
-            for (Location nearby : location.getNearbyLocations(SPAWN_CHECK_RADIUS)) {
+
+        return false;
+    }
+
+    /**
+     * Poison all nearby actors after the vent spawns an actor.
+     *
+     * @param location the location containing this vent
+     */
+    private void poisonNearbyActors(Location location) {
+        for (Location nearby : location.getNearbyLocations(SPAWN_CHECK_RADIUS)) {
+            if (nearby.containsAnActor()) {
                 Actor actor = nearby.getActor();
                 actor.addStatus(new PoisonStatus(SPAWN_POISON_DURATION, SPAWN_POISON_DAMAGE));
             }
@@ -77,6 +114,7 @@ public class Vent extends Ground implements Spawner {
         if (random.nextBoolean()) {
             return Slime.getSlimeSpawn();
         }
+
         return Parasite.getParasiteSpawn();
     }
 }
