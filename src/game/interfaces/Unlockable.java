@@ -1,5 +1,9 @@
 package game.interfaces;
 
+import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.positions.Location;
+import game.enums.AccessLevel;
+
 /**
  * Represents a ground that can be unlocked.
  */
@@ -22,6 +26,13 @@ public interface Unlockable {
     void lock();
 
     /**
+     * Get the clearance level required to unlock this object.
+     *
+     * @return the required access level
+     */
+    AccessLevel getRequiredClearance();
+
+    /**
      * Apply the immediate effect that occurs when this object is unlocked.
      * By default, unlocking has no extra effect.
      *
@@ -29,8 +40,7 @@ public interface Unlockable {
      * @param location the location of this unlockable object
      * @return result description
      */
-    default String onUnlocked(edu.monash.fit2099.engine.actors.Actor actor,
-                              edu.monash.fit2099.engine.positions.Location location) {
+    default String onUnlocked(Actor actor, Location location) {
         return "";
     }
 }

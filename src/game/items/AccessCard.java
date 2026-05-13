@@ -59,15 +59,15 @@ public class AccessCard extends Item implements Purchasable, DoorUnlocker {
 
     /**
      * Check whether this card can unlock the given target.
-     * For REQ1, all access cards can unlock current unlockable targets.
-     * More detailed clearance checks can be added in REQ2.
      *
      * @param unlockable the target to be unlocked
-     * @return true if the target is locked and can be unlocked
+     * @return true if the target is locked and this card has enough clearance
      */
     @Override
     public boolean canUnlock(Unlockable unlockable) {
-        return unlockable != null && !unlockable.isUnlocked();
+        return unlockable != null
+                && !unlockable.isUnlocked()
+                && level.canOpen(unlockable.getRequiredClearance());
     }
 
     /**

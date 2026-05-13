@@ -1,6 +1,7 @@
 package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.positions.Location;
 import game.enums.AccessLevel;
 
 /**
@@ -8,6 +9,7 @@ import game.enums.AccessLevel;
  * When unlocked, it triggers a decontamination sequence that heals the actor for 5 health points.
  */
 public class TitaniumDoor extends Door {
+    private static final int HEAL_AMOUNT = 5;
 
     /**
      * Constructor for TitaniumDoor.
@@ -18,6 +20,7 @@ public class TitaniumDoor extends Door {
 
     /**
      * Get the required access level for this door.
+     *
      * @return AccessLevel.LEVEL_3
      */
     @Override
@@ -27,10 +30,15 @@ public class TitaniumDoor extends Door {
 
     /**
      * When unlocked, heal the actor for 5 health points.
-     * @param actor the actor unlocking the door
+     *
+     * @param actor the actor unlocking this object
+     * @param location the location of this unlockable object
+     * @return result description
      */
     @Override
-    public void onUnlock(Actor actor) {
-        actor.heal(5);
+    public String onUnlocked(Actor actor, Location location) {
+        actor.heal(HEAL_AMOUNT);
+        return actor + " is healed by the Titanium Door decontamination sequence for "
+                + HEAL_AMOUNT + " health.";
     }
 }
