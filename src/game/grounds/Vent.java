@@ -30,7 +30,7 @@ public class Vent extends Ground implements Spawner {
      * Creates a vent ground tile.
      */
     public Vent() {
-        super('v', "Vent");
+        super('V', "Vent");
     }
 
     /**
