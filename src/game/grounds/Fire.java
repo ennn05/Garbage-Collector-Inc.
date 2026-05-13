@@ -4,25 +4,37 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.FireHazard;
-import game.status.BurnStatus;
 
 /**
- * A temporary fire that burns actors standing on it and disappears after a few turns.
+ * A temporary fire that burns actors standing on it and disappears after a number of turns.
  */
 public class Fire extends Ground implements FireHazard {
-    private static final int FIRE_DURATION = 2;
-
-    // "Standard burn effect" used elsewhere in this codebase (e.g. Lantern sale).
-    private static final int BURN_TURNS = 3;
-    private static final int BURN_DAMAGE = 2;
+    public static final int DEFAULT_FIRE_DURATION = 5;
+    private static final int DAMAGE_PER_TURN = 1;
 
     private final Ground previousGround;
     private int turnsRemaining;
 
+    /**
+     * Constructor for the standard fire effect.
+     * The standard fire lasts for 5 turns.
+     *
+     * @param previousGround the ground that should be restored after the fire disappears
+     */
     public Fire(Ground previousGround) {
+        this(previousGround, DEFAULT_FIRE_DURATION);
+    }
+
+    /**
+     * Constructor for fire with a custom duration.
+     *
+     * @param previousGround the ground that should be restored after the fire disappears
+     * @param duration the number of turns this fire should remain on the ground
+     */
+    public Fire(Ground previousGround, int duration) {
         super('^', "Fire");
         this.previousGround = previousGround;
-        this.turnsRemaining = FIRE_DURATION;
+        this.turnsRemaining = duration;
     }
 
     /**
@@ -35,9 +47,8 @@ public class Fire extends Ground implements FireHazard {
     public void tick(Location location) {
         if (location.containsAnActor()) {
             Actor actor = location.getActor();
-            if (!actor.hasStatus(BurnStatus.class)) {
-                actor.addStatus(new BurnStatus(BURN_TURNS, BURN_DAMAGE));
-            }
+            actor.hurt(DAMAGE_PER_TURN);
+            System.out.println(actor + " is burned by fire for " + DAMAGE_PER_TURN + " damage.");
         }
 
         turnsRemaining--;
@@ -48,6 +59,7 @@ public class Fire extends Ground implements FireHazard {
 
         if (turnsRemaining <= 0) {
             location.setGround(previousGround);
+            System.out.println("Fire at " + location + " has disappeared.");
         }
     }
 }
