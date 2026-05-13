@@ -2,19 +2,17 @@ package game.status;
 
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.GameEntity;
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.Host;
 import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
 
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * A status effect that causes a host to periodically spawn a new entity into an adjacent empty location.
  * <p>
- * Each tick, the host's spawn effect is triggered. Once the spawn counter reaches zero,
+ * Each tick, the host's hive effect is triggered. Once the spawn counter reaches zero,
  * the configured {@link Spawner} is spawned into the first available adjacent location.
  */
 public class HiveStatus implements Status {
@@ -39,7 +37,7 @@ public class HiveStatus implements Status {
     /**
      * Advances this status by one tick.
      * <p>
-     * If the current entity has the {@link Host} capability, its spawn effect is triggered.
+     * If the current entity has the {@link Host} capability, its hive effect is triggered.
      * When the internal counter reaches zero, this status attempts to spawn a new entity
      * into the first adjacent location that does not already contain an actor.
      *
@@ -48,38 +46,51 @@ public class HiveStatus implements Status {
      */
     @Override
     public void tickStatus(GameEntity currEntity, Location location) {
-        Optional<Host> host = currEntity.asCapability(Host.class);
-        if (host.isPresent()) {
-            Host hostEntity = host.get();
-            hostEntity.hiveEffect();
-            if (spawnCounter <= 0) {
-                boolean spawned = false;
-                for (Location nearby : location.getNearbyLocations(SPAWNER_CHECK_RADIUS)) {
-                    if (!nearby.containsAnActor()) {
-                        try {
-                            nearby.addActor(spawner.spawn(nearby));
-                            Objects.requireNonNull(location.getActorAs(Spawnable.class)).spawnEffect(nearby);
-                            spawned = true;
-                            break;
-                        } catch (GameEngineException | NullPointerException e) {
-                            System.out.println("Failed to spawn entity: " + e.getMessage());
-                        }
+        Host host = currEntity.asCapability(Host.class).orElse(null);
+
+        if (host == null) {
+            return;
+        }
+
+        host.hiveEffect();
+        spawnCounter--;
+
+        if (spawnCounter > 0) {
+            return;
+        }
+
+        boolean spawned = false;
+
+        for (Location nearby : location.getNearbyLocations(SPAWNER_CHECK_RADIUS)) {
+            Actor spawnedActor = spawner.spawn(nearby);
+
+            if (!nearby.containsAnActor() && nearby.getGround().canActorEnter(spawnedActor)) {
+                try {
+                    nearby.addActor(spawnedActor);
+
+                    Spawnable spawnable = spawnedActor.asCapability(Spawnable.class).orElse(null);
+                    if (spawnable != null) {
+                        spawnable.spawnEffect(nearby);
                     }
+
+                    spawned = true;
+                    break;
+                } catch (GameEngineException e) {
+                    System.out.println("Failed to spawn entity: " + e.getMessage());
                 }
-                if (spawned) {
-                    spawnCounter = spawnInterval;
-                    System.out.println(currEntity + " spawned a new entity due to being a host.");
-                }
-            } else {
-                spawnCounter--;
             }
+        }
+
+        if (spawned) {
+            spawnCounter = spawnInterval;
+            System.out.println(currEntity + " spawned a new entity due to being a host.");
         }
     }
 
     /**
      * Hive status is always active while attached to an entity.
      *
-     * @return {@code true}
+     * @return true
      */
     @Override
     public boolean isStatusActive() {
