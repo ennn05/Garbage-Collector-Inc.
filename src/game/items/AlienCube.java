@@ -1,28 +1,30 @@
 package game.items;
 
-import game.interfaces.Teleportable;
-import game.actions.TeleportAction;
-import game.grounds.ToxicWaste;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import edu.monash.fit2099.engine.positions.Exit;
-import edu.monash.fit2099.engine.actions.ActionList;
+import game.actions.TeleportAction;
 import game.actors.Undead;
 import game.economy.Wallet;
-import game.grounds.Floor;
+import game.grounds.ToxicWaste;
 import game.interfaces.Sellable;
+import game.interfaces.Teleportable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
- * An alien cube item that allows teleportation to 3 random locations on the map.
- * Each use by an actor randomly selects one of 3 possible destinations.
+ * An alien cube item that allows teleportation to random locations on the map.
+ * Each use by an actor presents up to 3 possible destinations.
  */
 public class AlienCube extends Item implements Teleportable, Sellable {
     private static final int SELL_PRICE = 25;
+    private static final int DESTINATION_COUNT = 3;
+
     private final Random random = new Random();
 
     /**
@@ -34,39 +36,77 @@ public class AlienCube extends Item implements Teleportable, Sellable {
     }
 
     /**
-     * Get 3 randomly-selected locations from the map for teleportation.
-     * These are the possible destinations the actor can choose from.
+     * Get possible destination locations for teleportation.
+     * This interface method does not know which actor is teleporting, so it returns
+     * unoccupied locations. The actor-specific enterability check is applied in allowableActions().
+     *
      * @param map the current game map
-     * @return list of 3 random locations on the map that are Floor tiles
+     * @return list of unoccupied locations on the map
      */
     @Override
     public List<Location> getDestinations(GameMap map) {
         List<Location> validDestinations = new ArrayList<>();
-        
-        // Collect all valid destination tiles (Floor)
+
         for (int x : map.getXRange()) {
             for (int y : map.getYRange()) {
-                Location loc = map.at(x, y);
-                if (loc != null && !loc.containsAnActor() && loc.getGround() instanceof game.grounds.Floor) {
-                    validDestinations.add(loc);
+                Location location = map.at(x, y);
+
+                if (location != null && !location.containsAnActor()) {
+                    validDestinations.add(location);
                 }
             }
         }
-        
-        // Select up to 3 random destinations
+
+        return selectRandomDestinations(validDestinations);
+    }
+
+    /**
+     * Get up to 3 random locations that the given actor can enter.
+     *
+     * @param map the current game map
+     * @param actor the actor using the Alien Cube
+     * @return list of selected destination locations
+     */
+    private List<Location> getDestinationsForActor(GameMap map, Actor actor) {
+        List<Location> validDestinations = new ArrayList<>();
+
+        for (int x : map.getXRange()) {
+            for (int y : map.getYRange()) {
+                Location location = map.at(x, y);
+
+                if (location != null
+                        && !location.containsAnActor()
+                        && location.canActorEnter(actor)) {
+                    validDestinations.add(location);
+                }
+            }
+        }
+
+        return selectRandomDestinations(validDestinations);
+    }
+
+    /**
+     * Select up to three random destination locations.
+     *
+     * @param validDestinations all valid destination candidates
+     * @return randomly selected destinations
+     */
+    private List<Location> selectRandomDestinations(List<Location> validDestinations) {
         List<Location> selectedDestinations = new ArrayList<>();
-        for (int i = 0; i < 3 && !validDestinations.isEmpty(); i++) {
+
+        for (int i = 0; i < DESTINATION_COUNT && !validDestinations.isEmpty(); i++) {
             Location selected = validDestinations.get(random.nextInt(validDestinations.size()));
             selectedDestinations.add(selected);
-            validDestinations.remove(selected); // Don't select the same location twice
+            validDestinations.remove(selected);
         }
-        
+
         return selectedDestinations;
     }
 
     /**
      * Handle teleportation side effects.
-     * Ripping a hole in reality corrupts all adjacent ground tiles to Toxic Waste.
+     * Ripping a hole in reality corrupts adjacent enterable tiles to Toxic Waste.
+     *
      * @param actor the actor being teleported
      * @param source the source location
      * @param destination the destination location
@@ -74,57 +114,89 @@ public class AlienCube extends Item implements Teleportable, Sellable {
      */
     @Override
     public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
-        // Corrupt all adjacent tiles at source location to Toxic Waste
-        corruptAdjacentTiles(source);
+        corruptAdjacentTiles(source, actor);
     }
 
     /**
-     * Turn all adjacent floor tiles to Toxic Waste.
-     * @param location the source location whose adjacent tiles to corrupt
+     * Turn adjacent enterable tiles into Toxic Waste.
+     *
+     * @param location the source location whose adjacent tiles are corrupted
+     * @param actor the actor using the Alien Cube
      */
-    private void corruptAdjacentTiles(Location location) {
+    private void corruptAdjacentTiles(Location location, Actor actor) {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
-            // Only corrupt floor-like tiles (not walls, etc.)
-            if (adjacent.getGround() instanceof game.grounds.Floor) {
+
+            if (!adjacent.containsAnActor() && adjacent.canActorEnter(actor)) {
                 adjacent.setGround(new ToxicWaste());
             }
         }
     }
 
+    /**
+     * Get teleport actions available to the owner.
+     *
+     * @param owner the actor carrying the Alien Cube
+     * @param map the map the actor is on
+     * @return available teleport actions
+     */
     @Override
     public ActionList allowableActions(Actor owner, GameMap map) {
         ActionList actions = new ActionList();
-        for (Location destination : getDestinations(map)) {
-            if (destination != null && destination.canActorEnter(owner)) {
-                actions.add(new TeleportAction(this, destination));
-            }
+
+        for (Location destination : getDestinationsForActor(map, owner)) {
+            actions.add(new TeleportAction(this, destination));
         }
+
         return actions;
     }
 
+    /**
+     * Get the selling price.
+     *
+     * @return selling price in credits
+     */
     @Override
     public int getSellPrice() {
         return SELL_PRICE;
     }
 
+    /**
+     * Apply Alien Cube sale effect.
+     * When sold, the cube attempts to spawn one Undead beside the seller.
+     *
+     * @param seller the actor selling this item
+     * @param map the map where the transaction happens
+     * @param terminalLocation the location of the Supercomputer
+     * @param wallet the seller's wallet
+     * @return result description
+     */
     @Override
     public String onSold(Actor seller, GameMap map, Location terminalLocation, Wallet wallet) {
         Location sellerLocation = map.locationOf(seller);
+
         for (Exit exit : sellerLocation.getExits()) {
             Location candidate = exit.getDestination();
-            if (!candidate.containsAnActor() && candidate.getGround() instanceof Floor) {
+            Undead undead = new Undead();
+
+            if (!candidate.containsAnActor() && candidate.canActorEnter(undead)) {
                 try {
-                    map.addActor(new Undead(), candidate);
+                    map.addActor(undead, candidate);
                     return "Reality shudders. An Undead emerges beside " + seller + ".";
                 } catch (Exception ignored) {
                     break;
                 }
             }
         }
+
         return "Reality warps briefly, but nothing manifests nearby.";
     }
 
+    /**
+     * String representation.
+     *
+     * @return item name
+     */
     @Override
     public String toString() {
         return "Alien Cube";
