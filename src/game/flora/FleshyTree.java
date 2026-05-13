@@ -2,6 +2,7 @@ package game.flora;
 
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.enums.Ability;
 
 /**
  * Abstract base for fleshy trees that spawn an actor when any worker enters an adjacent tile.
@@ -25,16 +26,19 @@ public abstract class FleshyTree extends Tree {
     }
 
     /**
-     * Scans adjacent tiles for any actor. On first match, delegates to
+     * Scans adjacent tiles for workers only. On first match, delegates to
      * {@link #spawnActor(Location)} and returns true so growth is skipped this turn.
      *
      * @param location the location of this tree
-     * @return true if an adjacent actor was found and a spawn was triggered
+     * @return true if an adjacent worker was found and a spawn was triggered
      */
     @Override
     protected boolean proximityEffect(Location location) {
         for (Exit exit : location.getExits()) {
-            if (exit.getDestination().containsAnActor()) {
+            Location surroundingLocation = exit.getDestination();
+
+            if (surroundingLocation.containsAnActor()
+                    && surroundingLocation.getActor().hasAbility(Ability.WORKER)) {
                 spawnActor(location);
                 return true;
             }

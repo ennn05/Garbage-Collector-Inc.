@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.WarpAction;
+import game.enums.Ability;
 
 /**
  * Stage 2 of the Warper Tree (display: 'W').
@@ -25,16 +26,17 @@ public class WarperMatureTree extends Tree {
     }
 
     /**
-     * Scans adjacent tiles for an actor. On first match, forces a random warp via {@link WarpAction}.
+     * Scans adjacent tiles for a worker. On first match, forces a random warp via {@link WarpAction}.
      *
      * @param location the location of this mature warper tree
-     * @return true if an actor was found and warped this turn
+     * @return true if a worker was found and warped this turn
      */
     @Override
     protected boolean proximityEffect(Location location) {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
-            if (adjacent.containsAnActor()) {
+
+            if (adjacent.containsAnActor() && adjacent.getActor().hasAbility(Ability.WORKER)) {
                 Actor actor = adjacent.getActor();
                 new WarpAction().execute(actor, location.map());
                 return true;
