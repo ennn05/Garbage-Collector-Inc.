@@ -1,11 +1,10 @@
 package game.flora;
 
+import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Slime;
-import game.interfaces.Spawnable;
 
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -39,11 +38,16 @@ public class FleshySprout extends FleshyTree {
     protected void spawnActor(Location location) {
         for (Exit exit : location.getExits()) {
             Location adjacent = exit.getDestination();
-            if (!adjacent.containsAnActor() && adjacent.getGround().canActorEnter(new Slime())) {
-                Slime slime = new Slime();
-                location.map().addActor(slime, adjacent);
-                Objects.requireNonNull(adjacent.getActorAs(Spawnable.class)).spawnEffect(adjacent);
-                return;
+            Slime slime = new Slime();
+
+            if (!adjacent.containsAnActor() && adjacent.getGround().canActorEnter(slime)) {
+                try {
+                    location.map().addActor(slime, adjacent);
+                    slime.spawnEffect(adjacent);
+                    return;
+                } catch (GameEngineException ignored) {
+                    // Try the next adjacent location if this one cannot accept the actor.
+                }
             }
         }
     }
