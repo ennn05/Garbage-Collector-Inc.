@@ -32,14 +32,21 @@ public class MimicState implements MannequinState {
     @Override
     public MannequinState evaluate(Actor mannequin, Location location, StateManager manager, StateData data) {
         data.decrementDisguiseTurns();
+
         int workers = countNearbyWorkers(location);
 
         if (workers == 1) {
             return manager.berserk();
         }
-        if (data.getDisguiseTurnsLeft() == 0 && mannequin.getInventory().getItems().isEmpty()) {
-            return manager.idle();
+
+        if (data.getDisguiseTurnsLeft() == 0) {
+            if (mannequin.getInventory().getItems().isEmpty()) {
+                return manager.idle();
+            }
+
+            return manager.active();
         }
+
         return this;
     }
 
@@ -58,17 +65,22 @@ public class MimicState implements MannequinState {
 
         for (Exit exit : location.getExits()) {
             Location workerLoc = exit.getDestination();
+
             if (!workerLoc.containsAnActor()) {
                 continue;
             }
+
             Actor worker = workerLoc.getActor();
+
             if (!worker.hasAbility(Ability.WORKER)) {
                 continue;
             }
 
             int currentDist = chebyshev(location, workerLoc);
+
             for (Exit pushExit : workerLoc.getExits()) {
                 Location pushDest = pushExit.getDestination();
+
                 if (chebyshev(location, pushDest) > currentDist && pushDest.canActorEnter(worker)) {
                     location.map().moveActor(worker, pushDest);
                     break;
@@ -89,11 +101,13 @@ public class MimicState implements MannequinState {
 
     private int countNearbyWorkers(Location location) {
         int count = 0;
+
         for (Location nearby : location.getNearbyLocations(WORKER_DETECTION_RADIUS)) {
             if (nearby.containsAnActor() && nearby.getActor().hasAbility(Ability.WORKER)) {
                 count++;
             }
         }
+
         return count;
     }
 
