@@ -51,7 +51,7 @@ public class MagicCircle extends Ground implements Teleportable {
 
                 if (location != null
                         && !location.containsAnActor()
-                        && location.getGround() instanceof MagicCircle) {
+                        && location.getGroundAs(MagicCircle.class) != null) {
                     circles.add(location);
                 }
             }
