@@ -4,6 +4,8 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
+import edu.monash.fit2099.engine.items.DropAction;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.AttackWorkerBehaviour;
@@ -15,11 +17,11 @@ import java.util.List;
 
 /**
  * The Mannequin abandons subtlety and hunts workers relentlessly.
- * Entering this state triggers an AOE burst of damage to all adjacent actors.
+ * Entering this state triggers an immediate panic effect that forces adjacent workers
+ * to drop their carried items.
  */
 public class BerserkState implements MannequinState {
     private static final int WORKER_DETECTION_RADIUS = 3;
-    private static final int AOE_DAMAGE = 10;
     private static final double LOW_HEALTH_THRESHOLD = 0.30;
 
     private final List<Behaviour<Actor, Action>> behaviours;
@@ -38,6 +40,7 @@ public class BerserkState implements MannequinState {
         if (workers > 1) {
             return manager.idle();
         }
+
         if (workers == 0) {
             int currentHp = mannequin.getStatistic(ActorStatistics.HEALTH);
             int maxHp = mannequin.getMaximumStatistic(ActorStatistics.HEALTH);
@@ -46,19 +49,33 @@ public class BerserkState implements MannequinState {
             if (lowHealth && hasItems) {
                 return manager.mimic();
             }
-            if (!hasItems) {
-                return manager.active();
-            }
+
+            return manager.active();
         }
+
         return this;
     }
 
     @Override
     public void onEnter(Actor mannequin, Location location, StateData data) {
+        data.setDisplayChar('M');
+        data.resetIdleTurns();
+
         for (Exit exit : location.getExits()) {
             Location nearby = exit.getDestination();
-            if (nearby.containsAnActor()) {
-                nearby.getActor().hurt(AOE_DAMAGE);
+
+            if (!nearby.containsAnActor()) {
+                continue;
+            }
+
+            Actor nearbyActor = nearby.getActor();
+
+            if (!nearbyActor.hasAbility(Ability.WORKER)) {
+                continue;
+            }
+
+            for (Item item : new ArrayList<>(nearbyActor.getInventory().getItems())) {
+                new DropAction(item).execute(nearbyActor, location.map());
             }
         }
     }
@@ -75,11 +92,13 @@ public class BerserkState implements MannequinState {
 
     private int countNearbyWorkers(Location location) {
         int count = 0;
+
         for (Location nearby : location.getNearbyLocations(WORKER_DETECTION_RADIUS)) {
             if (nearby.containsAnActor() && nearby.getActor().hasAbility(Ability.WORKER)) {
                 count++;
             }
         }
+
         return count;
     }
 }

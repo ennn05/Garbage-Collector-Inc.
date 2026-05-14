@@ -117,7 +117,10 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
 
     @Override
     public String infect(Actor otherActor, GameMap gameMap) {
-        Spawner spawner = (Spawner) otherActor;
+        Spawner spawner = otherActor.asCapability(Spawner.class).orElse(null);
+        if (spawner == null) {
+            return otherActor + " cannot infect " + this + " as a hive.";
+        }
         return otherActor + " infected " + this + "\n" + this.hive(spawner);
     }
 

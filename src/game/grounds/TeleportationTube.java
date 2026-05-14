@@ -93,6 +93,9 @@ public class TeleportationTube extends Ground implements Teleportable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
+        if (!direction.isEmpty()) {
+            return actions;
+        }
 
         for (Location destination : getDestinations(location.map())) {
             if (destination != null && destination.canActorEnter(actor)) {

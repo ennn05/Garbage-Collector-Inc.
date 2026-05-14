@@ -82,9 +82,9 @@ public class HiveStatus implements Status {
         }
 
         if (spawned) {
-            spawnCounter = spawnInterval;
             System.out.println(currEntity + " spawned a new entity due to being a host.");
         }
+        spawnCounter = spawnInterval;
     }
 
     /**

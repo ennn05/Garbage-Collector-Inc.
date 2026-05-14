@@ -175,7 +175,10 @@ public class Cookies extends ConsumableItem implements Sellable, Host {
      */
     @Override
     public String infect(Actor otherActor, GameMap gameMap) {
-        Spawner spawner = (Spawner) otherActor;
+        Spawner spawner = otherActor.asCapability(Spawner.class).orElse(null);
+        if (spawner == null) {
+            return otherActor + " infects " + this;
+        }
         this.addStatus(new ItemDegradeStatus());
         return otherActor + " infects " + this + "\n" + this.hive(spawner);
     }

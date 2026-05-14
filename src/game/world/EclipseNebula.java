@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
+import game.actors.Mannequin;
 import game.enums.AccessLevel;
 import game.flora.FleshyMatureTree;
 import game.flora.FleshySapling;
@@ -25,6 +26,7 @@ import game.grounds.TeleportationTube;
 import game.grounds.TitaniumDoor;
 import game.grounds.ToxicWaste;
 import game.grounds.Trap;
+import game.grounds.Vent;
 import game.grounds.Wall;
 import game.inventory.WeightLimitedInventory;
 import game.items.AccessCard;
@@ -37,8 +39,6 @@ import game.items.Flask;
 import game.items.FloppyDisk;
 import game.items.Lantern;
 import game.items.SterilisationBox;
-<<<<<<< HEAD
-=======
 import game.grounds.Supercomputer;
 import game.inventory.WeightLimitedInventory;
 import game.items.AccessCard;
@@ -51,7 +51,6 @@ import game.flora.FleshyMatureTree;
 import game.flora.WarperSapling;
 import game.flora.WarperMatureTree;
 import game.actors.Mannequin;
->>>>>>> REQ5
 
 import java.util.Arrays;
 import java.util.List;
@@ -101,6 +100,9 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('Y', FleshyMatureTree::new);
         groundCreator.registerGround('w', WarperSapling::new);
         groundCreator.registerGround('W', WarperMatureTree::new);
+
+        // REQ4 ground types
+        groundCreator.registerGround('V', Vent::new);
 
         List<String> moon99Deprecated = Arrays.asList(
                 "....................########################################",
@@ -201,6 +203,14 @@ public class EclipseNebula extends World {
 
         FacilityAlarmSystem.register(overflow20Map);
 
+        // REQ2: Replace selected aluminium doors with higher-clearance doors.
+        overflow20Map.at(35, 4).setGround(new IronDoor());
+        overflow20Map.at(34, 14).setGround(new TitaniumDoor());
+
+        // REQ4: Place vents in 20-Overflow so motion-activated spawning can occur.
+        overflow20Map.at(31, 13).setGround(new Vent());
+        overflow20Map.at(54, 14).setGround(new Vent());
+
         // Place Alien Cubes at marked locations.
         overflow20Map.at(17, 3).addItem(new AlienCube());
         overflow20Map.at(18, 14).addItem(new AlienCube());
@@ -235,19 +245,10 @@ public class EclipseNebula extends World {
 
         overflow20Map.at(5, 19).setGround(new WarperMatureTree());
         overflow20Map.at(9, 19).setGround(new WarperMatureTree());
-<<<<<<< HEAD
-=======
 
-        // REQ5: Mannequins placed in floor areas of the 20-Overflow map
+        // REQ5: Mannequins placed in floor areas of the 20-Overflow map.
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(17, 4));
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(28, 8));
 
-        // Add a cross-map destination to the ship tube in 99-deprecated.
-        // This ensures the tubes support both within-map and between-maps movement.
-        if (moon99DeprecatedMap.at(7, 3).getGround() instanceof TeleportationTube) {
-            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(7, 3).getGround();
-            ship99Tube.addDestination(overflow20Map.at(6, 3));
-        }
->>>>>>> REQ5
     }
 }
