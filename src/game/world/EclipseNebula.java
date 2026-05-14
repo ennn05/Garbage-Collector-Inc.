@@ -26,6 +26,7 @@ import game.grounds.TeleportationTube;
 import game.grounds.TitaniumDoor;
 import game.grounds.ToxicWaste;
 import game.grounds.Trap;
+import game.grounds.Vent;
 import game.grounds.Wall;
 import game.inventory.WeightLimitedInventory;
 import game.items.AccessCard;
@@ -87,6 +88,9 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('Y', FleshyMatureTree::new);
         groundCreator.registerGround('w', WarperSapling::new);
         groundCreator.registerGround('W', WarperMatureTree::new);
+
+        // REQ4 ground types
+        groundCreator.registerGround('V', Vent::new);
 
         List<String> moon99Deprecated = Arrays.asList(
                 "....................########################################",
@@ -186,6 +190,14 @@ public class EclipseNebula extends World {
         this.addGameMap(overflow20Map);
 
         FacilityAlarmSystem.register(overflow20Map);
+
+        // REQ2: Replace selected aluminium doors with higher-clearance doors.
+        overflow20Map.at(35, 4).setGround(new IronDoor());
+        overflow20Map.at(34, 14).setGround(new TitaniumDoor());
+
+        // REQ4: Place vents in 20-Overflow so motion-activated spawning can occur.
+        overflow20Map.at(31, 13).setGround(new Vent());
+        overflow20Map.at(54, 14).setGround(new Vent());
 
         // Place Alien Cubes at marked locations.
         overflow20Map.at(17, 3).addItem(new AlienCube());
