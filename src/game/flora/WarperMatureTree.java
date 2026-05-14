@@ -38,7 +38,7 @@ public class WarperMatureTree extends Tree {
 
             if (adjacent.containsAnActor() && adjacent.getActor().hasAbility(Ability.WORKER)) {
                 Actor actor = adjacent.getActor();
-                new WarpAction().execute(actor, location.map());
+                System.out.println(new WarpAction().execute(actor, location.map()));
                 return true;
             }
         }
