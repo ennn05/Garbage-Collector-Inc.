@@ -6,9 +6,11 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import game.actions.TeleportAction;
 import game.actors.Undead;
 import game.economy.Wallet;
+import game.enums.ItemStatistics;
 import game.grounds.ToxicWaste;
 import game.interfaces.Sellable;
 import game.interfaces.Teleportable;
@@ -33,6 +35,7 @@ public class AlienCube extends Item implements Teleportable, Sellable {
     public AlienCube() {
         super("Alien Cube", '◈');
         this.makePortable();
+        this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(5));
     }
 
     /**
