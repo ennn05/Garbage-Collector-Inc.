@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.CollectGroundItemBehaviour;
 import game.enums.Ability;
@@ -36,12 +37,15 @@ public class ActiveState implements MannequinState {
         if (workers == 1) {
             return manager.berserk();
         }
+
         if (inventoryFull || (workers > 1 && hasItems)) {
             return manager.mimic();
         }
+
         if (workers > 1 && !hasItems) {
             return manager.idle();
         }
+
         return this;
     }
 
@@ -50,13 +54,38 @@ public class ActiveState implements MannequinState {
         data.setDisplayChar('M');
         data.resetIdleTurns();
 
-        List<Item> groundItems = new ArrayList<>(location.getItems());
+        vacuumItemsFrom(location, mannequin);
+
+        for (Exit exit : location.getExits()) {
+            Location nearby = exit.getDestination();
+
+            if (mannequin.getInventory().getItems().size() >= MAX_INVENTORY_SIZE) {
+                break;
+            }
+
+            if (!nearby.containsAnActor() && nearby.canActorEnter(mannequin)) {
+                vacuumItemsFrom(nearby, mannequin);
+            }
+        }
+    }
+
+    /**
+     * Move loose items from the given location into the Mannequin's inventory
+     * until its inventory reaches the state-specific capacity.
+     *
+     * @param source the location to collect items from
+     * @param mannequin the Mannequin actor entering ActiveState
+     */
+    private void vacuumItemsFrom(Location source, Actor mannequin) {
+        List<Item> groundItems = new ArrayList<>(source.getItems());
+
         for (Item item : groundItems) {
             if (mannequin.getInventory().getItems().size() >= MAX_INVENTORY_SIZE) {
                 break;
             }
+
             mannequin.getInventory().add(item);
-            location.removeItem(item);
+            source.removeItem(item);
         }
     }
 
@@ -72,11 +101,13 @@ public class ActiveState implements MannequinState {
 
     private int countNearbyWorkers(Location location) {
         int count = 0;
+
         for (Location nearby : location.getNearbyLocations(WORKER_DETECTION_RADIUS)) {
             if (nearby.containsAnActor() && nearby.getActor().hasAbility(Ability.WORKER)) {
                 count++;
             }
         }
+
         return count;
     }
 }
