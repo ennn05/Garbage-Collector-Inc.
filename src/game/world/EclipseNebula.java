@@ -39,6 +39,18 @@ import game.items.Flask;
 import game.items.FloppyDisk;
 import game.items.Lantern;
 import game.items.SterilisationBox;
+import game.grounds.Supercomputer;
+import game.inventory.WeightLimitedInventory;
+import game.items.AccessCard;
+import game.items.AlienCube;
+import game.enums.AccessLevel;
+import game.grounds.Wall;
+import game.flora.FleshySprout;
+import game.flora.FleshySapling;
+import game.flora.FleshyMatureTree;
+import game.flora.WarperSapling;
+import game.flora.WarperMatureTree;
+import game.actors.Mannequin;
 
 import java.util.Arrays;
 import java.util.List;
@@ -237,5 +249,12 @@ public class EclipseNebula extends World {
         // REQ5: Mannequins placed in floor areas of the 20-Overflow map.
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(17, 4));
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(28, 8));
+
+        // Add a cross-map destination to the ship tube in 99-deprecated.
+        // This ensures the tubes support both within-map and between-maps movement.
+        if (moon99DeprecatedMap.at(7, 3).getGround() instanceof TeleportationTube) {
+            TeleportationTube ship99Tube = (TeleportationTube) moon99DeprecatedMap.at(7, 3).getGround();
+            ship99Tube.addDestination(overflow20Map.at(6, 3));
+        }
     }
 }
