@@ -93,6 +93,9 @@ public class MagicCircle extends Ground implements Teleportable {
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = new ActionList();
+        if (!direction.isEmpty()) {
+            return actions;
+        }
         List<Location> destinations = getDestinations(location.map());
 
         if (!destinations.isEmpty()) {
