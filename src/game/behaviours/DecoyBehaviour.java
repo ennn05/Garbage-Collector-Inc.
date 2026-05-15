@@ -3,13 +3,10 @@ package game.behaviours;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
-import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.DecoyAction;
 import game.enums.Ability;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * While disguised, the Mannequin heals itself each turn when adjacent to a worker.
@@ -30,40 +27,9 @@ public class DecoyBehaviour implements Behaviour<Actor, Action> {
                 continue;
             }
 
-            return new DecoyAction(worker);
+            return new DecoyAction(worker, HEAL_AMOUNT);
         }
 
         return null;
-    }
-
-    /**
-     * Heals the Mannequin and forces an adjacent worker to drop one item.
-     */
-    private class DecoyAction extends Action {
-        private final Actor target;
-
-        DecoyAction(Actor target) {
-            this.target = target;
-        }
-
-        @Override
-        public String execute(Actor actor, edu.monash.fit2099.engine.positions.GameMap map) {
-            actor.heal(HEAL_AMOUNT);
-
-            List<Item> items = new ArrayList<>(target.getInventory().getItems());
-            if (!items.isEmpty()) {
-                Item dropped = items.get(0);
-                target.getInventory().remove(dropped);
-                map.locationOf(target).addItem(dropped);
-                return actor + " heals " + HEAL_AMOUNT + " HP and causes " + target + " to drop " + dropped;
-            }
-
-            return actor + " heals " + HEAL_AMOUNT + " HP while lurking near " + target;
-        }
-
-        @Override
-        public String menuDescription(Actor actor) {
-            return actor + " uses decoy near " + target;
-        }
     }
 }
