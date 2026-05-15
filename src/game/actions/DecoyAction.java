@@ -25,7 +25,7 @@ public class DecoyAction extends Action {
 
         List<Item> items = new ArrayList<>(target.getInventory().getItems());
         if (!items.isEmpty()) {
-            Item dropped = items.getFirst();
+            Item dropped = items.get(0);
             target.getInventory().remove(dropped);
             map.locationOf(target).addItem(dropped);
             return actor + " heals " + healAmount + " HP and causes " + target + " to drop " + dropped;
