@@ -23,7 +23,8 @@
 |   | | | |   ||     |_ |   |                                                            
 |___| |_|  |__||_______||___|                                                                                                                                                                                                                         
 ```
-
+## Contribution log
+[Contribution log link](https://docs.google.com/spreadsheets/d/1EAoeuuQ9YHIjVSB8gqZoziGPfBNeuz8M6MIWxhEWIpc/edit?usp=sharing)
 ## About the Mannequin
 
 The Mannequin is a sophisticated, adaptive AI actor that cycles through four distinct behavioral states based on environmental conditions, inventory status, and worker proximity. It employs a **State Machine Pattern** to manage complex behavior transitions and execution.
