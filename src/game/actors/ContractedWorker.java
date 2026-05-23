@@ -25,7 +25,7 @@ import game.world.FacilityAlarmSystem;
  * fluids to stay alive.
  */
 public class ContractedWorker extends Actor implements WalletHolder, Host {
-    private static final int HIVE_SPAWN_INTERVAL = 4;
+    private static final int HIVE_SPAWN_INTERVAL = 5;
     private static final int HOST_DAMAGE = 1;
 
     private final Wallet wallet;

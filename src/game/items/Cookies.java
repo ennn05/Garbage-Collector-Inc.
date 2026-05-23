@@ -23,7 +23,7 @@ public class Cookies extends ConsumableItem implements Sellable, Host {
     private static final int TOTAL_COOKIES = 5;
     private static final int HEAL_AMOUNT = 1;
     private static final int MAX_HP_DECREASE = 1;
-    private static final int HIVE_SPAWN_INTERVAL = 0;
+    private static final int HIVE_SPAWN_INTERVAL = 1;
 
     public Cookies() {
         super("Cookies", '◍');
