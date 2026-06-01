@@ -45,13 +45,4 @@ public enum AccessLevel {
         return weight;
     }
 
-    /**
-     * Check whether this access level can open a door with the required clearance.
-     *
-     * @param requiredClearance the door's required clearance level
-     * @return true if this access level is high enough
-     */
-    public boolean canOpen(AccessLevel requiredClearance) {
-        return this.ordinal() >= requiredClearance.ordinal();
-    }
 }

@@ -67,7 +67,7 @@ public class AccessCard extends Item implements Purchasable, DoorUnlocker {
     public boolean canUnlock(Unlockable unlockable) {
         return unlockable != null
                 && !unlockable.isUnlocked()
-                && level.canOpen(unlockable.getRequiredClearance());
+                && level.ordinal() >= unlockable.getRequiredClearance().ordinal();
     }
 
     /**
