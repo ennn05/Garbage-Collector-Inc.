@@ -39,18 +39,10 @@ import game.items.Flask;
 import game.items.FloppyDisk;
 import game.items.Lantern;
 import game.items.SterilisationBox;
-import game.grounds.Supercomputer;
-import game.inventory.WeightLimitedInventory;
-import game.items.AccessCard;
-import game.items.AlienCube;
-import game.enums.AccessLevel;
-import game.grounds.Wall;
-import game.flora.FleshySprout;
-import game.flora.FleshySapling;
-import game.flora.FleshyMatureTree;
-import game.flora.WarperSapling;
-import game.flora.WarperMatureTree;
-import game.actors.Mannequin;
+import game.grounds.BlightFungus;
+import game.grounds.SporeColony;
+import game.grounds.SporeExplosion;
+import game.items.SporeCanister;
 
 import java.util.Arrays;
 import java.util.List;
@@ -103,6 +95,11 @@ public class EclipseNebula extends World {
 
         // REQ4 ground types
         groundCreator.registerGround('V', Vent::new);
+
+        // REQ3 (creative) fungal ground types
+        groundCreator.registerGround('%', BlightFungus::new);
+        groundCreator.registerGround('*', SporeExplosion::new);
+        groundCreator.registerGround('§', SporeColony::new);
 
         List<String> moon99Deprecated = Arrays.asList(
                 "....................########################################",
@@ -249,6 +246,15 @@ public class EclipseNebula extends World {
         // REQ5: Mannequins placed in floor areas of the 20-Overflow map.
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(17, 4));
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(28, 8));
+
+        // REQ3 (creative): Seed initial fungal ground tiles and a SporeCanister pickup.
+        moon99DeprecatedMap.at(35, 5).setGround(new BlightFungus());
+        moon99DeprecatedMap.at(46, 15).setGround(new SporeExplosion());
+        moon99DeprecatedMap.at(50, 5).setGround(new SporeColony());
+        moon99DeprecatedMap.at(33, 11).addItem(new SporeCanister());
+
+        overflow20Map.at(25, 3).setGround(new BlightFungus());
+        overflow20Map.at(45, 8).setGround(new SporeColony());
 
     }
 }
