@@ -42,23 +42,30 @@ public class Hole extends Ground implements Spawner {
             return;   // no generate
         }
 
-        try {
-            if (!location.containsAnActor()) { // empty then generate
-                location.addActor(this.spawn(location));
-                Objects.requireNonNull(location.getActorAs(Spawnable.class)).spawnEffect(location);
-                if (random.nextDouble() < GROW_CHANCE) {
-                    List<Location> adj = new ArrayList<>(location.getNearbyLocations(SPAWN_CHECK_RADIUS));
-                    Collections.shuffle(adj); // shuffle for random adjacent
-                    for (Location nearby : adj) {
-                        if (nearby.getGroundAs(Hole.class) == null) {
-                            nearby.setGround(new Hole());
-                            break;
-                        }
+        if (!location.containsAnActor()) {
+            Actor spawnedActor = this.spawn(location);
+            try {
+                location.addActor(spawnedActor);
+            } catch (GameEngineException e) {
+                System.out.println("Hole failed to spawn actor: " + e.getMessage());
+                return;
+            }
+
+            Spawnable spawnable = spawnedActor.asCapability(Spawnable.class).orElse(null);
+            if (spawnable != null) {
+                spawnable.spawnEffect(location);
+            }
+
+            if (random.nextDouble() < GROW_CHANCE) {
+                List<Location> adj = new ArrayList<>(location.getNearbyLocations(SPAWN_CHECK_RADIUS));
+                Collections.shuffle(adj);
+                for (Location nearby : adj) {
+                    if (!(nearby.getGround() instanceof Hole)) {
+                        nearby.setGround(new Hole());
+                        break;
                     }
                 }
             }
-        } catch (GameEngineException | NullPointerException e) {
-            throw new RuntimeException(e);
         }
 
         turnsElapsed = 0; // 20rounds attempt happened
