@@ -15,6 +15,9 @@ import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
+import game.grounds.BlightFungus;
+import game.grounds.Floor;
+import game.grounds.FungalGround;
 import game.interfaces.*;
 import game.status.HiveStatus;
 import game.world.FacilityAlarmSystem;
@@ -24,7 +27,7 @@ import game.world.FacilityAlarmSystem;
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends Actor implements WalletHolder, Host {
+public class ContractedWorker extends Actor implements WalletHolder, Host, SporeEmitter {
     private static final int HIVE_SPAWN_INTERVAL = 5;
     private static final int HOST_DAMAGE = 1;
 
@@ -133,5 +136,24 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
     @Override
     public void hiveEffect() {
         this.hurt(HOST_DAMAGE);
+    }
+
+    /**
+     * Converts the Floor tile at the given location into BlightFungus.
+     * Called each turn by SporeInfection (30% chance) while this worker is infected.
+     *
+     * @param source the worker's current location
+     */
+    @Override
+    public void emitSpores(Location source) {
+        if (source.getGround() instanceof Floor) {
+            source.setGround(new BlightFungus());
+            System.out.println(this + " leaves a trail of blight spores!");
+        }
+    }
+
+    @Override
+    public Class<? extends FungalGround> getSporeType() {
+        return BlightFungus.class;
     }
 }
