@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.actions.ActionList;
+import game.status.BurnStatus;
 import game.utility.FireSpawner;
 
 import java.util.ArrayList;
@@ -80,6 +81,8 @@ public class TeleportationTube extends Ground implements Teleportable {
         }
 
         fireSpawner.spawnAround(finalDestination, FIRE_DURATION);
+        actor.addStatus(new BurnStatus(FIRE_DURATION, 1));
+        System.out.println(actor + " is scorched by the teleportation blast!");
     }
 
     /**
