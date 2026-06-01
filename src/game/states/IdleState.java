@@ -38,7 +38,7 @@ public class IdleState implements MannequinState {
     @Override
     public void onEnter(Actor mannequin, Location location, StateData data) {
         data.resetIdleTurns();
-        data.setDisplayChar('M');
+        data.setDisplayChar('Ω');
 
         for (Item item : new ArrayList<>(mannequin.getInventory().getItems())) {
             new DropAction(item).execute(mannequin, location.map());
@@ -48,11 +48,6 @@ public class IdleState implements MannequinState {
     @Override
     public List<Behaviour<Actor, Action>> getBehaviours() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public String getStateName() {
-        return "Idle";
     }
 
     private int countNearbyWorkers(Location location) {

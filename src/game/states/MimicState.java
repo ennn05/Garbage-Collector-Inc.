@@ -94,11 +94,6 @@ public class MimicState implements MannequinState {
         return behaviours;
     }
 
-    @Override
-    public String getStateName() {
-        return "Mimic";
-    }
-
     private int countNearbyWorkers(Location location) {
         int count = 0;
 

@@ -58,7 +58,7 @@ public class BerserkState implements MannequinState {
 
     @Override
     public void onEnter(Actor mannequin, Location location, StateData data) {
-        data.setDisplayChar('M');
+        data.setDisplayChar('Ω');
         data.resetIdleTurns();
 
         for (Exit exit : location.getExits()) {
@@ -83,11 +83,6 @@ public class BerserkState implements MannequinState {
     @Override
     public List<Behaviour<Actor, Action>> getBehaviours() {
         return behaviours;
-    }
-
-    @Override
-    public String getStateName() {
-        return "Berserk";
     }
 
     private int countNearbyWorkers(Location location) {

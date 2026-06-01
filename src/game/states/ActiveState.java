@@ -51,7 +51,7 @@ public class ActiveState implements MannequinState {
 
     @Override
     public void onEnter(Actor mannequin, Location location, StateData data) {
-        data.setDisplayChar('M');
+        data.setDisplayChar('Ω');
         data.resetIdleTurns();
 
         vacuumItemsFrom(location, mannequin);
@@ -92,11 +92,6 @@ public class ActiveState implements MannequinState {
     @Override
     public List<Behaviour<Actor, Action>> getBehaviours() {
         return behaviours;
-    }
-
-    @Override
-    public String getStateName() {
-        return "Active";
     }
 
     private int countNearbyWorkers(Location location) {

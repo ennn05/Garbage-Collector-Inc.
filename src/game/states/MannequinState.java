@@ -42,10 +42,4 @@ public interface MannequinState {
      */
     List<Behaviour<Actor, Action>> getBehaviours();
 
-    /**
-     * Returns a human-readable name for this state.
-     *
-     * @return the state name
-     */
-    String getStateName();
 }

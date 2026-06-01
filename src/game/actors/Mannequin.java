@@ -29,7 +29,7 @@ public class Mannequin extends Creature {
     private MannequinState currentState;
 
     public Mannequin() {
-        super("Mannequin", 'M', HIT_POINTS, new BasicInventory());
+        super("Mannequin", 'Ω', HIT_POINTS, new BasicInventory());
         this.setIntrinsicWeapon(new IntrinsicWeapon(ATTACK_DAMAGE, "slashes", HIT_RATE, "claws") {});
         this.enableAbility(Ability.HOSTILE);
 

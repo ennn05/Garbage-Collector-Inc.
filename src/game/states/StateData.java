@@ -12,7 +12,7 @@ public class StateData {
     public StateData() {
         this.idleTurnCount = 0;
         this.disguiseTurnsLeft = 0;
-        this.displayChar = 'M';
+        this.displayChar = 'Ω';
     }
 
     public int getIdleTurnCount() {
