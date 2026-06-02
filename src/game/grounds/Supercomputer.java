@@ -13,6 +13,7 @@ import game.economy.WalletHolder;
 import game.enums.AccessLevel;
 import game.interfaces.Depositable;
 import game.interfaces.Purchasable;
+import game.interfaces.QuotaHost;
 import game.interfaces.Sellable;
 import game.items.AccessCard;
 import game.items.FirstAidKit;
@@ -26,7 +27,7 @@ import java.util.List;
  * A Supercomputer terminal that allows workers to buy and sell items.
  * Also manages the company quota system.
  */
-public class Supercomputer extends Ground {
+public class Supercomputer extends Ground implements QuotaHost {
     private final List<Purchasable> purchasableItems;
     private QuotaSystem quotaSystem;
 
