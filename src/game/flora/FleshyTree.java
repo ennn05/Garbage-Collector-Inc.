@@ -1,15 +1,16 @@
 package game.flora;
 
+import edu.monash.fit2099.engine.GameEngineException;
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.enums.Ability;
+import game.interfaces.Spawnable;
+
+import java.util.function.Supplier;
 
 /**
  * Abstract base for fleshy trees that spawn an actor when any worker enters an adjacent tile.
- *
- * <p>Centralises the adjacency-check logic shared by {@link FleshySprout} and
- * {@link FleshyMatureTree}, keeping each subclass responsible only for deciding
- * <em>what</em> to spawn rather than <em>how</em> to detect proximity (DRY).
  *
  * @author ennn12
  */
@@ -53,4 +54,43 @@ public abstract class FleshyTree extends Tree {
      * @param location the location of this tree
      */
     protected abstract void spawnActor(Location location);
+
+    /**
+     * Safely spawns one actor on the first valid adjacent tile found and applies its spawn effect.
+     *
+     * @param location the location of this tree
+     * @param actorFactory factory that creates the actor to spawn
+     * @return true if an actor was spawned successfully
+     */
+    protected boolean spawnActorOnAdjacentTile(Location location, Supplier<Actor> actorFactory) {
+        for (Exit exit : location.getExits()) {
+            Location adjacent = exit.getDestination();
+            Actor actor = actorFactory.get();
+
+            if (adjacent.canActorEnter(actor)) {
+                try {
+                    adjacent.addActor(actor);
+                    applySpawnEffect(actor, adjacent);
+                    return true;
+                } catch (GameEngineException ignored) {
+                    // Try the next adjacent tile if this location cannot accept the actor.
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Applies spawn effects without depending on concrete creature classes.
+     *
+     * @param actor the spawned actor
+     * @param location the actor's spawn location
+     */
+    private void applySpawnEffect(Actor actor, Location location) {
+        Spawnable spawnable = actor.asCapability(Spawnable.class).orElse(null);
+        if (spawnable != null) {
+            spawnable.spawnEffect(location);
+        }
+    }
 }

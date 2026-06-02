@@ -8,7 +8,10 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
 import game.actors.Mannequin;
 import game.enums.AccessLevel;
+import game.flora.DeprecatedFleshyMatureTree;
+import game.flora.DeprecatedFleshySprout;
 import game.flora.FleshyMatureTree;
+import game.flora.FleshyMonolith;
 import game.flora.FleshySapling;
 import game.flora.FleshySprout;
 import game.flora.WarperMatureTree;
@@ -32,25 +35,13 @@ import game.inventory.WeightLimitedInventory;
 import game.items.AccessCard;
 import game.items.AlienCube;
 import game.items.Apple;
-import game.items.CRTMonitor;
 import game.items.Cookies;
+import game.items.CRTMonitor;
 import game.items.FirstAidKit;
 import game.items.Flask;
 import game.items.FloppyDisk;
 import game.items.Lantern;
 import game.items.SterilisationBox;
-import game.grounds.Supercomputer;
-import game.inventory.WeightLimitedInventory;
-import game.items.AccessCard;
-import game.items.AlienCube;
-import game.enums.AccessLevel;
-import game.grounds.Wall;
-import game.flora.FleshySprout;
-import game.flora.FleshySapling;
-import game.flora.FleshyMatureTree;
-import game.flora.WarperSapling;
-import game.flora.WarperMatureTree;
-import game.actors.Mannequin;
 
 import java.util.Arrays;
 import java.util.List;
@@ -87,19 +78,22 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('o', Hole::new);
         groundCreator.registerGround('!', Trap::new);
 
-        // REQ2 ground types
+        // REQ1 and REQ2 ground types
         groundCreator.registerGround('≡', Supercomputer::new);
         groundCreator.registerGround('≈', ToxicWaste::new);
         groundCreator.registerGround('Φ', TeleportationTube::new);
         groundCreator.registerGround('◎', MagicCircle::new);
         groundCreator.registerGround('◈', Floor::new);
 
-        // REQ3 flora ground types
+        // REQ3 flora ground types for 20-Overflow
         groundCreator.registerGround('y', FleshySprout::new);
         groundCreator.registerGround('v', FleshySapling::new);
         groundCreator.registerGround('Y', FleshyMatureTree::new);
         groundCreator.registerGround('w', WarperSapling::new);
         groundCreator.registerGround('W', WarperMatureTree::new);
+
+        // REQ2 final deprecated fleshy tree stage
+        groundCreator.registerGround('H', FleshyMonolith::new);
 
         // REQ4 ground types
         groundCreator.registerGround('V', Vent::new);
@@ -164,6 +158,15 @@ public class EclipseNebula extends World {
         moon99DeprecatedMap.at(47, 8).setGround(new Trap());
         moon99DeprecatedMap.at(35, 14).setGround(new Trap());
 
+        // ass3REQ2: Populate the 99-Deprecated moon with deprecated fleshy trees.
+        // These trees use different behaviour from the 20-Overflow fleshy trees.
+        moon99DeprecatedMap.at(13, 2).setGround(new DeprecatedFleshySprout());
+        moon99DeprecatedMap.at(16, 10).setGround(new DeprecatedFleshySprout());
+
+        moon99DeprecatedMap.at(3, 15).setGround(new DeprecatedFleshyMatureTree());
+        moon99DeprecatedMap.at(17, 15).setGround(new DeprecatedFleshyMatureTree());
+
+
         ContractedWorker contractedWorker1 = createWorker("#1 Bob");
         ContractedWorker contractedWorker2 = createWorker("#2 Tom");
         ContractedWorker contractedWorker3 = createWorker("#3 Sarah");
@@ -181,7 +184,7 @@ public class EclipseNebula extends World {
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 "...#######...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈##################≈≈≈≈≈≈≈",
                 "...#≡____#...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈#________________#≈≈≈≈≈≈≈",
-                "...#__Φ__=...........≈≈≈≈≈≈≈≈#######_______◈________#≈≈≈≈≈≈≈",
+                "...#__Φ__=...........≈≈≈≈≈≈≈#######_______◈________#≈≈≈≈≈≈≈≈",
                 "...#_____#...........≈≈≈≈≈≈≈≈#_____=________________#≈≈≈≈≈≈≈",
                 "...#######...≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_◎___###########=######≈≈≈≈≈≈≈",
                 ".............≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈#_____#≈≈≈≈≈≈≈≈≈#______#≈≈≈≈≈≈≈",
@@ -205,7 +208,7 @@ public class EclipseNebula extends World {
 
         FacilityAlarmSystem.register(overflow20Map);
 
-        // Initialize quota system for the supercomputer in overflow20
+        // Initialize quota system for the supercomputer in overflow20.
         Supercomputer overflow20Supercomputer = (Supercomputer) overflow20Map.at(4, 2).getGround();
         if (overflow20Supercomputer != null) {
             overflow20Supercomputer.initialiseQuotaSystem(overflow20Map.at(4, 2));
@@ -257,6 +260,5 @@ public class EclipseNebula extends World {
         // REQ5: Mannequins placed in floor areas of the 20-Overflow map.
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(17, 4));
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(28, 8));
-
     }
 }

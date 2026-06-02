@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Parasite;
+import game.actors.ScrapSnatcher;
 import game.actors.Slime;
 import game.actors.Undead;
 import game.enums.Ability;
@@ -15,14 +16,17 @@ import game.interfaces.Spawner;
 import game.items.IndustrialFan;
 import game.status.PoisonStatus;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 /**
  * A ground tile that spawns a hostile creature when a contracted worker is nearby.
  * <p>
- * When activated, the vent creates either a slime or a parasite, places it on the
- * current location, triggers its spawn effect, and poisons nearby actors.
- * Can be cut with a plasma cutter.
+ * When activated, the vent creates a random spawnable actor, places it on the
+ * current location, triggers its spawn effect, and poisons nearby actors. It can
+ * be cut with a plasma cutter.
  */
 public class Vent extends Ground implements Spawner, Cuttable {
     private static final int SPAWN_POISON_DURATION = 5;
@@ -40,46 +44,43 @@ public class Vent extends Ground implements Spawner, Cuttable {
 
     /**
      * Spawns a hostile creature when a contracted worker is nearby.
-     * <p>
-     * If a worker is detected within the spawn-check radius, the vent creates a
-     * random spawnable actor, places it at this location, invokes its spawn effect,
-     * and then applies poison to nearby actors.
      *
      * @param location the location containing this vent
      */
     @Override
     public void tick(Location location) {
-        if (!hasWorkerNearby(location)) {
-            return;
-        }
-
-        if (location.containsAnActor()) {
+        if (!hasWorkerNearby(location) || location.containsAnActor()) {
             return;
         }
 
         Actor spawnedActor = spawn(location);
-        boolean spawned = false;
-
         try {
             location.addActor(spawnedActor);
-
-            Spawnable spawnable = spawnedActor.asCapability(Spawnable.class).orElse(null);
-            if (spawnable != null) {
-                spawnable.spawnEffect(location);
-            }
-
-            spawned = true;
-        } catch (GameEngineException e) {
-            System.out.println("Vent failed to spawn an actor: " + e.getMessage());
-        }
-
-        if (spawned) {
+            applySpawnEffect(spawnedActor, location);
             poisonNearbyActors(location);
+        } catch (GameEngineException ignored) {
+            // The spawn attempt is safely ignored if the engine rejects the actor placement.
         }
     }
 
     /**
-     * Check whether a worker is nearby.
+     * Creates a random spawnable actor for this vent.
+     *
+     * @param location the location where the actor will be spawned
+     * @return a new hostile creature
+     */
+    @Override
+    public Actor spawn(Location location) {
+        List<Supplier<Actor>> spawnOptions = new ArrayList<>();
+        spawnOptions.add(Slime::getSlimeSpawn);
+        spawnOptions.add(Parasite::getParasiteSpawn);
+        spawnOptions.add(ScrapSnatcher::getScrapSnatcherSpawn);
+
+        return spawnOptions.get(random.nextInt(spawnOptions.size())).get();
+    }
+
+    /**
+     * Checks whether a worker is nearby.
      *
      * @param location the location containing this vent
      * @return true if a worker is within the check radius
@@ -95,7 +96,20 @@ public class Vent extends Ground implements Spawner, Cuttable {
     }
 
     /**
-     * Poison all nearby actors after the vent spawns an actor.
+     * Applies the spawn side effect if the spawned actor supports it.
+     *
+     * @param spawnedActor the actor that has just been spawned
+     * @param location the spawn location
+     */
+    private void applySpawnEffect(Actor spawnedActor, Location location) {
+        Spawnable spawnable = spawnedActor.asCapability(Spawnable.class).orElse(null);
+        if (spawnable != null) {
+            spawnable.spawnEffect(location);
+        }
+    }
+
+    /**
+     * Poisons all nearby actors after the vent spawns an actor.
      *
      * @param location the location containing this vent
      */
@@ -109,25 +123,10 @@ public class Vent extends Ground implements Spawner, Cuttable {
     }
 
     /**
-     * Creates a random spawnable actor for this vent.
-     *
-     * @param location the location where the actor will be spawned
-     * @return either a new slime or a new parasite
-     */
-    @Override
-    public Actor spawn(Location location) {
-        if (random.nextBoolean()) {
-            return Slime.getSlimeSpawn();
-        }
-
-        return Parasite.getParasiteSpawn();
-    }
-
-    /**
-     * Check if this vent can be cut.
+     * Checks if this vent can be cut.
      *
      * @param actor the actor attempting to cut
-     * @return true (vents can always be cut)
+     * @return true because vents can always be cut
      */
     @Override
     public boolean canBeCut(Actor actor) {
@@ -135,8 +134,8 @@ public class Vent extends Ground implements Spawner, Cuttable {
     }
 
     /**
-     * Handle cutting the vent.
-     * Spawns an Undead on the current location.
+     * Handles cutting the vent. The vent spawns an Undead on the current
+     * location and then transforms into a Floor tile.
      *
      * @param actor the actor performing the cut
      * @param location the location of this vent
@@ -144,31 +143,23 @@ public class Vent extends Ground implements Spawner, Cuttable {
      */
     @Override
     public String onCut(Actor actor, Location location) {
-        String result = actor + " cuts through the Vent with the Plasma Cutter! " +
-                "It transforms into a Floor tile.";
+        String result = actor + " cuts through the Vent with the Plasma Cutter! "
+                + "It transforms into a Floor tile.";
 
-        // Try to spawn an Undead on this location
         try {
-            Undead undead = new Undead();
+            Actor undead = Undead.getUndeadSpawn();
             location.addActor(undead);
-            
-            // Apply spawn effect if available
-            Spawnable spawnable = undead.asCapability(Spawnable.class).orElse(null);
-            if (spawnable != null) {
-                spawnable.spawnEffect(location);
-            }
-            
+            applySpawnEffect(undead, location);
             result += "\nAn Undead instantly spawns from the vent!";
-        } catch (GameEngineException e) {
+        } catch (GameEngineException ignored) {
             result += "\nFailed to spawn Undead from the vent.";
         }
 
-        System.out.println(result);
         return result;
     }
 
     /**
-     * Get the item dropped when this vent is cut.
+     * Gets the item dropped when this vent is cut.
      *
      * @return IndustrialFan
      */
