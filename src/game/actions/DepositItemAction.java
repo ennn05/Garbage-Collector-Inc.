@@ -74,7 +74,7 @@ public class DepositItemAction extends Action {
         }
 
         // Update quota system
-        Supercomputer supercomputer = supercomputerLocation.getGroundAs(Supercomputer.class);
+        Supercomputer supercomputer = (Supercomputer) supercomputerLocation.getGround();
         if (supercomputer != null) {
             QuotaSystem quotaSystem = supercomputer.getQuotaSystem();
             if (quotaSystem != null) {
