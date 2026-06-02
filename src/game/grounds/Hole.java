@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Parasite;
 import game.actors.Slime;
 import game.actors.Undead;
+import game.interfaces.HoleGround;
 import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
 
@@ -15,7 +16,7 @@ import java.util.*;
 /**
  * A hole that periodically spawns moon creatures.
  */
-public class Hole extends Ground implements Spawner {
+public class Hole extends Ground implements Spawner, HoleGround {
     private static final int SPAWN_INTERVAL = 20;
     private static final double GROW_CHANCE = 0.01;
     private static final int SPAWN_CHECK_RADIUS = 1;
@@ -60,7 +61,7 @@ public class Hole extends Ground implements Spawner {
                 List<Location> adj = new ArrayList<>(location.getNearbyLocations(SPAWN_CHECK_RADIUS));
                 Collections.shuffle(adj);
                 for (Location nearby : adj) {
-                    if (!(nearby.getGround() instanceof Hole)) {
+                    if (nearby.getGroundAs(HoleGround.class) == null) {
                         nearby.setGround(new Hole());
                         break;
                     }
