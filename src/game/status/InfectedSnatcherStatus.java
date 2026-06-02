@@ -3,6 +3,7 @@ package game.status;
 import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.capabilities.Status;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Location;
 
 /**
@@ -16,6 +17,7 @@ public class InfectedSnatcherStatus implements Status {
     private static final int DAMAGE_PER_TURN = 1;
 
     private final Actor infectedSnatcher;
+    private final Display display = new Display();
     private boolean active = true;
 
     /**
@@ -41,8 +43,11 @@ public class InfectedSnatcherStatus implements Status {
         }
 
         infectedSnatcher.hurt(DAMAGE_PER_TURN);
+        display.println(infectedSnatcher + " suffers " + DAMAGE_PER_TURN
+                + " damage from the infection.");
 
         if (!infectedSnatcher.isConscious()) {
+            display.println(infectedSnatcher + " dies from the infection.");
             location.map().removeActor(infectedSnatcher);
             active = false;
         }
