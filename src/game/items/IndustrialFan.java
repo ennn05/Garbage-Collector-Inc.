@@ -3,10 +3,12 @@ package game.items;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.actors.Slime;
 import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.interfaces.Depositable;
@@ -81,6 +83,21 @@ public class IndustrialFan extends Item implements Purchasable, Sellable, Deposi
     public String onSold(Actor seller, GameMap map, Location terminalLocation, Wallet wallet) {
         String message = seller + " sells the Industrial Fan for " + SELL_PRICE + " worker credits. " +
                 "Stripping the facility's cooling system triggers a hazard: a Slime spawns nearby!";
+        
+        // Try to spawn a slime on an adjacent empty location
+        for (Exit exit : terminalLocation.getExits()) {
+            Location adjacent = exit.getDestination();
+            if (!adjacent.containsAnActor() && adjacent.canActorEnter(new Slime())) {
+                try {
+                    map.addActor(new Slime(), adjacent);
+                    message += "\n[Slime spawned at " + adjacent + "]";
+                    break;  // Only spawn one slime
+                } catch (Exception e) {
+                    // If spawning fails, continue
+                }
+            }
+        }
+        
         System.out.println(message);
         return message;
     }
