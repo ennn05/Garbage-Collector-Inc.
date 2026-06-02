@@ -12,8 +12,10 @@ import game.actors.Undead;
 import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.grounds.ToxicWaste;
+import game.interfaces.Cuttable;
 import game.interfaces.Sellable;
 import game.interfaces.Teleportable;
+import game.status.PoisonStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +24,13 @@ import java.util.Random;
 /**
  * An alien cube item that allows teleportation to random locations on the map.
  * Each use by an actor presents up to 3 possible destinations.
+ * Can be cut with a plasma cutter while in inventory.
  */
-public class AlienCube extends Item implements Teleportable, Sellable {
+public class AlienCube extends Item implements Teleportable, Sellable, Cuttable {
     private static final int SELL_PRICE = 25;
     private static final int DESTINATION_COUNT = 3;
+    private static final int POISON_DURATION = 5;
+    private static final int POISON_DAMAGE = 1;
 
     private final Random random = new Random();
 
@@ -193,6 +198,46 @@ public class AlienCube extends Item implements Teleportable, Sellable {
         }
 
         return "Reality warps briefly, but nothing manifests nearby.";
+    }
+
+    /**
+     * Check if this alien cube can be cut.
+     * Can only be cut if it's in an actor's inventory.
+     *
+     * @param actor the actor attempting to cut
+     * @return true if the cube is in the actor's inventory
+     */
+    @Override
+    public boolean canBeCut(Actor actor) {
+        return actor.getInventory().getItems().contains(this);
+    }
+
+    /**
+     * Handle cutting the alien cube.
+     * Inflicts poison status on the actor.
+     *
+     * @param actor the actor performing the cut
+     * @param location the location of the actor (not used for inventory items)
+     * @return result description of the cutting
+     */
+    @Override
+    public String onCut(Actor actor, Location location) {
+        actor.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE));
+        String result = actor + " cuts open the Alien Cube with the Plasma Cutter! " +
+                "It releases a toxic substance, poisoning " + actor + " for " + 
+                POISON_DURATION + " turns!";
+        System.out.println(result);
+        return result;
+    }
+
+    /**
+     * Get the item dropped when this cube is cut.
+     *
+     * @return AlienArtifact
+     */
+    @Override
+    public Item getDroppedItem() {
+        return new AlienArtifact();
     }
 
     /**

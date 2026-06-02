@@ -6,13 +6,17 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.BuyItemAction;
+import game.actions.DepositItemAction;
 import game.actions.SellItemAction;
+import game.economy.QuotaSystem;
 import game.economy.WalletHolder;
 import game.enums.AccessLevel;
+import game.interfaces.Depositable;
 import game.interfaces.Purchasable;
 import game.interfaces.Sellable;
 import game.items.AccessCard;
 import game.items.FirstAidKit;
+import game.items.PlasmaCutter;
 import game.items.SterilisationBox;
 
 import java.util.ArrayList;
@@ -20,9 +24,11 @@ import java.util.List;
 
 /**
  * A Supercomputer terminal that allows workers to buy and sell items.
+ * Also manages the company quota system.
  */
 public class Supercomputer extends Ground {
     private final List<Purchasable> purchasableItems;
+    private QuotaSystem quotaSystem;
 
     /**
      * Constructor.
@@ -36,10 +42,45 @@ public class Supercomputer extends Ground {
         purchasableItems.add(new AccessCard(AccessLevel.LEVEL_1));
         purchasableItems.add(new AccessCard(AccessLevel.LEVEL_2));
         purchasableItems.add(new AccessCard(AccessLevel.LEVEL_3));
+        purchasableItems.add(new PlasmaCutter());
     }
 
     /**
-     * Return buying and selling actions when an actor interacts with the Supercomputer.
+     * Initialise the quota system for this supercomputer.
+     * Called after the supercomputer is placed on the map.
+     *
+     * @param location the location of this Supercomputer
+     */
+    public void initialiseQuotaSystem(Location location) {
+        this.quotaSystem = new QuotaSystem(location);
+    }
+
+    /**
+     * Get the quota system.
+     *
+     * @return the quota system
+     */
+    public QuotaSystem getQuotaSystem() {
+        return quotaSystem;
+    }
+
+    /**
+     * Update the quota system each turn.
+     *
+     * @param location the location of this Supercomputer
+     */
+    @Override
+    public void tick(Location location) {
+        if (quotaSystem != null) {
+            String quotaUpdate = quotaSystem.tick(location.map());
+            if (!quotaUpdate.isEmpty()) {
+                System.out.println(quotaUpdate);
+            }
+        }
+    }
+
+    /**
+     * Return buying, selling, and deposit actions when an actor interacts with the Supercomputer.
      *
      * @param actor the Actor acting
      * @param location the location of this Supercomputer
@@ -55,13 +96,19 @@ public class Supercomputer extends Ground {
             return actions;
         }
 
+        // Add purchase actions
         for (Purchasable purchasable : purchasableItems) {
             actions.add(new BuyItemAction(purchasable, location));
         }
 
+        // Add sell and deposit actions for items in inventory
         for (Item item : actor.getInventory().getItems()) {
             item.asCapability(Sellable.class).ifPresent(sellable ->
                     actions.add(new SellItemAction(item, sellable, location))
+            );
+            
+            item.asCapability(Depositable.class).ifPresent(depositable ->
+                    actions.add(new DepositItemAction(item, depositable, location))
             );
         }
 
