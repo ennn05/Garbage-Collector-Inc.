@@ -106,10 +106,15 @@ public class AlienArtifact extends Item implements Sellable, Depositable {
 
     private Location findRandomLocation(Actor actor, edu.monash.fit2099.engine.positions.GameMap map) {
         Location current = map.locationOf(actor);
+        int xMin = map.getXRange().min();
+        int xMax = map.getXRange().max();
+        int yMin = map.getYRange().min();
+        int yMax = map.getYRange().max();
+
         for (int attempts = 0; attempts < 100; attempts++) {
-            Location candidate = map.at(
-                    (int) (Math.random() * map.getXRange().max()),
-                    (int) (Math.random() * map.getYRange().max()));
+            int x = xMin + (int) (Math.random() * (xMax - xMin + 1));
+            int y = yMin + (int) (Math.random() * (yMax - yMin + 1));
+            Location candidate = map.at(x, y);
             if (candidate != null && candidate != current && candidate.canActorEnter(actor)) {
                 return candidate;
             }

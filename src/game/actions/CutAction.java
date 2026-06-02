@@ -9,6 +9,8 @@ import game.grounds.Floor;
 import game.interfaces.Cuttable;
 import game.interfaces.CuttingTool;
 
+import java.util.ArrayList;
+
 /**
  * An action that allows an actor with a plasma cutter to cut cuttable objects.
  */
@@ -57,9 +59,16 @@ public class CutAction extends Action {
             targetLocation.addItem(droppedItem);
         }
 
-        // Transform ground to Floor if target is a ground (checked by trying to set ground)
-        if (targetLocation.getGround() instanceof Cuttable) {
+        // Transform ground to Floor if target is a cuttable ground; otherwise remove the item from inventory
+        if (targetLocation.getGroundAs(Cuttable.class) != null) {
             targetLocation.setGround(new Floor());
+        } else {
+            for (Item item : new ArrayList<>(actor.getInventory().getItems())) {
+                if (item.asCapability(Cuttable.class).orElse(null) == target) {
+                    actor.getInventory().remove(item);
+                    break;
+                }
+            }
         }
 
         return result;
