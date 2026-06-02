@@ -206,9 +206,9 @@ public class EclipseNebula extends World {
         FacilityAlarmSystem.register(overflow20Map);
 
         // Initialize quota system for the supercomputer in overflow20
-        Supercomputer overflow20Supercomputer = overflow20Map.at(3, 2).getGroundAs(Supercomputer.class);
+        Supercomputer overflow20Supercomputer = (Supercomputer) overflow20Map.at(4, 2).getGround();
         if (overflow20Supercomputer != null) {
-            overflow20Supercomputer.initialiseQuotaSystem(overflow20Map.at(3, 2));
+            overflow20Supercomputer.initialiseQuotaSystem(overflow20Map.at(4, 2));
         }
 
         // REQ2: Replace selected aluminium doors with higher-clearance doors.
