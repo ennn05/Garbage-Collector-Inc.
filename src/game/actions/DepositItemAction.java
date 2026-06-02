@@ -89,25 +89,30 @@ public class DepositItemAction extends Action {
 
     /**
      * Teleport actor to a random valid location on the map.
+     * Validates that the location is walkable and can accept the actor.
      *
      * @param actor the actor to teleport
      * @param map the game map
      * @return a random valid location, or null if none found
      */
     private Location teleportToRandomLocation(Actor actor, GameMap map) {
-        // This is a simplified version - in a full implementation you'd want to
-        // iterate through all locations and find valid ones
         Location currentLocation = map.locationOf(actor);
         int attempts = 0;
         Location newLocation = currentLocation;
 
-        while (attempts < 100 && newLocation == currentLocation) {
+        // Try up to 100 times to find a valid location
+        while (attempts < 100 && (newLocation == currentLocation || !newLocation.canActorEnter(actor))) {
             newLocation = map.at((int)(Math.random() * map.getXRange().max()), 
                                  (int)(Math.random() * map.getYRange().max()));
             attempts++;
         }
 
-        return newLocation;
+        // Return the location only if it's different from current and can be entered
+        if (newLocation != currentLocation && newLocation.canActorEnter(actor)) {
+            return newLocation;
+        }
+        
+        return null;
     }
 
     /**
