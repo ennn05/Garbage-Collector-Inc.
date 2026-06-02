@@ -91,11 +91,30 @@ public class AlienArtifact extends Item implements Sellable, Depositable {
      */
     @Override
     public String onDeposit(Actor actor, Location location) {
-        String message = actor + " deposits the Alien Artifact for " + DEPOSIT_REWARD + 
-                " company credits. The worker is teleported back to work!";
+        String message = actor + " deposits the Alien Artifact for " + DEPOSIT_REWARD +
+                " company credits.";
+
+        Location randomLocation = findRandomLocation(actor, location.map());
+        if (randomLocation != null) {
+            location.map().moveActor(actor, randomLocation);
+            message += " The worker is teleported back to work!";
+        }
+
         System.out.println(message);
-        // Teleportation logic will be handled in DepositItemAction
         return message;
+    }
+
+    private Location findRandomLocation(Actor actor, edu.monash.fit2099.engine.positions.GameMap map) {
+        Location current = map.locationOf(actor);
+        for (int attempts = 0; attempts < 100; attempts++) {
+            Location candidate = map.at(
+                    (int) (Math.random() * map.getXRange().max()),
+                    (int) (Math.random() * map.getYRange().max()));
+            if (candidate != null && candidate != current && candidate.canActorEnter(actor)) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     /**

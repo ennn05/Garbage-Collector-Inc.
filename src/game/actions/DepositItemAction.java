@@ -6,9 +6,8 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.economy.QuotaSystem;
-import game.grounds.Supercomputer;
 import game.interfaces.Depositable;
-import game.items.AlienArtifact;
+import game.interfaces.QuotaHost;
 
 /**
  * An action that allows an actor to deposit a depositable item at the supercomputer.
@@ -59,27 +58,16 @@ public class DepositItemAction extends Action {
             return actor + " fails to deposit " + itemToDeposit + ".";
         }
 
-        // Apply deposit effect
-        String depositEffect = depositable.onDeposit(actor, supercomputerLocation);
+        // Apply deposit effect (teleportation for AlienArtifact is handled inside onDeposit)
+        String result = depositable.onDeposit(actor, supercomputerLocation);
 
-        // Handle special case for Alien Artifact teleportation
-        String result = depositEffect;
-        if (itemToDeposit instanceof AlienArtifact) {
-            // Find a random valid location on the map
-            Location randomLocation = teleportToRandomLocation(actor, map);
-            if (randomLocation != null && randomLocation != map.locationOf(actor)) {
-                map.moveActor(actor, randomLocation);
-                result += "\n" + actor + " is teleported to a new location!";
-            }
-        }
-
-        // Update quota system
-        Supercomputer supercomputer = (Supercomputer) supercomputerLocation.getGround();
-        if (supercomputer != null) {
-            QuotaSystem quotaSystem = supercomputer.getQuotaSystem();
+        // Update quota system via QuotaHost interface — no concrete cast needed
+        QuotaHost quotaHost = supercomputerLocation.getGroundAs(QuotaHost.class);
+        if (quotaHost != null) {
+            QuotaSystem quotaSystem = quotaHost.getQuotaSystem();
             if (quotaSystem != null) {
                 quotaSystem.progressQuota(companyCreditsReward);
-                result += "\n[Deposited " + itemToDeposit.toString() + " for " + companyCreditsReward + 
+                result += "\n[Deposited " + itemToDeposit + " for " + companyCreditsReward +
                         " Company Credits. " + quotaSystem.getQuotaStatus() + "]";
             }
         }
@@ -95,26 +83,6 @@ public class DepositItemAction extends Action {
      * @param map the game map
      * @return a random valid location, or null if none found
      */
-    private Location teleportToRandomLocation(Actor actor, GameMap map) {
-        Location currentLocation = map.locationOf(actor);
-        int attempts = 0;
-        Location newLocation = currentLocation;
-
-        // Try up to 100 times to find a valid location
-        while (attempts < 100 && (newLocation == currentLocation || !newLocation.canActorEnter(actor))) {
-            newLocation = map.at((int)(Math.random() * map.getXRange().max()), 
-                                 (int)(Math.random() * map.getYRange().max()));
-            attempts++;
-        }
-
-        // Return the location only if it's different from current and can be entered
-        if (newLocation != currentLocation && newLocation.canActorEnter(actor)) {
-            return newLocation;
-        }
-        
-        return null;
-    }
-
     /**
      * Menu description.
      *

@@ -5,7 +5,7 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.ContractedWorker;
+import game.enums.Ability;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class QuotaSystem {
             Location adjacent = exit.getDestination();
             if (adjacent.containsAnActor()) {
                 Actor actor = adjacent.getActor();
-                if (actor instanceof ContractedWorker) {
+                if (actor.hasAbility(Ability.WORKER)) {
                     adjacentWorkers.add(actor);
                 }
             }
