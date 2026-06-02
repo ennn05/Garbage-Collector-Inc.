@@ -12,11 +12,12 @@ import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.grounds.BlightFungus;
 import game.grounds.FungalGround;
+import game.grounds.SporeColony;
+import game.grounds.SporeExplosion;
 import game.interfaces.Seedable;
 import game.interfaces.Sellable;
 import game.interfaces.SporeEmitter;
 
-import java.util.Random;
 
 /**
  * A pressurised canister of fungal spores obtainable only by cutting a SporeColony.
@@ -29,9 +30,6 @@ public class SporeCanister extends Item implements SporeEmitter, Sellable {
 
     private static final int WEIGHT = 3;
     private static final int SELL_PRICE = 60;
-    private static final int AOE_CHANCE = 25;
-
-    private final Random random = new Random();
 
     public SporeCanister() {
         super("SporeCanister", '¡');
@@ -45,7 +43,9 @@ public class SporeCanister extends Item implements SporeEmitter, Sellable {
         for (Exit exit : location.getExits()) {
             Location target = exit.getDestination();
             if (target.getGroundAs(Seedable.class) != null) {
-                actions.add(new EmitSporesAction(this, target, exit.getName()));
+                actions.add(new EmitSporesAction(BlightFungus::new,   "BlightFungus",   target, exit.getName()));
+                actions.add(new EmitSporesAction(SporeExplosion::new, "SporeExplosion", target, exit.getName()));
+                actions.add(new EmitSporesAction(SporeColony::new,    "SporeColony",    target, exit.getName()));
             }
         }
         return actions;
@@ -53,21 +53,9 @@ public class SporeCanister extends Item implements SporeEmitter, Sellable {
 
     @Override
     public void emitSpores(Location source) {
-        if (source.getGroundAs(Seedable.class) == null) {
-            return;
-        }
-
-        source.setGround(new BlightFungus());
-        System.out.println("A BlightFungus takes root at " + source + "!");
-
-        if (random.nextInt(100) < AOE_CHANCE) {
-            System.out.println("SporeCanister AoE burst! Blight spreads to surrounding tiles!");
-            for (Exit exit : source.getExits()) {
-                Location adj = exit.getDestination();
-                if (adj.getGroundAs(Seedable.class) != null) {
-                    adj.setGround(new BlightFungus());
-                }
-            }
+        if (source.getGroundAs(Seedable.class) != null) {
+            source.setGround(new BlightFungus());
+            System.out.println("SporeCanister seeds BlightFungus at " + source + "!");
         }
     }
 
