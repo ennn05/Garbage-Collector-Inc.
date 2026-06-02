@@ -166,8 +166,6 @@ public class EclipseNebula extends World {
         moon99DeprecatedMap.at(3, 15).setGround(new DeprecatedFleshyMatureTree());
         moon99DeprecatedMap.at(17, 15).setGround(new DeprecatedFleshyMatureTree());
 
-        // A starting monolith is placed for easier testing of the warp behaviour.
-        moon99DeprecatedMap.at(18, 1).setGround(new FleshyMonolith());
 
         ContractedWorker contractedWorker1 = createWorker("#1 Bob");
         ContractedWorker contractedWorker2 = createWorker("#2 Tom");
