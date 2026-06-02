@@ -2,13 +2,17 @@ package game.grounds;
 
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Parasite;
 import game.actors.Slime;
+import game.actors.Undead;
 import game.enums.Ability;
+import game.interfaces.Cuttable;
 import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
+import game.items.IndustrialFan;
 import game.status.PoisonStatus;
 
 import java.util.Random;
@@ -18,8 +22,9 @@ import java.util.Random;
  * <p>
  * When activated, the vent creates either a slime or a parasite, places it on the
  * current location, triggers its spawn effect, and poisons nearby actors.
+ * Can be cut with a plasma cutter.
  */
-public class Vent extends Ground implements Spawner {
+public class Vent extends Ground implements Spawner, Cuttable {
     private static final int SPAWN_POISON_DURATION = 5;
     private static final int SPAWN_POISON_DAMAGE = 1;
     private static final int SPAWN_CHECK_RADIUS = 1;
@@ -116,5 +121,59 @@ public class Vent extends Ground implements Spawner {
         }
 
         return Parasite.getParasiteSpawn();
+    }
+
+    /**
+     * Check if this vent can be cut.
+     *
+     * @param actor the actor attempting to cut
+     * @return true (vents can always be cut)
+     */
+    @Override
+    public boolean canBeCut(Actor actor) {
+        return true;
+    }
+
+    /**
+     * Handle cutting the vent.
+     * Spawns an Undead on the current location.
+     *
+     * @param actor the actor performing the cut
+     * @param location the location of this vent
+     * @return result description of the cutting
+     */
+    @Override
+    public String onCut(Actor actor, Location location) {
+        String result = actor + " cuts through the Vent with the Plasma Cutter! " +
+                "It transforms into a Floor tile.";
+
+        // Try to spawn an Undead on this location
+        try {
+            Undead undead = new Undead();
+            location.addActor(undead);
+            
+            // Apply spawn effect if available
+            Spawnable spawnable = undead.asCapability(Spawnable.class).orElse(null);
+            if (spawnable != null) {
+                spawnable.spawnEffect(location);
+            }
+            
+            result += "\nAn Undead instantly spawns from the vent!";
+        } catch (GameEngineException e) {
+            result += "\nFailed to spawn Undead from the vent.";
+        }
+
+        System.out.println(result);
+        return result;
+    }
+
+    /**
+     * Get the item dropped when this vent is cut.
+     *
+     * @return IndustrialFan
+     */
+    @Override
+    public Item getDroppedItem() {
+        return new IndustrialFan();
     }
 }

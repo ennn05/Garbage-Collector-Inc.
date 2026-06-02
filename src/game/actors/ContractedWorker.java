@@ -11,11 +11,13 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.ConsumeFlaskAction;
+import game.actions.CutAction;
 import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
 import game.interfaces.*;
+import game.items.PlasmaCutter;
 import game.status.HiveStatus;
 import game.world.FacilityAlarmSystem;
 
@@ -47,6 +49,34 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
     }
 
     /**
+     * Check whether there is a nearby cuttable ground or item.
+     *
+     * @param map the map containing the actor
+     * @return true if there is a nearby cuttable object
+     */
+    private boolean hasNearbyCuttable(GameMap map) {
+        Location location = map.locationOf(this);
+
+        // Check nearby grounds
+        for (Exit exit : location.getExits()) {
+            Location surroundingLocation = exit.getDestination();
+            Cuttable cuttable = surroundingLocation.getGroundAs(Cuttable.class);
+            if (cuttable != null) {
+                return true;
+            }
+        }
+
+        // Check inventory items
+        for (Cuttable cuttable : this.getInventory().getItemsAs(Cuttable.class)) {
+            if (cuttable.canBeCut(this)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Check whether a door unlocker can unlock a nearby unlockable ground.
      *
      * @param doorUnlocker the item that can unlock doors
@@ -72,7 +102,32 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
      * The playTurn method checks whether the current actor is unconscious due to environmental hazards.
      * Next, it checks whether the actor is carrying an item that can unlock nearby unlockable grounds.
      * If a drinkable item is available in the inventory, the actor will be able to drink from it.
-     * Additionally, it handles multi-turn actions by getting the subsequent action returned by the previous action.
+     * A// Add cut action if actor has plasma cutter and there's a nearby cuttable
+        for (PlasmaCutter plasmaCutter : this.getInventory().getItemsAs(PlasmaCutter.class)) {
+            if (hasNearbyCuttable(map)) {
+                // Add cut actions for each nearby cuttable object
+                Location location = map.locationOf(this);
+                
+                // Check nearby grounds
+                for (Exit exit : location.getExits()) {
+                    Location surroundingLocation = exit.getDestination();
+                    Cuttable cuttable = surroundingLocation.getGroundAs(Cuttable.class);
+                    if (cuttable != null) {
+                        actions.add(new CutAction(cuttable, surroundingLocation));
+                    }
+                }
+                
+                // Check inventory items
+                for (Cuttable cuttable : this.getInventory().getItemsAs(Cuttable.class)) {
+                    if (cuttable.canBeCut(this)) {
+                        actions.add(new CutAction(cuttable, location));
+                    }
+                }
+                break;
+            }
+        }
+
+        dditionally, it handles multi-turn actions by getting the subsequent action returned by the previous action.
      * Finally, it adds all possible actions that the actor can perform in the current turn and shows them on the
      * console menu for the player to choose.
      *

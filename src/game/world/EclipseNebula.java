@@ -130,7 +130,9 @@ public class EclipseNebula extends World {
         GameMap moon99DeprecatedMap = new GameMap("99-Deprecated", groundCreator, moon99Deprecated);
         this.addGameMap(moon99DeprecatedMap);
 
-        moon99DeprecatedMap.at(5, 3).setGround(new Supercomputer());
+        Supercomputer moon99Supercomputer = new Supercomputer();
+        moon99DeprecatedMap.at(5, 3).setGround(moon99Supercomputer);
+        moon99Supercomputer.initialiseQuotaSystem(moon99DeprecatedMap.at(5, 3));
 
         FacilityAlarmSystem.register(moon99DeprecatedMap);
 
@@ -202,6 +204,12 @@ public class EclipseNebula extends World {
         this.addGameMap(overflow20Map);
 
         FacilityAlarmSystem.register(overflow20Map);
+
+        // Initialize quota system for the supercomputer in overflow20
+        Supercomputer overflow20Supercomputer = (Supercomputer) overflow20Map.at(4, 2).getGround();
+        if (overflow20Supercomputer != null) {
+            overflow20Supercomputer.initialiseQuotaSystem(overflow20Map.at(4, 2));
+        }
 
         // REQ2: Replace selected aluminium doors with higher-clearance doors.
         overflow20Map.at(35, 4).setGround(new IronDoor());
