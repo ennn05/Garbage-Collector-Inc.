@@ -12,8 +12,8 @@ import game.behaviours.PursueWorkerBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.enums.Ability;
 import game.grounds.BlightFungus;
-import game.grounds.Floor;
 import game.grounds.FungalGround;
+import game.interfaces.Seedable;
 import game.interfaces.Infectable;
 import game.interfaces.Spawnable;
 import game.interfaces.SporeEmitter;
@@ -82,7 +82,7 @@ public class Undead extends Creature implements Infectable, Spawnable, SporeEmit
         int spreadCount = 0;
         for (Exit exit : source.getExits()) {
             Location adj = exit.getDestination();
-            if (adj.getGround() instanceof Floor) {
+            if (adj.getGroundAs(Seedable.class) != null) {
                 adj.setGround(new BlightFungus());
                 spreadCount++;
             }

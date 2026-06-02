@@ -16,8 +16,8 @@ import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
 import game.grounds.BlightFungus;
-import game.grounds.Floor;
 import game.grounds.FungalGround;
+import game.interfaces.Seedable;
 import game.interfaces.*;
 import game.status.HiveStatus;
 import game.world.FacilityAlarmSystem;
@@ -146,7 +146,7 @@ public class ContractedWorker extends Actor implements WalletHolder, Host, Spore
      */
     @Override
     public void emitSpores(Location source) {
-        if (source.getGround() instanceof Floor) {
+        if (source.getGroundAs(Seedable.class) != null) {
             source.setGround(new BlightFungus());
             System.out.println(this + " leaves a trail of blight spores!");
         }

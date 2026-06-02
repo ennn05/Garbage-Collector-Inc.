@@ -3,6 +3,7 @@ package game.grounds;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.Seedable;
 
 /**
  * A volatile cluster of pressurised spores.
@@ -37,7 +38,7 @@ public class SporeExplosion extends FungalGround {
 
         for (Exit exit : location.getExits()) {
             Location adj = exit.getDestination();
-            if (adj.getGround() instanceof Floor) {
+            if (adj.getGroundAs(Seedable.class) != null) {
                 adj.setGround(new BlightFungus());
                 System.out.println("BlightFungus erupts at " + adj + "!");
             }

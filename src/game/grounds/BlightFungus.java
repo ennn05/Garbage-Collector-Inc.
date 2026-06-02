@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.items.DropAction;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.Seedable;
 import game.status.SporeInfection;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class BlightFungus extends FungalGround {
         List<Location> adjacentFloors = new ArrayList<>();
         for (Exit exit : location.getExits()) {
             Location adj = exit.getDestination();
-            if (adj.getGround() instanceof Floor) {
+            if (adj.getGroundAs(Seedable.class) != null) {
                 adjacentFloors.add(adj);
             }
         }

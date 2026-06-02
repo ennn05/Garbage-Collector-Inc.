@@ -11,8 +11,8 @@ import game.actions.EmitSporesAction;
 import game.economy.Wallet;
 import game.enums.ItemStatistics;
 import game.grounds.BlightFungus;
-import game.grounds.Floor;
 import game.grounds.FungalGround;
+import game.interfaces.Seedable;
 import game.interfaces.Sellable;
 import game.interfaces.SporeEmitter;
 
@@ -44,7 +44,7 @@ public class SporeCanister extends Item implements SporeEmitter, Sellable {
         ActionList actions = super.allowableActions(actor, location);
         for (Exit exit : location.getExits()) {
             Location target = exit.getDestination();
-            if (target.getGround() instanceof Floor) {
+            if (target.getGroundAs(Seedable.class) != null) {
                 actions.add(new EmitSporesAction(this, target, exit.getName()));
             }
         }
@@ -53,7 +53,7 @@ public class SporeCanister extends Item implements SporeEmitter, Sellable {
 
     @Override
     public void emitSpores(Location source) {
-        if (!(source.getGround() instanceof Floor)) {
+        if (source.getGroundAs(Seedable.class) == null) {
             return;
         }
 
@@ -64,7 +64,7 @@ public class SporeCanister extends Item implements SporeEmitter, Sellable {
             System.out.println("SporeCanister AoE burst! Blight spreads to surrounding tiles!");
             for (Exit exit : source.getExits()) {
                 Location adj = exit.getDestination();
-                if (adj.getGround() instanceof Floor) {
+                if (adj.getGroundAs(Seedable.class) != null) {
                     adj.setGround(new BlightFungus());
                 }
             }
