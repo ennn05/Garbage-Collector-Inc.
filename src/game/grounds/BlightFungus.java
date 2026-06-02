@@ -29,7 +29,7 @@ public class BlightFungus extends FungalGround {
     private final Random random = new Random();
 
     public BlightFungus() {
-        super('%', "BlightFungus");
+        super('β', "BlightFungus");
     }
 
     @Override

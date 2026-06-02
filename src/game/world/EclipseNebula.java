@@ -97,7 +97,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('V', Vent::new);
 
         // REQ3 (creative) fungal ground types
-        groundCreator.registerGround('%', BlightFungus::new);
+        groundCreator.registerGround('β', BlightFungus::new);
         groundCreator.registerGround('*', SporeExplosion::new);
         groundCreator.registerGround('§', SporeColony::new);
 
