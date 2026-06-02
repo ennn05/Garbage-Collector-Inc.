@@ -62,25 +62,8 @@ public class Hole extends Ground implements Spawner, HoleGround {
                 return;
             }
 
-            Spawnable spawnable = spawnedActor.asCapability(Spawnable.class).orElse(null);
-            if (spawnable != null) {
-                spawnable.spawnEffect(location);
-            }
-
-            if (random.nextDouble() < GROW_CHANCE) {
-                List<Location> adj = new ArrayList<>(location.getNearbyLocations(SPAWN_CHECK_RADIUS));
-                Collections.shuffle(adj);
-                for (Location nearby : adj) {
-                    if (nearby.getGroundAs(HoleGround.class) == null) {
-                        nearby.setGround(new Hole());
-                        break;
-                    }
-                }
-                applySpawnEffect(spawnedActor, location);
-                tryGrow(location);
-            } catch (GameEngineException ignored) {
-                // The spawn attempt is safely ignored if the engine rejects the actor placement.
-            }
+            applySpawnEffect(spawnedActor, location);
+            tryGrow(location);
         }
 
         turnsElapsed = 0;
@@ -138,7 +121,7 @@ public class Hole extends Ground implements Spawner, HoleGround {
         Collections.shuffle(nearbyLocations);
 
         for (Location nearby : nearbyLocations) {
-            if (nearby.getGround().getDisplayChar() != this.getDisplayChar()) {
+            if (nearby.getGroundAs(HoleGround.class) == null) {
                 nearby.setGround(new Hole());
                 return;
             }
