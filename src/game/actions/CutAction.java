@@ -7,7 +7,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Floor;
 import game.interfaces.Cuttable;
-import game.items.PlasmaCutter;
+import game.interfaces.CuttingTool;
 
 /**
  * An action that allows an actor with a plasma cutter to cut cuttable objects.
@@ -36,16 +36,10 @@ public class CutAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        // Check if actor has a plasma cutter
-        boolean hasPlasmaCutter = false;
-        for (Item item : actor.getInventory().getItems()) {
-            if (item instanceof PlasmaCutter) {
-                hasPlasmaCutter = true;
-                break;
-            }
-        }
+        // Check if actor has a cutting tool
+        boolean hasCuttingTool = !actor.getInventory().getItemsAs(CuttingTool.class).isEmpty();
 
-        if (!hasPlasmaCutter) {
+        if (!hasCuttingTool) {
             return actor + " does not have a Plasma Cutter to cut with!";
         }
 
