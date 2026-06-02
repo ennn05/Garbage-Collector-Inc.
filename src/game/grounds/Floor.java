@@ -1,6 +1,7 @@
 package game.grounds;
 
 import edu.monash.fit2099.engine.positions.Ground;
+import game.interfaces.Seedable;
 
 /**
  * Not lava. Not spikes. Not an elaborate trap. Just a perfectly flat surface
@@ -9,7 +10,7 @@ import edu.monash.fit2099.engine.positions.Ground;
  *
  * @author Adrian Kristanto
  */
-public class Floor extends Ground {
+public class Floor extends Ground implements Seedable {
     public Floor() {
         super('_', "Floor");
     }
