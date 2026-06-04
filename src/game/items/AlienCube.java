@@ -192,7 +192,7 @@ public class AlienCube extends Item implements Teleportable, Sellable, Cuttable 
                     map.addActor(undead, candidate);
                     return "Reality shudders. An Undead emerges beside " + seller + ".";
                 } catch (Exception ignored) {
-                    break;
+                    continue;
                 }
             }
         }

@@ -84,14 +84,16 @@ public class IndustrialFan extends Item implements Purchasable, Sellable, Deposi
         String message = seller + " sells the Industrial Fan for " + SELL_PRICE + " worker credits. " +
                 "Stripping the facility's cooling system triggers a hazard: a Slime spawns nearby!";
         
-        // Try to spawn a slime on an adjacent empty location
+        // Try to spawn a slime on an adjacent empty location and apply its spawn effect
         for (Exit exit : terminalLocation.getExits()) {
             Location adjacent = exit.getDestination();
-            if (!adjacent.containsAnActor() && adjacent.canActorEnter(new Slime())) {
+            Slime slime = new Slime();
+            if (!adjacent.containsAnActor() && adjacent.canActorEnter(slime)) {
                 try {
-                    map.addActor(new Slime(), adjacent);
+                    map.addActor(slime, adjacent);
+                    slime.spawnEffect(adjacent);
                     message += "\n[Slime spawned at " + adjacent + "]";
-                    break;  // Only spawn one slime
+                    break;
                 } catch (Exception e) {
                     // If spawning fails, continue
                 }

@@ -16,8 +16,10 @@ import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
 import game.enums.Ability;
+import game.grounds.BlightFungus;
+import game.grounds.FungalGround;
+import game.interfaces.Seedable;
 import game.interfaces.*;
-import game.items.PlasmaCutter;
 import game.status.HiveStatus;
 import game.world.FacilityAlarmSystem;
 
@@ -26,7 +28,7 @@ import game.world.FacilityAlarmSystem;
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends Actor implements WalletHolder, Host {
+public class ContractedWorker extends Actor implements WalletHolder, Host, SporeEmitter {
     private static final int HIVE_SPAWN_INTERVAL = 5;
     private static final int HOST_DAMAGE = 1;
 
@@ -102,32 +104,7 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
      * The playTurn method checks whether the current actor is unconscious due to environmental hazards.
      * Next, it checks whether the actor is carrying an item that can unlock nearby unlockable grounds.
      * If a drinkable item is available in the inventory, the actor will be able to drink from it.
-     * A// Add cut action if actor has plasma cutter and there's a nearby cuttable
-        for (PlasmaCutter plasmaCutter : this.getInventory().getItemsAs(PlasmaCutter.class)) {
-            if (hasNearbyCuttable(map)) {
-                // Add cut actions for each nearby cuttable object
-                Location location = map.locationOf(this);
-                
-                // Check nearby grounds
-                for (Exit exit : location.getExits()) {
-                    Location surroundingLocation = exit.getDestination();
-                    Cuttable cuttable = surroundingLocation.getGroundAs(Cuttable.class);
-                    if (cuttable != null) {
-                        actions.add(new CutAction(cuttable, surroundingLocation));
-                    }
-                }
-                
-                // Check inventory items
-                for (Cuttable cuttable : this.getInventory().getItemsAs(Cuttable.class)) {
-                    if (cuttable.canBeCut(this)) {
-                        actions.add(new CutAction(cuttable, location));
-                    }
-                }
-                break;
-            }
-        }
-
-        dditionally, it handles multi-turn actions by getting the subsequent action returned by the previous action.
+     * Additionally, it handles multi-turn actions by getting the subsequent action returned by the previous action.
      * Finally, it adds all possible actions that the actor can perform in the current turn and shows them on the
      * console menu for the player to choose.
      *
@@ -162,6 +139,23 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
             }
         }
 
+        // Add cut actions if actor carries a CuttingTool and there are nearby Cuttable objects
+        if (!this.getInventory().getItemsAs(CuttingTool.class).isEmpty() && hasNearbyCuttable(map)) {
+            Location location = map.locationOf(this);
+            for (Exit exit : location.getExits()) {
+                Location surroundingLocation = exit.getDestination();
+                Cuttable cuttable = surroundingLocation.getGroundAs(Cuttable.class);
+                if (cuttable != null) {
+                    actions.add(new CutAction(cuttable, surroundingLocation));
+                }
+            }
+            for (Cuttable cuttable : this.getInventory().getItemsAs(Cuttable.class)) {
+                if (cuttable.canBeCut(this)) {
+                    actions.add(new CutAction(cuttable, location));
+                }
+            }
+        }
+
         if (lastAction.getNextAction() != null) {
             return lastAction.getNextAction();
         }
@@ -188,5 +182,24 @@ public class ContractedWorker extends Actor implements WalletHolder, Host {
     @Override
     public void hiveEffect() {
         this.hurt(HOST_DAMAGE);
+    }
+
+    /**
+     * Converts the Floor tile at the given location into BlightFungus.
+     * Called each turn by SporeInfection (30% chance) while this worker is infected.
+     *
+     * @param source the worker's current location
+     */
+    @Override
+    public void emitSpores(Location source) {
+        if (source.getGroundAs(Seedable.class) != null) {
+            source.setGround(new BlightFungus());
+            System.out.println(this + " leaves a trail of blight spores!");
+        }
+    }
+
+    @Override
+    public Class<? extends FungalGround> getSporeType() {
+        return BlightFungus.class;
     }
 }

@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.TeleportAction;
+import game.interfaces.TeleportAnchor;
 import game.interfaces.Teleportable;
 import game.items.Flask;
 
@@ -19,7 +20,7 @@ import java.util.Random;
  * Using it randomly selects another magic circle on the map as the destination.
  * After teleporting, a Flask is spawned on an adjacent enterable tile.
  */
-public class MagicCircle extends Ground implements Teleportable {
+public class MagicCircle extends Ground implements Teleportable, TeleportAnchor {
     private final Random random = new Random();
 
     /**
@@ -51,7 +52,7 @@ public class MagicCircle extends Ground implements Teleportable {
 
                 if (location != null
                         && !location.containsAnActor()
-                        && location.getGround() instanceof MagicCircle) {
+                        && location.getGroundAs(TeleportAnchor.class) != null) {
                     circles.add(location);
                 }
             }

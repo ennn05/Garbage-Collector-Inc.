@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import game.economy.Wallet;
 import game.enums.ItemStatistics;
+import game.interfaces.CuttingTool;
 import game.interfaces.Purchasable;
 import game.status.BurnStatus;
 
@@ -15,7 +16,7 @@ import game.status.BurnStatus;
  * A plasma cutter tool that can cut through doors, vents, and alien cubes.
  * When purchased, the worker takes 5 damage and is burned for 5 turns.
  */
-public class PlasmaCutter extends Item implements Purchasable {
+public class PlasmaCutter extends Item implements Purchasable, CuttingTool {
     private static final int WEIGHT = 7;
     private static final int PURCHASE_PRICE = 50;
     private static final int BURN_DAMAGE_ON_PURCHASE = 5;

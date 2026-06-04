@@ -8,6 +8,7 @@ import game.actors.Parasite;
 import game.actors.ScrapSnatcher;
 import game.actors.Slime;
 import game.actors.Undead;
+import game.interfaces.HoleGround;
 import game.interfaces.Spawnable;
 import game.interfaces.Spawner;
 
@@ -20,7 +21,7 @@ import java.util.function.Supplier;
 /**
  * A hole that periodically spawns moon creatures.
  */
-public class Hole extends Ground implements Spawner {
+public class Hole extends Ground implements Spawner, HoleGround {
     private static final int SPAWN_INTERVAL = 20;
     private static final double GROW_CHANCE = 0.01;
     private static final int SPAWN_CHECK_RADIUS = 1;
@@ -56,11 +57,13 @@ public class Hole extends Ground implements Spawner {
             Actor spawnedActor = this.spawn(location);
             try {
                 location.addActor(spawnedActor);
-                applySpawnEffect(spawnedActor, location);
-                tryGrow(location);
-            } catch (GameEngineException ignored) {
-                // The spawn attempt is safely ignored if the engine rejects the actor placement.
+            } catch (GameEngineException e) {
+                System.out.println("Hole failed to spawn actor: " + e.getMessage());
+                return;
             }
+
+            applySpawnEffect(spawnedActor, location);
+            tryGrow(location);
         }
 
         turnsElapsed = 0;
@@ -118,7 +121,7 @@ public class Hole extends Ground implements Spawner {
         Collections.shuffle(nearbyLocations);
 
         for (Location nearby : nearbyLocations) {
-            if (nearby.getGround().getDisplayChar() != this.getDisplayChar()) {
+            if (nearby.getGroundAs(HoleGround.class) == null) {
                 nearby.setGround(new Hole());
                 return;
             }

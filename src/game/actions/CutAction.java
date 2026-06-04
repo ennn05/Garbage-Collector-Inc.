@@ -7,7 +7,9 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Floor;
 import game.interfaces.Cuttable;
-import game.items.PlasmaCutter;
+import game.interfaces.CuttingTool;
+
+import java.util.ArrayList;
 
 /**
  * An action that allows an actor with a plasma cutter to cut cuttable objects.
@@ -36,16 +38,10 @@ public class CutAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        // Check if actor has a plasma cutter
-        boolean hasPlasmaCutter = false;
-        for (Item item : actor.getInventory().getItems()) {
-            if (item instanceof PlasmaCutter) {
-                hasPlasmaCutter = true;
-                break;
-            }
-        }
+        // Check if actor has a cutting tool
+        boolean hasCuttingTool = !actor.getInventory().getItemsAs(CuttingTool.class).isEmpty();
 
-        if (!hasPlasmaCutter) {
+        if (!hasCuttingTool) {
             return actor + " does not have a Plasma Cutter to cut with!";
         }
 
@@ -63,9 +59,16 @@ public class CutAction extends Action {
             targetLocation.addItem(droppedItem);
         }
 
-        // Transform ground to Floor if target is a ground (checked by trying to set ground)
-        if (targetLocation.getGround() instanceof Cuttable) {
+        // Transform ground to Floor if target is a cuttable ground; otherwise remove the item from inventory
+        if (targetLocation.getGroundAs(Cuttable.class) != null) {
             targetLocation.setGround(new Floor());
+        } else {
+            for (Item item : new ArrayList<>(actor.getInventory().getItems())) {
+                if (item.asCapability(Cuttable.class).orElse(null) == target) {
+                    actor.getInventory().remove(item);
+                    break;
+                }
+            }
         }
 
         return result;
