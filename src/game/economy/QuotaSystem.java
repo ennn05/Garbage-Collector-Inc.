@@ -95,8 +95,8 @@ public class QuotaSystem {
      */
     private String progressRank() {
         currentRank++;
-        baseQuota = (int) Math.ceil(baseQuota * (1 + QUOTA_INCREASE_PERCENTAGE));
-        timeLimit = (int) Math.ceil(timeLimit * (1 + TIME_LIMIT_INCREASE_PERCENTAGE));
+        baseQuota = baseQuota + (int) Math.ceil(baseQuota * QUOTA_INCREASE_PERCENTAGE);
+        timeLimit = timeLimit + (int) Math.ceil(timeLimit * TIME_LIMIT_INCREASE_PERCENTAGE);
         currentTurn = 0;
 
         String message = "\n*** QUOTA MET! ***\n" +

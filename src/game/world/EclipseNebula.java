@@ -276,7 +276,7 @@ public class EclipseNebula extends World {
         moon99DeprecatedMap.at(50, 5).setGround(new SporeColony());
         moon99DeprecatedMap.at(33, 11).addItem(new SporeCanister());
 
-        overflow20Map.at(25, 3).setGround(new BlightFungus());
-        overflow20Map.at(45, 8).setGround(new SporeColony());
+        overflow20Map.at(35, 3).setGround(new BlightFungus());
+        overflow20Map.at(46, 8).setGround(new SporeColony());
     }
 }
