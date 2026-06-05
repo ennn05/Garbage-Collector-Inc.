@@ -62,6 +62,18 @@ public abstract class FungalGround extends Ground {
      */
     protected abstract void spread(Location location);
 
+    /**
+     * Immediately triggers a spread and resets the passive spread timer.
+     * Called by external systems (e.g. {@code FungalBloomEffect}) that need
+     * to accelerate fungal growth outside the normal tick cycle.
+     *
+     * @param location the location of this tile
+     */
+    public void forceSpread(Location location) {
+        spread(location);
+        spreadTimer = 0;
+    }
+
     @Override
     public boolean canActorEnter(Actor actor) {
         return true;
