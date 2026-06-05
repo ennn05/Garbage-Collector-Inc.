@@ -2,6 +2,10 @@ package game.weather;
 
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.weather.extractors.HumidityExtractor;
+import game.weather.extractors.TemperatureExtractor;
+import game.weather.extractors.WeatherConditionExtractor;
+import game.weather.extractors.WindSpeedExtractor;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,68 +13,63 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Orchestrates the real-world weather pipeline for the game.
  *
  * <p>This is a higher-level class that depends <em>only</em> on the
- * {@link WeatherDataExtractor} and {@link WeatherEffect} abstractions —
+ * {@link WeatherZone} and {@link WeatherEffect} abstractions —
  * never on any concrete implementation — satisfying the Dependency Inversion
  * Principle and REQ5 Rule 3.
  *
- * <p><b>Dynamic URL:</b> The OpenWeatherMap query uses real lat/lon coordinates
- * derived from the active player's x-position on the map. The 60-column map is
- * split into three equal zones (0–19, 20–39, 40–59), each mapped to a real-world
- * city. As the player moves across the facility, the queried city changes:
- * <ul>
- *   <li>x ∈ [0, 20) → Melbourne, Australia (−37.81°, 144.96°)</li>
- *   <li>x ∈ [20, 40) → London, United Kingdom (51.51°, −0.13°)</li>
- *   <li>x ∈ [40, 60) → Tokyo, Japan (35.68°, 139.69°)</li>
- * </ul>
+ * <p><b>Two-phase weather cycle (every {@value #FETCH_INTERVAL} turns):</b>
+ * <ol>
+ *   <li><b>Passive zone effect</b> — the active {@link WeatherZone} (determined by the
+ *       player's x-coordinate) applies its unique, always-on terrain transformation.</li>
+ *   <li><b>Threshold effects</b> — live weather data is fetched from OpenWeatherMap,
+ *       parsed into a {@link WeatherReport}, and each registered {@link WeatherEffect}
+ *       is evaluated; those whose thresholds are met are applied.</li>
+ * </ol>
  *
- * <p><b>API key security:</b> The key is never hard-coded. It is read first from
- * the {@code OPENWEATHER_API_KEY} environment variable, then from a {@code .env}
- * file in the working directory. If neither is present, the system falls back to
- * default weather values with a console warning.
+ * <p><b>Dynamic URL:</b> The active {@link WeatherZone} constructs the API query URL
+ * from its own city coordinates. As the player moves across the facility, the active
+ * zone changes, changing the URL — the query is never static.
+ *
+ * <p><b>API key security:</b> The key is read first from the
+ * {@code OPENWEATHER_API_KEY} environment variable, then from a {@code .env} file in
+ * the working directory. If neither is present, the system falls back to safe defaults.
  */
 public class WeatherSystem {
 
-    private static final String API_BASE =
-            "https://api.openweathermap.org/data/2.5/weather";
+    /** JSON parsing helpers — internal implementation detail, not injected. */
+    private static final List<WeatherDataExtractor<?>> EXTRACTORS = Arrays.asList(
+            new TemperatureExtractor(),
+            new HumidityExtractor(),
+            new WindSpeedExtractor(),
+            new WeatherConditionExtractor()
+    );
 
-    /** Width of each map zone (map is 60 columns wide, three equal zones). */
-    private static final int ZONE_WIDTH = 20;
-
-    /**
-     * Real-world city coordinates for each map zone.
-     * Index 0 → Melbourne, 1 → London, 2 → Tokyo.
-     */
-    private static final double[][] CITY_COORDS = {
-        {-37.81, 144.96},   // Melbourne, Australia
-        { 51.51,  -0.13},   // London, United Kingdom
-        { 35.68, 139.69}    // Tokyo, Japan
-    };
-
-    private static final String[] CITY_NAMES = {"Melbourne", "London", "Tokyo"};
-
-    private final List<WeatherDataExtractor<?>> extractors;
+    private final List<WeatherZone> zones;
     private final List<WeatherEffect> effects;
     private final String apiKey;
 
     /**
-     * Constructs a WeatherSystem wired to the given extractors and effects.
+     * Constructs a WeatherSystem wired to the given zones and effects.
      *
-     * @param extractors list of {@link WeatherDataExtractor} implementations to
-     *                   parse each field from the JSON response
-     * @param effects    list of {@link WeatherEffect} implementations to apply
-     *                   when their thresholds are met
+     * <p>Both parameters are typed as {@code List} of the abstract types —
+     * no concrete zone or effect class is mentioned here.
+     *
+     * @param zones   list of {@link WeatherZone} implementations that define
+     *                the geographic regions and their passive terrain effects
+     * @param effects list of {@link WeatherEffect} implementations that define
+     *                the threshold-triggered reactions to live weather data
      */
-    public WeatherSystem(List<WeatherDataExtractor<?>> extractors,
-                         List<WeatherEffect> effects) {
-        this.extractors = extractors;
+    public WeatherSystem(List<WeatherZone> zones, List<WeatherEffect> effects) {
+        this.zones   = zones;
         this.effects = effects;
-        this.apiKey = loadApiKey();
+        this.apiKey  = loadApiKey();
     }
 
     // ── API key loading ────────────────────────────────────────────────────────
@@ -80,13 +79,9 @@ public class WeatherSystem {
     }
 
     private String loadApiKey() {
-        // Priority 1: environment variable
         String key = System.getenv("OPENWEATHER_API_KEY");
-        if (!isBlank(key)) {
-            return key;
-        }
+        if (!isBlank(key)) return key;
 
-        // Priority 2: .env file in working directory
         try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -95,53 +90,40 @@ public class WeatherSystem {
                     if (!isBlank(value)) return value;
                 }
             }
-        } catch (IOException ignored) {
-            // .env file absent — not an error
-        }
+        } catch (IOException ignored) {}
 
         return null;
     }
 
-    // ── URL construction (game-state driven) ───────────────────────────────────
-
-    private int zoneOf(int playerX) {
-        return Math.min(playerX / ZONE_WIDTH, CITY_COORDS.length - 1);
-    }
+    // ── Active zone resolution ─────────────────────────────────────────────────
 
     /**
-     * Builds the dynamic API URL based on the player's x-coordinate.
-     * The x-coordinate selects a real-world city, so the URL changes as the
-     * player moves across different zones of the facility map.
-     *
-     * <p>Example for playerX = 35 (London zone):
-     * {@code https://api.openweathermap.org/data/2.5/weather?lat=51.51&lon=-0.13&units=metric&appid=***}
-     *
-     * @param playerX the player's x-coordinate on the current map
-     * @return the full API URL string
+     * Finds the {@link WeatherZone} whose column range contains the player's
+     * x-coordinate. Falls back to the first zone if none matches.
      */
-    private String buildUrl(int playerX) {
-        int zone = zoneOf(playerX);
-        double lat = CITY_COORDS[zone][0];
-        double lon = CITY_COORDS[zone][1];
-        return String.format("%s?lat=%.2f&lon=%.2f&units=metric&appid=%s",
-                API_BASE, lat, lon, apiKey);
+    private WeatherZone findActiveZone(int playerX) {
+        for (WeatherZone zone : zones) {
+            if (zone.containsPlayerX(playerX)) {
+                return zone;
+            }
+        }
+        return zones.get(0);
     }
 
     // ── HTTP fetch ─────────────────────────────────────────────────────────────
 
-    private String fetchJson(int playerX) {
+    private String fetchJson(WeatherZone activeZone) {
         if (isBlank(apiKey)) {
             System.out.println(
-                "[WeatherSystem] No API key found — using default weather values. "
+                "[WeatherSystem] No API key — using defaults. "
                 + "Set OPENWEATHER_API_KEY env var or add it to .env");
             return null;
         }
 
-        String url = buildUrl(playerX);
+        String url       = activeZone.buildApiQuery(apiKey);
         String maskedUrl = url.replace(apiKey, "***");
-        System.out.println("[WeatherSystem] Querying weather for "
-                + CITY_NAMES[zoneOf(playerX)]
-                + " (player x=" + playerX + ") → " + maskedUrl);
+        System.out.println("[WeatherSystem] Zone: " + activeZone.getZoneName()
+                + " → " + maskedUrl);
 
         HttpURLConnection conn = null;
         try {
@@ -156,16 +138,14 @@ public class WeatherSystem {
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(conn.getInputStream()))) {
                     String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
-                    }
+                    while ((line = br.readLine()) != null) sb.append(line);
                 }
                 return sb.toString();
             }
             System.out.println("[WeatherSystem] API returned HTTP "
                     + status + " — using defaults.");
         } catch (Exception e) {
-            System.out.println("[WeatherSystem] API fetch failed: "
+            System.out.println("[WeatherSystem] Fetch failed: "
                     + e.getMessage() + " — using defaults.");
         } finally {
             if (conn != null) conn.disconnect();
@@ -175,21 +155,15 @@ public class WeatherSystem {
 
     // ── Report building ────────────────────────────────────────────────────────
 
-    /**
-     * Runs all registered extractors over the JSON string and assembles a
-     * {@link WeatherReport}. If {@code json} is null, every extractor returns
-     * its built-in default value, producing a valid "calm conditions" report.
-     */
     private WeatherReport buildReport(String json) {
         double temperature = 20.0;
         int    humidity    = 50;
         double windSpeed   = 5.0;
         String condition   = "Clear";
 
-        for (WeatherDataExtractor<?> extractor : extractors) {
+        for (WeatherDataExtractor<?> extractor : EXTRACTORS) {
             Object value = extractor.extract(json);
             String field = extractor.getFieldName();
-
             if ("temperature".equals(field) && value instanceof Double) {
                 temperature = (Double) value;
             } else if ("humidity".equals(field) && value instanceof Integer) {
@@ -206,24 +180,31 @@ public class WeatherSystem {
     // ── Public API ─────────────────────────────────────────────────────────────
 
     /**
-     * Fetches current weather data for the zone matching {@code playerLocation.x()},
-     * then evaluates every registered {@link WeatherEffect} and applies those
-     * whose thresholds are met.
+     * Runs one full weather cycle:
+     * <ol>
+     *   <li>Resolves the active {@link WeatherZone} from the player's x-coordinate.</li>
+     *   <li>Calls {@link WeatherZone#applyPassiveEffect} — the always-on climate effect.</li>
+     *   <li>Fetches live JSON and builds a {@link WeatherReport}.</li>
+     *   <li>Applies every {@link WeatherEffect} whose threshold is met.</li>
+     * </ol>
      *
-     * <p>This method depends solely on the {@link WeatherDataExtractor} and
-     * {@link WeatherEffect} abstractions — demonstrating the Dependency
-     * Inversion Principle at the point of use.
+     * <p>Depends only on {@link WeatherZone} and {@link WeatherEffect} — demonstrating
+     * the Dependency Inversion Principle at the point of use.
      *
      * @param map            the game map to modify
-     * @param playerLocation the current location of the active player, used to
-     *                       (a) derive the dynamic API query parameter and
-     *                       (b) centre any area-of-effect changes
-     * @return a human-readable log of what happened this weather cycle
+     * @param playerLocation the active player's location
+     * @return a human-readable log of what happened this cycle
      */
     public String fetchAndApply(GameMap map, Location playerLocation) {
-        String json = fetchJson(playerLocation.x());
-        WeatherReport report = buildReport(json);
+        WeatherZone activeZone = findActiveZone(playerLocation.x());
 
+        // Phase 1 — passive zone effect (always runs)
+        System.out.println("[WeatherSystem] Applying passive effect for " + activeZone.getZoneName());
+        activeZone.applyPassiveEffect(map, playerLocation);
+
+        // Phase 2 — threshold-triggered effects (driven by live data)
+        String json         = fetchJson(activeZone);
+        WeatherReport report = buildReport(json);
         System.out.println("[WeatherSystem] Conditions: " + report);
 
         StringBuilder log = new StringBuilder();
@@ -235,7 +216,7 @@ public class WeatherSystem {
         }
 
         return log.length() == 0
-                ? "The facility weather sensors report calm conditions."
-                : "Weather alert: " + log;
+                ? "The facility weather sensors report calm conditions in the " + activeZone.getZoneName() + "."
+                : "Weather alert [" + activeZone.getZoneName() + "]: " + log;
     }
 }

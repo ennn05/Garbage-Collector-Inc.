@@ -49,13 +49,12 @@ import game.items.SporeCanister;
 import game.actors.WeatherController;
 import game.weather.WeatherBehaviour;
 import game.weather.WeatherSystem;
-import game.weather.extractors.HumidityExtractor;
-import game.weather.extractors.TemperatureExtractor;
-import game.weather.extractors.WeatherConditionExtractor;
-import game.weather.extractors.WindSpeedExtractor;
 import game.weather.effects.FungalBloomEffect;
 import game.weather.effects.HeatwaveEffect;
 import game.weather.effects.StormEffect;
+import game.weather.zones.AridZone;
+import game.weather.zones.HumidZone;
+import game.weather.zones.TemperateZone;
 
 import java.util.Arrays;
 import java.util.List;
@@ -290,13 +289,12 @@ public class EclipseNebula extends World {
         overflow20Map.at(46, 8).setGround(new SporeColony());
 
         // REQ5: Build and register the weather system on the 99-Deprecated map.
-        // WeatherSystem depends only on the WeatherDataExtractor and WeatherEffect
+        // WeatherSystem depends only on the WeatherZone and WeatherEffect
         // abstractions — concrete classes are injected here (Dependency Inversion).
         WeatherSystem weatherSystem = new WeatherSystem(
-                Arrays.asList(new TemperatureExtractor(),
-                        new HumidityExtractor(),
-                        new WindSpeedExtractor(),
-                        new WeatherConditionExtractor()),
+                Arrays.asList(new AridZone(),
+                        new TemperateZone(),
+                        new HumidZone()),
                 Arrays.asList(new HeatwaveEffect(),
                         new FungalBloomEffect(),
                         new StormEffect())
