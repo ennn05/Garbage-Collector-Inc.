@@ -23,6 +23,65 @@
 |   | | | |   ||     |_ |   |                                                            
 |___| |_|  |__||_______||___|                                                                                                                                                                                                                         
 ```
+## REQ5: Weather System — API Key Setup
+
+REQ5 integrates the **OpenWeatherMap** free-tier API to drive live weather effects inside the game. Follow these steps exactly before running the project.
+
+### Step 1 — Get a free API key
+
+1. Go to [https://openweathermap.org/api](https://openweathermap.org/api) and create a free account.
+2. Navigate to **My API keys** (top-right menu after logging in).
+3. Copy the default key (or generate a new one). The key looks like `a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4`.
+4. New keys can take **up to 2 hours** to activate after creation.
+
+### Step 2 — Set the API key (choose one method)
+
+**Method A — Environment variable (recommended)**
+
+Set the variable in your shell before running the game:
+
+```bash
+# macOS / Linux
+export OPENWEATHER_API_KEY=your_key_here
+
+# Windows Command Prompt
+set OPENWEATHER_API_KEY=your_key_here
+
+# Windows PowerShell
+$env:OPENWEATHER_API_KEY="your_key_here"
+```
+
+Or set it permanently via System Properties → Environment Variables (Windows) / `~/.bashrc` (Linux/macOS).
+
+In IntelliJ IDEA: **Run → Edit Configurations → Environment variables** → add `OPENWEATHER_API_KEY=your_key_here`.
+
+**Method B — `.env` file**
+
+1. Create a file named `.env` in the **project root** (the same folder as `src/`, `lib/`, `README.md`).
+2. Add exactly this line (no quotes, no spaces around `=`):
+
+```
+OPENWEATHER_API_KEY=your_key_here
+```
+
+> **Security:** The `.env` file is listed in `.gitignore`. Never commit it or your API key to the repository.
+
+### Step 3 — Run the game
+
+Launch `game.Application.main()` as normal. Every 15 game turns the console will print:
+
+```
+[WeatherSystem] Querying weather for London (player x=35) → https://...?lat=51.51&lon=-0.13&units=metric&appid=***
+[WeatherSystem] Conditions: 14.3°C | 82% humidity | 9.2 m/s wind | Rain
+Weather alert: Storm (puddles spread near player). Fungal Bloom (all fungal tiles spread instantly).
+```
+
+### Step 4 — Running without a key (offline / demo mode)
+
+If no API key is configured, the system prints a warning and uses safe default values (20 °C, 50 % humidity, 5 m/s wind, "Clear"). No effects trigger and the game continues normally — the key is optional for basic testing.
+
+---
+
 ## Contribution log
 [Contribution log link](https://docs.google.com/spreadsheets/d/1EAoeuuQ9YHIjVSB8gqZoziGPfBNeuz8M6MIWxhEWIpc/edit?usp=sharing)
 ## About the Mannequin
