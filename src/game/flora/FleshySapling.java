@@ -1,6 +1,7 @@
 package game.flora;
 
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.FleshySaplingGround;
 
 import java.util.Random;
 
@@ -15,7 +16,7 @@ import java.util.Random;
  *
  * @author ennn12
  */
-public class FleshySapling extends Tree {
+public class FleshySapling extends Tree implements FleshySaplingGround {
 
     private static final int GROW_INTERVAL = 25;
     private static final double GROW_CHANCE = 0.50;

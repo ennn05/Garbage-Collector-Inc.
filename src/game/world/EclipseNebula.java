@@ -46,6 +46,15 @@ import game.grounds.BlightFungus;
 import game.grounds.SporeColony;
 import game.grounds.SporeExplosion;
 import game.items.SporeCanister;
+import game.actors.WeatherController;
+import game.weather.WeatherBehaviour;
+import game.weather.WeatherSystem;
+import game.weather.effects.FungalBloomEffect;
+import game.weather.effects.HeatwaveEffect;
+import game.weather.effects.StormEffect;
+import game.weather.zones.AridZone;
+import game.weather.zones.HumidZone;
+import game.weather.zones.TemperateZone;
 
 import java.util.Arrays;
 import java.util.List;
@@ -278,5 +287,21 @@ public class EclipseNebula extends World {
 
         overflow20Map.at(35, 3).setGround(new BlightFungus());
         overflow20Map.at(46, 8).setGround(new SporeColony());
+
+        // REQ5: Build and register the weather system on the 99-Deprecated map.
+        // WeatherSystem depends only on the WeatherZone and WeatherEffect
+        // abstractions — concrete classes are injected here (Dependency Inversion).
+        WeatherSystem weatherSystem = new WeatherSystem(
+                Arrays.asList(new AridZone(),
+                        new TemperateZone(),
+                        new HumidZone()),
+                Arrays.asList(new HeatwaveEffect(),
+                        new FungalBloomEffect(),
+                        new StormEffect())
+        );
+        WeatherBehaviour weatherBehaviour = new WeatherBehaviour(weatherSystem);
+        WeatherController weatherController = new WeatherController(weatherBehaviour);
+        // Place on an exterior dirt tile — invisible (' ') and out of players' path.
+        moon99DeprecatedMap.addActor(weatherController, moon99DeprecatedMap.at(0, 0));
     }
 }

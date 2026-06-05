@@ -38,6 +38,17 @@ public class Fire extends Ground implements FireHazard {
     }
 
     /**
+     * Returns the ground that was beneath this fire before it ignited.
+     * Used by {@link game.weather.zones.HumidZone} to extinguish fires by
+     * restoring the original terrain.
+     *
+     * @return the wrapped ground
+     */
+    public Ground getPreviousGround() {
+        return previousGround;
+    }
+
+    /**
      * Burn any actor standing on the fire and count down the remaining duration.
      * When the fire ends, restore the previous ground.
      *

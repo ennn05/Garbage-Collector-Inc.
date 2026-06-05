@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actions.ConsumeAction;
 import game.enums.Ability;
 import game.interfaces.Consumable;
+import game.interfaces.PuddleGround;
 import game.interfaces.Sterilisable;
 import game.status.PoisonStatus;
 
@@ -16,7 +17,7 @@ import game.status.PoisonStatus;
  * in the Eclipse Nebula, it could be anything from spilled engine coolant to
  * highly corrosive alien saliva.
  */
-public class Puddle extends Ground implements Sterilisable, Consumable {
+public class Puddle extends Ground implements Sterilisable, Consumable, PuddleGround {
     private static final int HEAL_AMOUNT = 1;
     private static final int POISON_TURNS = 3;
 
