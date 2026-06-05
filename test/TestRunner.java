@@ -17,7 +17,8 @@ public class TestRunner {
                 .selectors(
                     DiscoverySelectors.selectPackage("req1"),
                     DiscoverySelectors.selectPackage("req2"),
-                    DiscoverySelectors.selectPackage("req3")
+                    DiscoverySelectors.selectPackage("req3"),
+                    DiscoverySelectors.selectPackage("req5")
                 )
                 .build();
 
