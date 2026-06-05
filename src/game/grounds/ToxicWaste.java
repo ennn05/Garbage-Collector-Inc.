@@ -3,12 +3,13 @@ package game.grounds;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.ToxicGround;
 
 /**
  * A ground tile representing toxic waste. Actors standing on it take 1 damage per turn.
  * This tile is permanent and never reverts.
  */
-public class ToxicWaste extends Ground {
+public class ToxicWaste extends Ground implements ToxicGround {
 
     /**
      * Constructor for ToxicWaste tile.

@@ -3,14 +3,20 @@ package req5;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.flora.FleshyMatureTree;
-import game.flora.FleshySapling;
-import game.flora.FleshySprout;
 import game.grounds.Fire;
 import game.grounds.Floor;
 import game.grounds.FungalGround;
 import game.grounds.Puddle;
 import game.grounds.ToxicWaste;
+import game.flora.FleshySapling;
+import game.flora.FleshySprout;
+import game.interfaces.FireHazard;
+import game.interfaces.FleshyMatureTreeGround;
+import game.interfaces.FleshySaplingGround;
+import game.interfaces.FleshySproutGround;
+import game.interfaces.PuddleGround;
+import game.interfaces.Seedable;
+import game.interfaces.ToxicGround;
 import game.weather.zones.AridZone;
 import game.weather.zones.HumidZone;
 import game.weather.zones.TemperateZone;
@@ -103,10 +109,10 @@ class WeatherZoneTest {
 
         new AridZone().applyPassiveEffect(map, player);
 
-        assertNull(puddleTile.getGroundAs(Puddle.class),
+        assertNull(puddleTile.getGroundAs(PuddleGround.class),
                 "Puddle within radius must be evaporated");
-        assertNotNull(puddleTile.getGroundAs(Floor.class),
-                "Evaporated tile must become Floor");
+        assertNotNull(puddleTile.getGroundAs(Seedable.class),
+                "Evaporated tile must become Floor (implements Seedable)");
     }
 
     @Test
@@ -120,7 +126,7 @@ class WeatherZoneTest {
 
         int remaining = 0;
         for (Location loc : puddles) {
-            if (loc.getGroundAs(Puddle.class) != null) remaining++;
+            if (loc.getGroundAs(PuddleGround.class) != null) remaining++;
         }
         assertEquals(1, remaining,
                 "3 Puddles placed; cap is 2 evaporations so exactly 1 must survive");
@@ -137,8 +143,8 @@ class WeatherZoneTest {
         new AridZone().applyPassiveEffect(map, player);
 
         for (Location loc : toxics) {
-            boolean isPuddle = loc.getGroundAs(Puddle.class)     != null;
-            boolean isToxic  = loc.getGroundAs(ToxicWaste.class) != null;
+            boolean isPuddle = loc.getGroundAs(PuddleGround.class) != null;
+            boolean isToxic  = loc.getGroundAs(ToxicGround.class)  != null;
             assertTrue(isPuddle || isToxic,
                     "ToxicWaste must only dilute into Puddle or remain ToxicWaste");
         }
@@ -155,9 +161,9 @@ class WeatherZoneTest {
 
         new TemperateZone().applyPassiveEffect(map, player);
 
-        assertNull(sproutTile.getGroundAs(FleshySprout.class),
+        assertNull(sproutTile.getGroundAs(FleshySproutGround.class),
                 "FleshySprout within radius must be advanced");
-        assertNotNull(sproutTile.getGroundAs(FleshySapling.class),
+        assertNotNull(sproutTile.getGroundAs(FleshySaplingGround.class),
                 "Advanced Sprout tile must become FleshySapling");
     }
 
@@ -172,7 +178,7 @@ class WeatherZoneTest {
 
         int remaining = 0;
         for (Location loc : sprouts) {
-            if (loc.getGroundAs(FleshySprout.class) != null) remaining++;
+            if (loc.getGroundAs(FleshySproutGround.class) != null) remaining++;
         }
         assertEquals(1, remaining,
                 "3 Sprouts placed; cap is 2 advances so exactly 1 must remain");
@@ -187,9 +193,9 @@ class WeatherZoneTest {
 
         new TemperateZone().applyPassiveEffect(map, player);
 
-        assertNull(saplingTile.getGroundAs(FleshySapling.class),
+        assertNull(saplingTile.getGroundAs(FleshySaplingGround.class),
                 "FleshySapling within radius must be advanced");
-        assertNotNull(saplingTile.getGroundAs(FleshyMatureTree.class),
+        assertNotNull(saplingTile.getGroundAs(FleshyMatureTreeGround.class),
                 "Advanced Sapling tile must become FleshyMatureTree");
     }
 
@@ -204,7 +210,7 @@ class WeatherZoneTest {
 
         int remaining = 0;
         for (Location loc : saplings) {
-            if (loc.getGroundAs(FleshySapling.class) != null) remaining++;
+            if (loc.getGroundAs(FleshySaplingGround.class) != null) remaining++;
         }
         assertEquals(1, remaining,
                 "2 Saplings placed; cap is 1 advancement so exactly 1 must remain");
@@ -221,10 +227,10 @@ class WeatherZoneTest {
 
         new HumidZone().applyPassiveEffect(map, player);
 
-        assertNull(fireTile.getGroundAs(Fire.class),
+        assertNull(fireTile.getGroundAs(FireHazard.class),
                 "Fire within radius must be extinguished");
-        assertNotNull(fireTile.getGroundAs(Floor.class),
-                "Extinguished tile must restore its previous ground (Floor)");
+        assertNotNull(fireTile.getGroundAs(Seedable.class),
+                "Extinguished tile must restore its previous ground (Floor implements Seedable)");
     }
 
     @Test
@@ -238,7 +244,7 @@ class WeatherZoneTest {
 
         int remaining = 0;
         for (Location loc : fires) {
-            if (loc.getGroundAs(Fire.class) != null) remaining++;
+            if (loc.getGroundAs(FireHazard.class) != null) remaining++;
         }
         assertEquals(1, remaining,
                 "3 fires placed; cap is 2 extinguished so exactly 1 must remain");

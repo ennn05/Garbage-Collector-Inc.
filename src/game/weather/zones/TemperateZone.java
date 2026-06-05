@@ -4,7 +4,8 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.flora.FleshyMatureTree;
 import game.flora.FleshySapling;
-import game.flora.FleshySprout;
+import game.interfaces.FleshySaplingGround;
+import game.interfaces.FleshySproutGround;
 import game.weather.WeatherZone;
 
 import java.util.ArrayList;
@@ -67,9 +68,9 @@ public class TemperateZone extends WeatherZone {
         List<Location> saplings = new ArrayList<>();
 
         for (Location loc : playerLocation.getNearbyLocations(RADIUS)) {
-            if (loc.getGroundAs(FleshySprout.class) != null) {
+            if (loc.getGroundAs(FleshySproutGround.class) != null) {
                 sprouts.add(loc);
-            } else if (loc.getGroundAs(FleshySapling.class) != null) {
+            } else if (loc.getGroundAs(FleshySaplingGround.class) != null) {
                 saplings.add(loc);
             }
         }

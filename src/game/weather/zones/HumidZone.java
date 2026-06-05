@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Fire;
 import game.grounds.FungalGround;
+import game.interfaces.FireHazard;
 import game.weather.WeatherZone;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class HumidZone extends WeatherZone {
         List<Location> fungalTiles = new ArrayList<>();
 
         for (Location loc : playerLocation.getNearbyLocations(RADIUS)) {
-            if (loc.getGroundAs(Fire.class) != null) {
+            if (loc.getGroundAs(FireHazard.class) != null) {
                 fireTiles.add(loc);
             } else if (loc.getGroundAs(FungalGround.class) != null) {
                 fungalTiles.add(loc);
@@ -79,8 +80,9 @@ public class HumidZone extends WeatherZone {
         int extinguished = 0;
         for (Location loc : fireTiles) {
             if (extinguished >= MAX_FIRES_EXTINGUISHED) break;
-            Fire fire = loc.getGroundAs(Fire.class);
-            if (fire == null) continue;
+            FireHazard hazard = loc.getGroundAs(FireHazard.class);
+            if (hazard == null) continue;
+            Fire fire = (Fire) hazard; // safe: only Fire implements FireHazard
             loc.setGround(fire.getPreviousGround());
             System.out.println("Humid air extinguishes the fire at " + loc + ", restoring the ground beneath.");
             extinguished++;

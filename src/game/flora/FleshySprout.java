@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Slime;
+import game.interfaces.FleshySproutGround;
 
 import java.util.Random;
 
@@ -15,7 +16,7 @@ import java.util.Random;
  *
  * @author ennn12
  */
-public class FleshySprout extends FleshyTree {
+public class FleshySprout extends FleshyTree implements FleshySproutGround {
 
     private static final int GROW_INTERVAL = 20;
     private static final double GROW_CHANCE = 0.25;

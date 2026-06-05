@@ -4,7 +4,8 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Floor;
 import game.grounds.Puddle;
-import game.grounds.ToxicWaste;
+import game.interfaces.PuddleGround;
+import game.interfaces.ToxicGround;
 import game.weather.WeatherZone;
 
 import java.util.ArrayList;
@@ -69,9 +70,9 @@ public class AridZone extends WeatherZone {
         List<Location> toxics  = new ArrayList<>();
 
         for (Location loc : playerLocation.getNearbyLocations(RADIUS)) {
-            if (loc.getGroundAs(Puddle.class) != null) {
+            if (loc.getGroundAs(PuddleGround.class) != null) {
                 puddles.add(loc);
-            } else if (loc.getGroundAs(ToxicWaste.class) != null) {
+            } else if (loc.getGroundAs(ToxicGround.class) != null) {
                 toxics.add(loc);
             }
         }

@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Undead;
+import game.interfaces.FleshyMatureTreeGround;
 
 /**
  * Stage 3 of the Fleshy Tree (display: 'Y').
@@ -13,7 +14,7 @@ import game.actors.Undead;
  *
  * @author ennn12
  */
-public class FleshyMatureTree extends FleshyTree {
+public class FleshyMatureTree extends FleshyTree implements FleshyMatureTreeGround {
 
     /**
      * Creates a Fleshy Mature Tree, the final growth stage of a Fleshy Tree,

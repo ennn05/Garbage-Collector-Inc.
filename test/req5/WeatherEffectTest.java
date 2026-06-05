@@ -3,9 +3,9 @@ package req5;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.grounds.Fire;
 import game.grounds.FungalGround;
-import game.grounds.Puddle;
+import game.interfaces.FireHazard;
+import game.interfaces.PuddleGround;
 import game.weather.WeatherReport;
 import game.weather.effects.FungalBloomEffect;
 import game.weather.effects.HeatwaveEffect;
@@ -38,60 +38,60 @@ class WeatherEffectTest {
 
     @Test
     void heatwaveActivatesAtThreshold() {
-        HeatwaveEffect effect = new HeatwaveEffect();
-        assertTrue(effect.shouldActivate(new WeatherReport(32.0, 50, 5.0, "Clear")));
+        assertTrue(new HeatwaveEffect().shouldActivate(
+                new WeatherReport(32.0, 50, 5.0, "Clear")));
     }
 
     @Test
     void heatwaveActivatesAboveThreshold() {
-        HeatwaveEffect effect = new HeatwaveEffect();
-        assertTrue(effect.shouldActivate(new WeatherReport(40.0, 50, 5.0, "Clear")));
+        assertTrue(new HeatwaveEffect().shouldActivate(
+                new WeatherReport(40.0, 50, 5.0, "Clear")));
     }
 
     @Test
     void heatwaveDoesNotActivateBelowThreshold() {
-        HeatwaveEffect effect = new HeatwaveEffect();
-        assertFalse(effect.shouldActivate(new WeatherReport(31.9, 50, 5.0, "Clear")));
+        assertFalse(new HeatwaveEffect().shouldActivate(
+                new WeatherReport(31.9, 50, 5.0, "Clear")));
     }
 
     // ── FungalBloomEffect: threshold ───────────────────────────────────────────
 
     @Test
     void fungalBloomActivatesAtThreshold() {
-        FungalBloomEffect effect = new FungalBloomEffect();
-        assertTrue(effect.shouldActivate(new WeatherReport(20.0, 75, 5.0, "Clear")));
+        assertTrue(new FungalBloomEffect().shouldActivate(
+                new WeatherReport(20.0, 75, 5.0, "Clear")));
     }
 
     @Test
     void fungalBloomActivatesAboveThreshold() {
-        FungalBloomEffect effect = new FungalBloomEffect();
-        assertTrue(effect.shouldActivate(new WeatherReport(20.0, 90, 5.0, "Clear")));
+        assertTrue(new FungalBloomEffect().shouldActivate(
+                new WeatherReport(20.0, 90, 5.0, "Clear")));
     }
 
     @Test
     void fungalBloomDoesNotActivateBelowThreshold() {
-        FungalBloomEffect effect = new FungalBloomEffect();
-        assertFalse(effect.shouldActivate(new WeatherReport(20.0, 74, 5.0, "Clear")));
+        assertFalse(new FungalBloomEffect().shouldActivate(
+                new WeatherReport(20.0, 74, 5.0, "Clear")));
     }
 
     // ── StormEffect: threshold ─────────────────────────────────────────────────
 
     @Test
     void stormActivatesAtThreshold() {
-        StormEffect effect = new StormEffect();
-        assertTrue(effect.shouldActivate(new WeatherReport(20.0, 50, 8.0, "Clear")));
+        assertTrue(new StormEffect().shouldActivate(
+                new WeatherReport(20.0, 50, 8.0, "Clear")));
     }
 
     @Test
     void stormActivatesAboveThreshold() {
-        StormEffect effect = new StormEffect();
-        assertTrue(effect.shouldActivate(new WeatherReport(20.0, 50, 15.0, "Clear")));
+        assertTrue(new StormEffect().shouldActivate(
+                new WeatherReport(20.0, 50, 15.0, "Clear")));
     }
 
     @Test
     void stormDoesNotActivateBelowThreshold() {
-        StormEffect effect = new StormEffect();
-        assertFalse(effect.shouldActivate(new WeatherReport(20.0, 50, 7.9, "Clear")));
+        assertFalse(new StormEffect().shouldActivate(
+                new WeatherReport(20.0, 50, 7.9, "Clear")));
     }
 
     // ── HeatwaveEffect: apply ──────────────────────────────────────────────────
@@ -105,7 +105,7 @@ class WeatherEffectTest {
 
         int fireCount = 0;
         for (Location loc : player.getNearbyLocations(4)) {
-            if (loc.getGroundAs(Fire.class) != null) fireCount++;
+            if (loc.getGroundAs(FireHazard.class) != null) fireCount++;
         }
         assertEquals(3, fireCount,
                 "Heatwave must ignite exactly 3 Floor tiles (MAX_FIRES cap)");
@@ -122,7 +122,7 @@ class WeatherEffectTest {
 
         int puddleCount = 0;
         for (Location loc : player.getNearbyLocations(5)) {
-            if (loc.getGroundAs(Puddle.class) != null) puddleCount++;
+            if (loc.getGroundAs(PuddleGround.class) != null) puddleCount++;
         }
         assertEquals(3, puddleCount,
                 "Storm must create exactly 3 Puddle tiles (MAX_PUDDLES cap)");
