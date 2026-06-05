@@ -1,10 +1,11 @@
 package game.weather;
 
 /**
- * Extracts a single typed value from a raw OpenWeatherMap JSON response string.
+ * Extracts a single typed value from a raw OpenWeatherMap JSON response string
+ * and writes it directly into a {@link WeatherReportBuilder}.
  *
- * Implementations parse one specific field (e.g. temperature, humidity) and
- * return a default if the field cannot be found.
+ * Adding a new field to {@link WeatherReport} requires only a new implementation
+ * of this interface — no changes to {@link WeatherSystem}.
  *
  * @param <T> the Java type of the extracted value
  */
@@ -19,13 +20,12 @@ public interface WeatherDataExtractor<T> {
     T extract(String jsonResponse);
 
     /**
-     * Returns the logical field name this extractor produces.
-     * Used by {@link WeatherSystem} to route the value into the correct
-     * {@link WeatherReport} field.
+     * Extracts the value from {@code json} and writes it to the appropriate
+     * field on {@code builder}. Implementations know their own concrete type,
+     * so no {@code instanceof} check is needed by the caller.
      *
-     * Valid values: "temperature", "humidity", "windSpeed", "condition"
-     *
-     * @return field name string
+     * @param builder the report builder to populate
+     * @param json    the raw JSON response from the weather API
      */
-    String getFieldName();
+    void populateReport(WeatherReportBuilder builder, String json);
 }

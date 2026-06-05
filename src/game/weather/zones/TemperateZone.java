@@ -67,9 +67,9 @@ public class TemperateZone extends WeatherZone {
         List<Location> saplings = new ArrayList<>();
 
         for (Location loc : playerLocation.getNearbyLocations(RADIUS)) {
-            if (loc.getGround() instanceof FleshySprout) {
+            if (loc.getGroundAs(FleshySprout.class) != null) {
                 sprouts.add(loc);
-            } else if (loc.getGround() instanceof FleshySapling) {
+            } else if (loc.getGroundAs(FleshySapling.class) != null) {
                 saplings.add(loc);
             }
         }

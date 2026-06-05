@@ -44,12 +44,13 @@ import java.util.List;
 public class WeatherSystem {
 
     /** JSON parsing helpers — internal implementation detail, not injected. */
-    private static final List<WeatherDataExtractor<?>> EXTRACTORS = Arrays.asList(
-            new TemperatureExtractor(),
-            new HumidityExtractor(),
-            new WindSpeedExtractor(),
-            new WeatherConditionExtractor()
-    );
+    private static final List<WeatherDataExtractor<?>> EXTRACTORS =
+            Arrays.<WeatherDataExtractor<?>>asList(
+                    new TemperatureExtractor(),
+                    new HumidityExtractor(),
+                    new WindSpeedExtractor(),
+                    new WeatherConditionExtractor()
+            );
 
     private final List<WeatherZone> zones;
     private final List<WeatherEffect> effects;
@@ -156,25 +157,11 @@ public class WeatherSystem {
     // ── Report building ────────────────────────────────────────────────────────
 
     private WeatherReport buildReport(String json) {
-        double temperature = 20.0;
-        int    humidity    = 50;
-        double windSpeed   = 5.0;
-        String condition   = "Clear";
-
+        WeatherReportBuilder builder = new WeatherReportBuilder();
         for (WeatherDataExtractor<?> extractor : EXTRACTORS) {
-            Object value = extractor.extract(json);
-            String field = extractor.getFieldName();
-            if ("temperature".equals(field) && value instanceof Double) {
-                temperature = (Double) value;
-            } else if ("humidity".equals(field) && value instanceof Integer) {
-                humidity = (Integer) value;
-            } else if ("windSpeed".equals(field) && value instanceof Double) {
-                windSpeed = (Double) value;
-            } else if ("condition".equals(field) && value instanceof String) {
-                condition = (String) value;
-            }
+            extractor.populateReport(builder, json);
         }
-        return new WeatherReport(temperature, humidity, windSpeed, condition);
+        return builder.build();
     }
 
     // ── Public API ─────────────────────────────────────────────────────────────

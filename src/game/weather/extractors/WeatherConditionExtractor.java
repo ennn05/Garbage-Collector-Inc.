@@ -1,6 +1,7 @@
 package game.weather.extractors;
 
 import game.weather.WeatherDataExtractor;
+import game.weather.WeatherReportBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +31,7 @@ public class WeatherConditionExtractor implements WeatherDataExtractor<String> {
     }
 
     @Override
-    public String getFieldName() {
-        return "condition";
+    public void populateReport(WeatherReportBuilder builder, String json) {
+        builder.setCondition(extract(json));
     }
 }

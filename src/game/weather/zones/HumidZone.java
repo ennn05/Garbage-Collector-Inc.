@@ -67,7 +67,7 @@ public class HumidZone extends WeatherZone {
         List<Location> fungalTiles = new ArrayList<>();
 
         for (Location loc : playerLocation.getNearbyLocations(RADIUS)) {
-            if (loc.getGround() instanceof Fire) {
+            if (loc.getGroundAs(Fire.class) != null) {
                 fireTiles.add(loc);
             } else if (loc.getGroundAs(FungalGround.class) != null) {
                 fungalTiles.add(loc);
@@ -79,7 +79,8 @@ public class HumidZone extends WeatherZone {
         int extinguished = 0;
         for (Location loc : fireTiles) {
             if (extinguished >= MAX_FIRES_EXTINGUISHED) break;
-            Fire fire = (Fire) loc.getGround();
+            Fire fire = loc.getGroundAs(Fire.class);
+            if (fire == null) continue;
             loc.setGround(fire.getPreviousGround());
             System.out.println("Humid air extinguishes the fire at " + loc + ", restoring the ground beneath.");
             extinguished++;

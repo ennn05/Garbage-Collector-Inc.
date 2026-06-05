@@ -69,9 +69,9 @@ public class AridZone extends WeatherZone {
         List<Location> toxics  = new ArrayList<>();
 
         for (Location loc : playerLocation.getNearbyLocations(RADIUS)) {
-            if (loc.getGround() instanceof Puddle) {
+            if (loc.getGroundAs(Puddle.class) != null) {
                 puddles.add(loc);
-            } else if (loc.getGround() instanceof ToxicWaste) {
+            } else if (loc.getGroundAs(ToxicWaste.class) != null) {
                 toxics.add(loc);
             }
         }

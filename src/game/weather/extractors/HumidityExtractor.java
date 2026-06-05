@@ -1,6 +1,7 @@
 package game.weather.extractors;
 
 import game.weather.WeatherDataExtractor;
+import game.weather.WeatherReportBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +28,7 @@ public class HumidityExtractor implements WeatherDataExtractor<Integer> {
     }
 
     @Override
-    public String getFieldName() {
-        return "humidity";
+    public void populateReport(WeatherReportBuilder builder, String json) {
+        builder.setHumidity(extract(json));
     }
 }
