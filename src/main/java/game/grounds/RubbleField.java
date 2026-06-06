@@ -50,10 +50,11 @@ public class RubbleField extends CrackableGround {
     public String mummify(Actor actor, Location location) {
         String result;
         try {
-            Actor undead = Undead.getUndeadSpawn();
+            Undead undead = Undead.getUndeadSpawn();
             Optional<Location> nearest = findNearestSpawnLocation(location, undead, location.map());
             if (nearest.isPresent()) {
                 nearest.get().addActor(undead);
+                undead.spawnEffect(nearest.get());
                 result = actor + " reemerges as " + undead + " at " + nearest.get();
             } else {
                 result = "Failed to spawn undead: no valid spawn location";
