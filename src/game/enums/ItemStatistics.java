@@ -8,6 +8,7 @@ package game.enums;
  * we just need to know if it will break the {@code ContractedWorker}'s back.
  */
 public enum ItemStatistics {
+    COOLDOWN,
     DURABILITY,
     WEIGHT,
 }
