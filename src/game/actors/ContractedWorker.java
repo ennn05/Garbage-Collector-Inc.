@@ -12,6 +12,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.ConsumeFlaskAction;
 import game.actions.CutAction;
+import game.actions.DetonateAction;
 import game.actions.UnlockDoorAction;
 import game.economy.Wallet;
 import game.economy.WalletHolder;
@@ -20,6 +21,7 @@ import game.grounds.BlightFungus;
 import game.grounds.FungalGround;
 import game.interfaces.Seedable;
 import game.interfaces.*;
+import game.items.BeaconDetonator;
 import game.status.HiveStatus;
 import game.world.FacilityAlarmSystem;
 
@@ -154,6 +156,10 @@ public class ContractedWorker extends Actor implements WalletHolder, Host, Spore
                     actions.add(new CutAction(cuttable, location));
                 }
             }
+        }
+
+        if (!this.getInventory().getItemsAs(BeaconDetonator.class).isEmpty()) {
+            actions.add(new DetonateAction(BeaconDetonator.getDetonateRange()));
         }
 
         if (lastAction.getNextAction() != null) {
