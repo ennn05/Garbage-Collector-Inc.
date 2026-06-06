@@ -2,6 +2,7 @@ package game.grounds;
 
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
@@ -76,6 +77,11 @@ public class RubbleField extends CrackableGround {
                 System.out.println(mummify(this.buriedActor, location));
                 this.buriedActor = null;
                 this.buryCounter = 0;
+            }
+        }
+        if (!location.getItems().isEmpty()) {
+            for (Item item : location.getItems()) {
+                location.removeItem(item);
             }
         }
     }
