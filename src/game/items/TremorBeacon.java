@@ -3,6 +3,8 @@ package game.items;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.statistics.BaseStatistic;
+import game.enums.ItemStatistics;
 import game.grounds.CrackableGround;
 import game.interfaces.Resonator;
 
@@ -11,11 +13,13 @@ import java.util.List;
 
 public class TremorBeacon extends Item implements Resonator {
     private static final int SHOCKWAVE_POWER = 1;
-    private static final int SHOCKWAVE_RADIUS = 2;
+    private static final int SHOCKWAVE_RADIUS = 4;
+    private static final int WEIGHT = 10;
 
     public TremorBeacon() {
         super("Tremor Beacon", 'I');
         this.makePortable();
+        this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
     }
 
     @Override
