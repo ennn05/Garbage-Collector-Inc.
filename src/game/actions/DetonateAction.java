@@ -21,6 +21,7 @@ public class DetonateAction extends Action {
         for (Location location : nearby) {
             List<TremorBeacon> beacons = location.getItemsAs(TremorBeacon.class);
             for (TremorBeacon beacon : beacons) {
+                location.removeItem(beacon);
                 beacon.triggerShockwave(location, map);
             }
         }
