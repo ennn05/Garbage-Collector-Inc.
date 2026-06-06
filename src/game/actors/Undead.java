@@ -44,7 +44,7 @@ public class Undead extends Creature implements Infectable, Spawnable, SporeEmit
      *
      * @return a new Undead
      */
-    public static Actor getUndeadSpawn() {
+    public static Undead getUndeadSpawn() {
         return new Undead();
     }
 
