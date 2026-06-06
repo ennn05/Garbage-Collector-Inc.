@@ -1,6 +1,8 @@
 package game.grounds;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
+import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.Seedable;
 
 /**
@@ -10,8 +12,18 @@ import game.interfaces.Seedable;
  *
  * @author Adrian Kristanto
  */
-public class Floor extends Ground implements Seedable {
+public class Floor extends CrackableGround implements Seedable {
+    private static final int DEGRADATION_LEVEL = 0;
+
     public Floor() {
-        super('_', "Floor");
+        super('_', "Floor", DEGRADATION_LEVEL);
+    }
+
+    @Override
+    public void onActorStep(Location location, Actor actor) {}
+
+    @Override
+    public CrackedFloor degrade() {
+        return new CrackedFloor();
     }
 }
