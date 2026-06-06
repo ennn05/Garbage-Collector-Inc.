@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Undead;
+import game.interfaces.HoleGround;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,6 +84,13 @@ public class RubbleField extends CrackableGround {
         if (!location.getItems().isEmpty()) {
             for (Item item : location.getItems()) {
                 location.removeItem(item);
+            }
+        }
+        List<Location> nearby = location.getNearbyLocations(1);
+        for (Location adj : nearby) {
+            HoleGround hole = adj.getGroundAs(HoleGround.class);
+            if (hole != null) {
+                adj.setGround(new RubbleField());
             }
         }
     }
