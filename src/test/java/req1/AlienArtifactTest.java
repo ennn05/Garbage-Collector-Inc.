@@ -52,10 +52,9 @@ class AlienArtifactTest {
         assertTrue(testMap.contains(worker),
                 "Worker must still be on the map after depositing AlienArtifact");
 
-        // Worker should land on a valid (Floor) tile â€” check canActorEnter was satisfied
+        // Worker should land on a valid (Floor) tile and check canActorEnter was satisfied
         // (the new location accepted the actor, so it must have been valid)
-        assertTrue(testMap.locationOf(worker).getGround() instanceof Floor,
-                "Worker should land on a Floor tile after teleport");
+        assertInstanceOf(Floor.class, testMap.locationOf(worker).getGround(), "Worker should land on a Floor tile after teleport");
     }
 
     @Test

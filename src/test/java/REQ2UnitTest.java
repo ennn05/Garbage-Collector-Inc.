@@ -1,5 +1,3 @@
-package test.game;
-
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
