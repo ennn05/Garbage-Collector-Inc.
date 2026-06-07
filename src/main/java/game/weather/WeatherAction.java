@@ -28,11 +28,26 @@ public class WeatherAction extends Action {
         this.playerLocation = playerLocation;
     }
 
+    /**
+     * Delegates to {@link WeatherSystem#fetchAndApply}, which queries the API,
+     * builds a {@link game.weather.WeatherReport}, applies any active effects, and
+     * runs the zone passive effect for the player's current position.
+     *
+     * @param actor the WeatherController actor executing this action
+     * @param map   the current game map
+     * @return a summary string produced by the weather system
+     */
     @Override
     public String execute(Actor actor, GameMap map) {
         return weatherSystem.fetchAndApply(map, playerLocation);
     }
 
+    /**
+     * Returns a fixed label for this system action (not shown in player menus).
+     *
+     * @param actor the executing actor
+     * @return {@code "Weather system update"}
+     */
     @Override
     public String menuDescription(Actor actor) {
         return "Weather system update";

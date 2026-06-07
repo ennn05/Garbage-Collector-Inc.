@@ -26,6 +26,13 @@ public class StormEffect implements WeatherEffect {
     private static final int RADIUS = 5;
     private static final int MAX_PUDDLES = 3;
 
+    /**
+     * Converts up to {@value #MAX_PUDDLES} randomly chosen {@link game.interfaces.Seedable}
+     * tiles within {@value #RADIUS} tiles of the player into {@link game.grounds.Puddle} ground.
+     *
+     * @param map            the game map to modify
+     * @param playerLocation the player's location used as the effect centre
+     */
     @Override
     public void apply(GameMap map, Location playerLocation) {
         List<Location> floorTiles = new ArrayList<>();
@@ -43,11 +50,22 @@ public class StormEffect implements WeatherEffect {
         }
     }
 
+    /**
+     * Activates when the reported wind speed is at or above {@value #THRESHOLD} m/s.
+     *
+     * @param report the current weather data snapshot
+     * @return {@code true} if the wind speed threshold is met
+     */
     @Override
     public boolean shouldActivate(WeatherReport report) {
         return report.getWindSpeed() >= THRESHOLD;
     }
 
+    /**
+     * Returns a human-readable name for this effect.
+     *
+     * @return {@code "Storm (puddles spread near player)"}
+     */
     @Override
     public String getEffectName() {
         return "Storm (puddles spread near player)";

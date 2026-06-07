@@ -34,6 +34,17 @@ public class WeatherController extends Actor {
         this.weatherBehaviour = weatherBehaviour;
     }
 
+    /**
+     * Delegates entirely to {@link WeatherBehaviour#operate} each turn. Returns the
+     * resulting {@link game.weather.WeatherAction} if the behaviour decides a weather
+     * cycle should run, or {@link DoNothingAction} otherwise.
+     *
+     * @param actions    available actions (unused — weather logic is behaviour-driven)
+     * @param lastAction the previous action taken (unused)
+     * @param map        the current game map
+     * @param display    the display (unused)
+     * @return the action to execute this turn
+     */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         Action action = weatherBehaviour.operate(this, map.locationOf(this));

@@ -11,6 +11,15 @@ public class WeatherReport {
     private final double windSpeed;
     private final String condition;
 
+    /**
+     * Creates a fully populated weather snapshot. Intended to be called only by
+     * {@link WeatherReportBuilder#build()} after all extractors have run.
+     *
+     * @param temperature temperature in degrees Celsius
+     * @param humidity    relative humidity as a percentage (0–100)
+     * @param windSpeed   wind speed in metres per second
+     * @param condition   OpenWeatherMap condition label (e.g. {@code "Clear"})
+     */
     public WeatherReport(double temperature, int humidity, double windSpeed, String condition) {
         this.temperature = temperature;
         this.humidity = humidity;

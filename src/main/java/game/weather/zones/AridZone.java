@@ -47,12 +47,25 @@ public class AridZone extends WeatherZone {
 
     private final Random random = new Random();
 
+    /**
+     * Builds the OpenWeatherMap API URL for Melbourne (lat {@value #LAT}, lon {@value #LON}).
+     *
+     * @param apiKey the OpenWeatherMap API key
+     * @return a fully formed URL string with metric units
+     */
     @Override
     public String buildApiQuery(String apiKey) {
         return String.format("%s?lat=%.2f&lon=%.2f&units=metric&appid=%s",
                 API_BASE, LAT, LON, apiKey);
     }
 
+    /**
+     * Returns {@code true} if the player's X coordinate falls within columns
+     * {@value #MIN_X}–{@value #MAX_X} (the arid zone region).
+     *
+     * @param playerX the player's current X coordinate on the map
+     * @return {@code true} if the player is in this zone
+     */
     @Override
     public boolean containsPlayerX(int playerX) {
         return playerX >= MIN_X && playerX <= MAX_X;
@@ -96,6 +109,11 @@ public class AridZone extends WeatherZone {
         }
     }
 
+    /**
+     * Returns the display name of this zone.
+     *
+     * @return {@code "Arid Zone (Melbourne)"}
+     */
     @Override
     public String getZoneName() {
         return "Arid Zone (Melbourne)";
