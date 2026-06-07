@@ -27,10 +27,12 @@ public class EmitSporesAction extends Action {
     private static final Random random = new Random();
 
     /**
-     * @param groundFactory supplier that creates the chosen FungalGround subtype
-     * @param groundName    display name shown in the menu
-     * @param target        the Floor tile to seed
-     * @param direction     direction label for the menu description
+     * Creates an action that will seed one specific fungal ground type onto a target tile.
+     *
+     * @param groundFactory supplier that creates the chosen {@link FungalGround} subtype
+     * @param groundName    display name shown in the action menu
+     * @param target        the {@link game.interfaces.Seedable} tile to seed
+     * @param direction     direction label used in the menu description
      */
     public EmitSporesAction(Supplier<FungalGround> groundFactory, String groundName,
                             Location target, String direction) {
@@ -40,6 +42,15 @@ public class EmitSporesAction extends Action {
         this.direction = direction;
     }
 
+    /**
+     * Seeds the target tile with the chosen fungal ground type. If the target is
+     * no longer {@link game.interfaces.Seedable}, the action is aborted. On a
+     * {@value #AOE_CHANCE}% chance, all adjacent Seedable tiles are also seeded.
+     *
+     * @param actor the actor deploying the canister
+     * @param map   the current game map
+     * @return a string describing what happened
+     */
     @Override
     public String execute(Actor actor, GameMap map) {
         if (target.getGroundAs(Seedable.class) == null) {
@@ -62,6 +73,12 @@ public class EmitSporesAction extends Action {
         return actor + " deploys SporeCanister [" + groundName + "] to the " + direction + "!";
     }
 
+    /**
+     * Returns the menu label shown to the player when choosing this action.
+     *
+     * @param actor the actor holding the canister
+     * @return a human-readable description including the ground type and direction
+     */
     @Override
     public String menuDescription(Actor actor) {
         return actor + " deploys SporeCanister [" + groundName + "] to the " + direction;
