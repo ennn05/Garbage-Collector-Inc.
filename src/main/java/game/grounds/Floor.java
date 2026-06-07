@@ -11,6 +11,10 @@ import game.interfaces.Seedable;
  * @author Adrian Kristanto
  */
 public class Floor extends Ground implements Seedable {
+    /**
+     * Creates a Floor tile (display character: {@code _}).
+     * Implements {@link game.interfaces.Seedable} so fungal ground can spread here.
+     */
     public Floor() {
         super('_', "Floor");
     }

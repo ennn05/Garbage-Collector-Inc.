@@ -23,6 +23,9 @@ public class Puddle extends Ground implements Sterilisable, Consumable, PuddleGr
 
     private boolean sterilised = false;
 
+    /**
+     * Creates a Puddle tile (display character: {@code ~}).
+     */
     public Puddle() {
         super('~', "Puddle");
     }
@@ -58,6 +61,12 @@ public class Puddle extends Ground implements Sterilisable, Consumable, PuddleGr
         return actor + " drinks from the puddle and is poisoned for " + POISON_TURNS + " turns.";
     }
 
+    /**
+     * Returns the menu label shown when the player is offered the drink action.
+     *
+     * @param actor the actor that would drink
+     * @return a string describing the drink action
+     */
     @Override
     public String menuDescription(Actor actor) {
         return actor + " drinks from Puddle";
@@ -82,11 +91,19 @@ public class Puddle extends Ground implements Sterilisable, Consumable, PuddleGr
         return actions;
     }
 
+    /**
+     * Returns whether this puddle has been sterilised (safe to drink).
+     *
+     * @return {@code true} if sterilised
+     */
     @Override
     public boolean isSterilised() {
         return sterilised;
     }
 
+    /**
+     * Marks this puddle as sterilised so that future drinking heals rather than poisons.
+     */
     @Override
     public void sterilise() {
         this.sterilised = true;

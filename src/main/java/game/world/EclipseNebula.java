@@ -64,6 +64,11 @@ import java.util.List;
  * and hashtags into a sprawling, functional sci-fi facility.
  */
 public class EclipseNebula extends World {
+    /**
+     * Creates the EclipseNebula world and wires it to the given display.
+     *
+     * @param display the display object used to render the game
+     */
     public EclipseNebula(Display display) {
         super(display);
     }
@@ -78,6 +83,13 @@ public class EclipseNebula extends World {
         return new ContractedWorker(name, 'ඞ', 10, createStarterInventory());
     }
 
+    /**
+     * Builds and populates all game maps, places actors, items, and ground tiles,
+     * and wires up the REQ3 fungal terrain, REQ4 cracked floors and shockwave items,
+     * REQ5 Mannequins and the {@link game.weather.WeatherSystem}.
+     *
+     * @throws Exception if map construction or actor placement fails
+     */
     public void initialise() throws Exception {
         DefaultGroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('.', Dirt::new);
