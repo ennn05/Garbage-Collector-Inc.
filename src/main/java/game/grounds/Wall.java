@@ -15,4 +15,14 @@ public class Wall extends Ground {
     public boolean canActorEnter(Actor actor) {
         return false;
     }
+
+    /**
+     * No objects can be thrown through a wall.
+     *
+     * @return true
+     */
+    @Override
+    public boolean blocksThrownObjects() {
+        return true;
+    }
 }

@@ -65,4 +65,14 @@ public abstract class Door extends Ground implements Unlockable {
     public boolean canActorEnter(Actor actor) {
         return isUnlocked;
     }
+
+    /**
+     * If the door is unlocked, any objects can pass through when thrown.
+     *
+     * @return true if the door is unlocked, false otherwise
+     */
+    @Override
+    public boolean blocksThrownObjects() {
+        return !isUnlocked;
+    }
 }

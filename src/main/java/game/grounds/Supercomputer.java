@@ -15,10 +15,7 @@ import game.interfaces.Depositable;
 import game.interfaces.Purchasable;
 import game.interfaces.QuotaHost;
 import game.interfaces.Sellable;
-import game.items.AccessCard;
-import game.items.FirstAidKit;
-import game.items.PlasmaCutter;
-import game.items.SterilisationBox;
+import game.items.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +41,10 @@ public class Supercomputer extends Ground implements QuotaHost {
         purchasableItems.add(new AccessCard(AccessLevel.LEVEL_2));
         purchasableItems.add(new AccessCard(AccessLevel.LEVEL_3));
         purchasableItems.add(new PlasmaCutter());
+        purchasableItems.add(new TremorBeacon());
+        purchasableItems.add(new BeaconDetonator());
+        purchasableItems.add(new QuakeCharge());
+        purchasableItems.add(new ResonanceMallet());
     }
 
     /**

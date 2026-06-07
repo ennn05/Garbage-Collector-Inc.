@@ -8,6 +8,10 @@ package game.enums;
  * we just need to know if it will break the {@code ContractedWorker}'s back.
  */
 public enum ItemStatistics {
+    /** Tracks how many turns remain before an item can be used again. */
+    COOLDOWN,
+    /** Tracks the number of uses remaining before an item is consumed. */
     DURABILITY,
+    /** The carry weight of an item, relevant to inventory capacity limits. */
     WEIGHT,
 }
