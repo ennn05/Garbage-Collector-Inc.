@@ -16,6 +16,16 @@ import game.interfaces.Resonator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A throwable grenade that degrades ground and pushes items within a shockwave radius on detonation.
+ * <p>
+ * QuakeCharge can be thrown up to {@value #THROW_RANGE} tiles in the four cardinal directions.
+ * Thrown objects stop at the first blocking tile. Each throw degrades one durability charge; the item
+ * is removed from inventory when all {@value #INITIAL_DURABILITY} uses are exhausted.
+ * The shockwave radius is {@value #SHOCKWAVE_RADIUS}, affecting only the tile immediately surrounding
+ * the blast point.
+ * Purchase price: {@value #PURCHASE_PRICE} credits. Weight: {@value #WEIGHT}.
+ */
 public class QuakeCharge extends Item implements Purchasable, Resonator {
     private static final int INITIAL_DURABILITY = 3;
     private static final int PURCHASE_PRICE = 55;
@@ -24,6 +34,10 @@ public class QuakeCharge extends Item implements Purchasable, Resonator {
     private static final int THROW_RANGE = 3;
     private static final int WEIGHT = 3;
 
+    /**
+     * Creates a new QuakeCharge item (display character: {@code @}) with
+     * {@value #INITIAL_DURABILITY} uses.
+     */
     public QuakeCharge() {
         super("Quake Grenade", '@');
         this.makePortable();
@@ -31,32 +45,52 @@ public class QuakeCharge extends Item implements Purchasable, Resonator {
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return a new QuakeCharge instance
+     */
     @Override
     public QuakeCharge createPurchasedItem() {
         return new QuakeCharge();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #PURCHASE_PRICE}
+     */
     @Override
     public int getPurchasePrice() {
         return PURCHASE_PRICE;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #SHOCKWAVE_POWER}
+     */
     @Override
     public int getShockwavePower() {
         return SHOCKWAVE_POWER;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #SHOCKWAVE_RADIUS}
+     */
     @Override
     public int getShockwaveRadius() {
         return SHOCKWAVE_RADIUS;
     }
 
     /**
-     * Handle insufficient credits response.
+     * {@inheritDoc}
      *
      * @param buyer the actor attempting to buy this item
-     * @param map the map where the transaction happens
-     * @return result description
+     * @param map   the map where the transaction happens
+     * @return a message explaining the buyer cannot afford the item
      */
     @Override
     public String onInsufficientCredits(Actor buyer, GameMap map) {
@@ -65,11 +99,28 @@ public class QuakeCharge extends Item implements Purchasable, Resonator {
         return message;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param buyer            the actor purchasing this item
+     * @param map              the game map
+     * @param terminalLocation the location of the shop terminal
+     * @param wallet           the buyer's wallet
+     * @return a confirmation message
+     */
     @Override
     public String onPurchased(Actor buyer, GameMap map, Location terminalLocation, Wallet wallet) {
         return buyer + " purchased the Quake Charge";
     }
 
+    /**
+     * Triggers the shockwave at {@code epicenter}, degrading all
+     * {@link game.grounds.CrackableGround} within the shockwave radius and pushing
+     * items outward from the blast point.
+     *
+     * @param epicenter the location where this grenade detonates
+     * @param map       the game map
+     */
     @Override
     public void triggerShockwave(Location epicenter, GameMap map) {
         List<Location> affected = new ArrayList<>(epicenter.getNearbyLocations(getShockwaveRadius()));

@@ -14,9 +14,13 @@ import game.status.PoisonStatus;
 import java.util.Random;
 
 /**
- * Alien artifact dropped from cutting alien cubes from inventory.
- * Can be sold for 200 worker credits (50% poison chance) or 
- * deposited for 100 company credits with teleportation.
+ * An alien artifact recovered from alien cubes, implementing both {@link Sellable} and
+ * {@link Depositable}.
+ * <p>
+ * <b>Sell</b>: yields {@value #SELL_PRICE} worker credits but carries a {@value #POISON_CHANCE * 100}%
+ * chance of poisoning the seller for {@value #POISON_DURATION} turns.
+ * <b>Deposit</b>: yields {@value #DEPOSIT_REWARD} company credits and teleports the worker to a
+ * random accessible location on the current map.
  */
 public class AlienArtifact extends Item implements Sellable, Depositable {
     private static final int WEIGHT = 1;
