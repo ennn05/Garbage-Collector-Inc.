@@ -13,10 +13,15 @@ import testutil.TestWorld;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for deprecated flora ground tiles: {@link DeprecatedFleshySprout},
+ * {@link DeprecatedFleshyMatureTree}, and {@link FleshyMonolith} tick behaviours.
+ */
 class FloraTest {
 
-    // -- DeprecatedFleshySprout --------------------------------------------------
+    // ── DeprecatedFleshySprout ─────────────────────────────────────────────────
 
+    /** Verifies that a DeprecatedFleshySprout spawns an Undead on an adjacent tile when a worker is nearby. */
     @Test
     void sproutSpawnsUndeadOnAdjacentTileWhenWorkerIsNearby() throws Exception {
         GameMap map = new TestWorld().createFloorMap(3, 3);
@@ -34,6 +39,7 @@ class FloraTest {
                 "Spawned creature should be an Undead");
     }
 
+    /** Verifies that a DeprecatedFleshySprout does not spawn anything when no worker is nearby. */
     @Test
     void sproutDoesNotSpawnWhenNoWorkerIsNearby() throws Exception {
         GameMap map = new TestWorld().createFloorMap(3, 3);
@@ -47,8 +53,9 @@ class FloraTest {
         }
     }
 
-    // -- DeprecatedFleshyMatureTree ----------------------------------------------
+    // ── DeprecatedFleshyMatureTree ─────────────────────────────────────────────
 
+    /** Verifies that a DeprecatedFleshyMatureTree spawns a ScrapSnatcher on an adjacent tile when a worker is nearby. */
     @Test
     void matureTreeSpawnsScrapSnatcherWhenWorkerIsNearby() throws Exception {
         GameMap map = new TestWorld().createFloorMap(3, 3);
@@ -66,8 +73,9 @@ class FloraTest {
                 "Spawned creature should be a Scrap Snatcher");
     }
 
-    // -- FleshyMonolith ----------------------------------------------------------
+    // ── FleshyMonolith ─────────────────────────────────────────────────────────
 
+    /** Verifies that a FleshyMonolith warps an adjacent worker to a different location on tick. */
     @Test
     void monolithWarpsAdjacentWorkerToDifferentLocation() throws Exception {
         GameMap map = new TestWorld().createFloorMap(5, 5);
@@ -83,6 +91,7 @@ class FloraTest {
                 "Monolith must warp an adjacent worker to a different tile");
     }
 
+    /** Verifies that a FleshyMonolith does nothing when no worker is adjacent. */
     @Test
     void monolithDoesNothingWhenNoWorkerIsAdjacent() throws Exception {
         GameMap map = new TestWorld().createFloorMap(3, 3);

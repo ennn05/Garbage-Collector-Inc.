@@ -15,17 +15,23 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link BlightFungus}: spore infection on contact, no double-infection,
+ * item drop chance, spread restrictions, and Undead-triggered AoE spread.
+ */
 class BlightFungusTest {
 
     private GameMap testMap;
 
+    /** Initialises a 7×7 floor map for use in each test. */
     @BeforeEach
     void setUp() throws Exception {
         testMap = new TestWorld().createFloorMap(7, 7);
     }
 
-    // â”€â”€ Infection on contact â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Infection on contact ───────────────────────────────────────────────────
 
+    /** Verifies that a worker standing on BlightFungus receives a SporeInfection status. */
     @Test
     void workerOnBlightFungusReceivesSporeInfection() throws Exception {
         ContractedWorker worker = new ContractedWorker("Bob", 'B', 20, new BasicInventory());
@@ -38,6 +44,7 @@ class BlightFungusTest {
                 "Worker on BlightFungus should receive SporeInfection");
     }
 
+    /** Verifies that a worker already infected is not re-infected on a subsequent tick. */
     @Test
     void workerNotReinfectedIfAlreadyInfected() throws Exception {
         ContractedWorker worker = new ContractedWorker("Bob", 'B', 20, new BasicInventory());
@@ -51,6 +58,7 @@ class BlightFungusTest {
         assertTrue(worker.hasStatus(SporeInfection.class));
     }
 
+    /** Verifies that a worker carrying an item may have it force-dropped within 30 ticks (25% chance). */
     @Test
     void workerWithItemMayDropOnBlightFungusContact() throws Exception {
         ContractedWorker worker = new ContractedWorker("Bob", 'B', 20, new BasicInventory());
@@ -58,7 +66,7 @@ class BlightFungusTest {
         testMap.addActor(worker, testMap.at(3, 3));
         testMap.at(3, 3).setGround(new BlightFungus());
 
-        // Run many ticks â€” 25% chance means statistically very likely to drop after 20+
+        // Run many ticks — 25% chance means statistically very likely to drop after 20+
         boolean itemDropped = false;
         for (int i = 0; i < 30 && !itemDropped; i++) {
             testMap.at(3, 3).tick();
@@ -69,13 +77,14 @@ class BlightFungusTest {
         assertTrue(itemDropped, "Item should have been force-dropped within 30 ticks (25% chance)");
     }
 
-    // â”€â”€ Passive spread â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Passive spread ─────────────────────────────────────────────────────────
 
+    /** Verifies that BlightFungus spread cannot overwrite a non-Seedable tile (e.g., Wall). */
     @Test
     void blightFungusCannotEnterNonSeedableTile() throws Exception {
         // Walls should not be seeded
         testMap.at(3, 3).setGround(new Wall());
-        // BlightFungus spread checks Seedable â€” Wall does not implement it
+        // BlightFungus spread checks Seedable — Wall does not implement it
         // Place BlightFungus adjacent and tick 10+ times to trigger spread
         testMap.at(2, 3).setGround(new BlightFungus());
         for (int i = 0; i < 10; i++) {
@@ -86,6 +95,7 @@ class BlightFungusTest {
                 "BlightFungus spread must not overwrite non-Seedable tiles");
     }
 
+    /** Verifies that exactly one adjacent Floor tile becomes BlightFungus after 10 ticks. */
     @Test
     void blightFungusSpreadsTurnsSeedableAdjacentTile() throws Exception {
         testMap.at(3, 3).setGround(new BlightFungus());
@@ -105,8 +115,9 @@ class BlightFungusTest {
                 "Exactly one adjacent Floor tile should become BlightFungus after 10 ticks");
     }
 
-    // â”€â”€ Undead AoE spread â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Undead AoE spread ──────────────────────────────────────────────────────
 
+    /** Verifies that an Undead standing on BlightFungus triggers AoE spread to adjacent floor tiles. */
     @Test
     void undeadOnBlightFungusSpreadsToAdjacentFloors() throws Exception {
         testMap.at(3, 3).setGround(new BlightFungus());
@@ -125,4 +136,3 @@ class BlightFungusTest {
                 "Undead on BlightFungus should AoE-spread BlightFungus to adjacent floors");
     }
 }
-

@@ -12,11 +12,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link SporeInfection}: activation, turn countdown, expiry,
+ * and the BlightFungus application path (including no double-application).
+ */
 class SporeInfectionTest {
 
     private GameMap testMap;
     private ContractedWorker worker;
 
+    /** Initialises a 5×5 floor map and places the worker at (2,2). */
     @BeforeEach
     void setUp() throws Exception {
         testMap = new TestWorld().createFloorMap(5, 5);
@@ -24,12 +29,14 @@ class SporeInfectionTest {
         testMap.addActor(worker, testMap.at(2, 2));
     }
 
+    /** Verifies that a newly created SporeInfection is immediately active. */
     @Test
     void statusActiveOnCreation() {
         SporeInfection infection = new SporeInfection(5);
         assertTrue(infection.isStatusActive());
     }
 
+    /** Verifies that the status remains active while turns remain (after partial ticks). */
     @Test
     void statusActiveWhileTurnsRemain() {
         SporeInfection infection = new SporeInfection(3);
@@ -39,6 +46,7 @@ class SporeInfectionTest {
         assertTrue(infection.isStatusActive());
     }
 
+    /** Verifies that the status becomes inactive once all turns have been ticked away. */
     @Test
     void statusInactiveAfterAllTurnsExpire() {
         SporeInfection infection = new SporeInfection(2);
@@ -48,6 +56,7 @@ class SporeInfectionTest {
         assertFalse(infection.isStatusActive());
     }
 
+    /** Verifies that a single-turn infection expires precisely after one tick. */
     @Test
     void statusExpiresPreciselyAtZeroTurns() {
         SporeInfection infection = new SporeInfection(1);
@@ -57,6 +66,7 @@ class SporeInfectionTest {
         assertFalse(infection.isStatusActive());
     }
 
+    /** Verifies that BlightFungus applies a SporeInfection to the worker on tile tick. */
     @Test
     void blightFungusAppliesSporeInfectionOnEntry() throws Exception {
         // Place BlightFungus under the worker
@@ -66,6 +76,7 @@ class SporeInfectionTest {
         assertTrue(worker.hasStatus(SporeInfection.class));
     }
 
+    /** Verifies that BlightFungus does not stack a second SporeInfection on an already-infected worker. */
     @Test
     void blightFungusDoesNotApplyInfectionTwice() throws Exception {
         testMap.at(2, 2).setGround(new BlightFungus());
@@ -76,4 +87,3 @@ class SporeInfectionTest {
         assertTrue(worker.hasStatus(SporeInfection.class));
     }
 }
-

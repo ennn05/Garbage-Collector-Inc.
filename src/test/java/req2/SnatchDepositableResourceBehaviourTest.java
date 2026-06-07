@@ -15,12 +15,17 @@ import testutil.TestWorld;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link SnatchDepositableResourceBehaviour} and {@link MoveSnatchResourceAction}:
+ * action selection, non-depositable item avoidance, successful snatch, trapped-actor edge cases.
+ */
 class SnatchDepositableResourceBehaviourTest {
 
     private GameMap testMap;
     private ScrapSnatcher snatcher;
     private SnatchDepositableResourceBehaviour behaviour;
 
+    /** Initialises a 5×5 floor map, places the snatcher at (2,2), and creates the behaviour. */
     @BeforeEach
     void setUp() throws Exception {
         testMap = new TestWorld().createFloorMap(5, 5);
@@ -29,6 +34,7 @@ class SnatchDepositableResourceBehaviourTest {
         behaviour = new SnatchDepositableResourceBehaviour();
     }
 
+    /** Verifies that the behaviour returns a non-null action when a depositable item is adjacent. */
     @Test
     void returnsActionWhenDepositableItemOnAdjacentTile() {
         testMap.at(3, 2).addItem(new AluminiumScrap());
@@ -36,6 +42,7 @@ class SnatchDepositableResourceBehaviourTest {
         assertNotNull(action, "Should return a snatch action when depositable item is adjacent");
     }
 
+    /** Verifies that the behaviour still returns a (wander) action when no depositable resource is found. */
     @Test
     void returnsActionEvenWithNoDepositableItem() {
         // Random wander action returned when no depositable resource found
@@ -43,15 +50,17 @@ class SnatchDepositableResourceBehaviourTest {
         assertNotNull(action, "Should still return a move action when no depositable item nearby");
     }
 
+    /** Verifies that a non-depositable item (e.g., Flask) is not snatched and remains on the tile. */
     @Test
     void doesNotSnatchNonDepositableItem() {
-        // Flask is not Depositable â€” snatcher should just wander, not snatch
+        // Flask is not Depositable — snatcher should just wander, not snatch
         testMap.at(3, 2).addItem(new Flask());
         behaviour.operate(snatcher, testMap.at(2, 2));
         assertFalse(testMap.at(3, 2).getItems().isEmpty(),
                 "Non-depositable items should not be snatched");
     }
 
+    /** Verifies that executing MoveSnatchResourceAction places the snatched item in the snatcher's inventory. */
     @Test
     void snatchedItemEndsUpInSnatcherInventoryViaMoveSnatchAction() throws Exception {
         AluminiumScrap scrap = new AluminiumScrap();
@@ -64,6 +73,7 @@ class SnatchDepositableResourceBehaviourTest {
                 "Snatched item should be in snatcher inventory after MoveSnatchResourceAction executes");
     }
 
+    /** Verifies that the behaviour returns {@code null} when the snatcher has no valid exits (surrounded by walls). */
     @Test
     void behaviourReturnsNullWhenSnatcherIsTrapped() throws Exception {
         GameMap map = new TestWorld().createFloorMap(3, 3);
@@ -78,6 +88,7 @@ class SnatchDepositableResourceBehaviourTest {
         assertNull(action, "Snatcher with no valid exits should return null");
     }
 
+    /** Verifies that MoveSnatchResourceAction does not pick up a non-depositable item and leaves it on the tile. */
     @Test
     void moveSnatchActionSkipsNonDepositableItem() throws Exception {
         Item nonDepositable = new NonDepositableItem();
@@ -100,4 +111,3 @@ class SnatchDepositableResourceBehaviourTest {
         }
     }
 }
-

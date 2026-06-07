@@ -14,12 +14,17 @@ import testutil.TestWorld;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link DepositItemAction}: inventory removal, quota progression,
+ * failure when item is not carried, and menu description formatting.
+ */
 class DepositItemActionTest {
 
     private GameMap testMap;
     private ContractedWorker worker;
     private Supercomputer supercomputer;
 
+    /** Initialises a 5×5 map, places the worker at (2,2), and sets up a Supercomputer at (2,1). */
     @BeforeEach
     void setUp() throws Exception {
         testMap = new TestWorld().createFloorMap(5, 5);
@@ -30,6 +35,7 @@ class DepositItemActionTest {
         supercomputer.initialiseQuotaSystem(testMap.at(2, 1));
     }
 
+    /** Verifies that executing a deposit removes the item from the worker's inventory. */
     @Test
     void depositRemovesItemFromInventory() {
         AluminiumScrap scrap = new AluminiumScrap();
@@ -42,6 +48,7 @@ class DepositItemActionTest {
                 "Item must be removed from inventory after deposit");
     }
 
+    /** Verifies that executing a deposit increases the quota progress by the item's deposit reward. */
     @Test
     void depositProgressesQuota() {
         AluminiumScrap scrap = new AluminiumScrap();
@@ -57,6 +64,7 @@ class DepositItemActionTest {
                 "Quota progress must increase by the item's deposit reward");
     }
 
+    /** Verifies that depositing an item not in inventory returns an appropriate failure message. */
     @Test
     void depositFailsIfItemNotInInventory() {
         AluminiumScrap scrap = new AluminiumScrap();
@@ -69,6 +77,7 @@ class DepositItemActionTest {
                 "Should report item not carried");
     }
 
+    /** Verifies that the menu description includes the item's 50-credit deposit reward. */
     @Test
     void menuDescriptionShowsDepositReward() {
         AluminiumScrap scrap = new AluminiumScrap();
@@ -80,4 +89,3 @@ class DepositItemActionTest {
         assertTrue(menu.contains("50"), "Menu should show the 50-credit deposit reward");
     }
 }
-
