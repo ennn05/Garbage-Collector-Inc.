@@ -72,7 +72,7 @@ public class QuakeCharge extends Item implements Purchasable, Resonator {
 
     @Override
     public void triggerShockwave(Location epicenter, GameMap map) {
-        List<Location> affected = epicenter.getNearbyLocations(getShockwaveRadius());
+        List<Location> affected = new ArrayList<>(epicenter.getNearbyLocations(getShockwaveRadius()));
         affected.add(epicenter);
         for (Location location : affected) {
             if (!location.getItems().isEmpty()) {
@@ -86,7 +86,9 @@ public class QuakeCharge extends Item implements Purchasable, Resonator {
                 }
             }
             CrackableGround ground = location.getGroundAs(CrackableGround.class);
-            if (ground != null) ground.degrade();
+            if (ground != null) {
+                location.setGround(ground.degrade());
+            }
         }
     }
 
