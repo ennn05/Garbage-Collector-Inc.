@@ -14,15 +14,21 @@ import testutil.TestWorld;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link SporeExplosion}: self-destruct to Floor on actor entry,
+ * AoE damage, adjacent floor conversion to BlightFungus, and no-detonation without actor.
+ */
 class SporeExplosionTest {
 
     private GameMap testMap;
 
+    /** Initialises a 7×7 floor map for use in each test. */
     @BeforeEach
     void setUp() throws Exception {
         testMap = new TestWorld().createFloorMap(7, 7);
     }
 
+    /** Verifies that SporeExplosion converts to Floor after an actor steps on it. */
     @Test
     void selfDestructsToFloorWhenActorStepsOn() throws Exception {
         testMap.at(3, 3).setGround(new SporeExplosion());
@@ -35,6 +41,7 @@ class SporeExplosionTest {
                 "SporeExplosion must convert to Floor after detonation");
     }
 
+    /** Verifies that actors within the AoE radius take damage when SporeExplosion detonates. */
     @Test
     void dealsAoeDamageToActorsInRadius() throws Exception {
         testMap.at(3, 3).setGround(new SporeExplosion());
@@ -50,6 +57,7 @@ class SporeExplosionTest {
                 "Actor within AoE radius must take damage from SporeExplosion");
     }
 
+    /** Verifies that adjacent Floor tiles become BlightFungus after SporeExplosion detonates. */
     @Test
     void convertsAdjacentFloorToBlightFungus() throws Exception {
         testMap.at(3, 3).setGround(new SporeExplosion());
@@ -66,6 +74,7 @@ class SporeExplosionTest {
                 "Adjacent Floor tiles must become BlightFungus after explosion");
     }
 
+    /** Verifies that SporeExplosion does not detonate when no actor is present on its tile. */
     @Test
     void doesNotDetonateWithoutActor() {
         testMap.at(3, 3).setGround(new SporeExplosion());
@@ -74,4 +83,3 @@ class SporeExplosionTest {
                 "SporeExplosion must not detonate when no actor is present");
     }
 }
-

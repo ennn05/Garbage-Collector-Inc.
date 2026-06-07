@@ -16,11 +16,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link CutAction}: cutting an AluminiumDoor (ground target)
+ * and cutting an AlienCube (inventory item target), including a no-tool failure case.
+ */
 class CutActionTest {
 
     private GameMap testMap;
     private ContractedWorker worker;
 
+    /** Initialises a 5×5 floor map, places the worker at (2,2), and equips a PlasmaCutter. */
     @BeforeEach
     void setUp() throws Exception {
         testMap = new TestWorld().createFloorMap(5, 5);
@@ -29,8 +34,9 @@ class CutActionTest {
         worker.getInventory().add(new PlasmaCutter());
     }
 
-    // â”€â”€ AluminiumDoor cut â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── AluminiumDoor cut ──────────────────────────────────────────────────────
 
+    /** Verifies that cutting an AluminiumDoor replaces it with a Floor tile. */
     @Test
     void cuttingAluminiumDoorTransformsGroundToFloor() {
         Location doorLocation = testMap.at(3, 2);
@@ -44,6 +50,7 @@ class CutActionTest {
                 "Ground should be Floor after cutting");
     }
 
+    /** Verifies that cutting an AluminiumDoor drops an AluminiumScrap at the door's location. */
     @Test
     void cuttingAluminiumDoorDropsAluminiumScrap() {
         Location doorLocation = testMap.at(3, 2);
@@ -57,6 +64,7 @@ class CutActionTest {
                 "AluminiumScrap should be dropped at door location");
     }
 
+    /** Verifies that a worker without a PlasmaCutter cannot cut, and the door remains. */
     @Test
     void cuttingWithoutPlasmaCutterFails() throws Exception {
         ContractedWorker unarmedWorker = new ContractedWorker("Unarmed", 'U', 50, new BasicInventory());
@@ -75,8 +83,9 @@ class CutActionTest {
                 "Door should remain unchanged");
     }
 
-    // â”€â”€ AlienCube inventory cut â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── AlienCube inventory cut ────────────────────────────────────────────────
 
+    /** Verifies that cutting an AlienCube removes it from the worker's inventory. */
     @Test
     void cuttingAlienCubeRemovesCubeFromInventory() {
         AlienCube cube = new AlienCube();
@@ -91,6 +100,7 @@ class CutActionTest {
                 "AlienCube must be removed from inventory after cutting");
     }
 
+    /** Verifies that cutting an AlienCube drops an AlienArtifact at the worker's location. */
     @Test
     void cuttingAlienCubeDropsAlienArtifactOnGround() {
         AlienCube cube = new AlienCube();
@@ -107,6 +117,7 @@ class CutActionTest {
                 "Dropped item should be AlienArtifact");
     }
 
+    /** Verifies that cutting an AlienCube applies a PoisonStatus to the worker. */
     @Test
     void cuttingAlienCubeAppliesPoisonToWorker() {
         AlienCube cube = new AlienCube();
@@ -120,6 +131,7 @@ class CutActionTest {
                 "Worker should be poisoned after cutting AlienCube");
     }
 
+    /** Verifies that cutting an inventory item does not change the ground beneath the worker. */
     @Test
     void cuttingAlienCubeDoesNotTransformGround() {
         AlienCube cube = new AlienCube();
@@ -133,4 +145,3 @@ class CutActionTest {
                 "Ground under worker should remain Floor after cutting inventory item");
     }
 }
-

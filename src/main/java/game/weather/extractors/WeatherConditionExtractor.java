@@ -20,6 +20,14 @@ public class WeatherConditionExtractor implements WeatherDataExtractor<String> {
                     Pattern.DOTALL);
     private static final String DEFAULT_CONDITION = "Clear";
 
+    /**
+     * Parses the {@code "main"} key inside the first {@code "weather"} array element.
+     * Returns {@value #DEFAULT_CONDITION} if the response is {@code null} or the pattern
+     * does not match.
+     *
+     * @param jsonResponse the raw JSON string from the OpenWeatherMap API
+     * @return the condition label (e.g. {@code "Clear"}, {@code "Rain"})
+     */
     @Override
     public String extract(String jsonResponse) {
         if (jsonResponse == null) return DEFAULT_CONDITION;
@@ -30,6 +38,12 @@ public class WeatherConditionExtractor implements WeatherDataExtractor<String> {
         return DEFAULT_CONDITION;
     }
 
+    /**
+     * Extracts the condition label and forwards it to {@link WeatherReportBuilder#setCondition}.
+     *
+     * @param builder the builder being assembled by the extractor chain
+     * @param json    the raw JSON string from the OpenWeatherMap API
+     */
     @Override
     public void populateReport(WeatherReportBuilder builder, String json) {
         builder.setCondition(extract(json));

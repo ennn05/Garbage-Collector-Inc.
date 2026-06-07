@@ -17,6 +17,13 @@ public class FungalBloomEffect implements WeatherEffect {
 
     private static final int THRESHOLD = 75;
 
+    /**
+     * Iterates every tile on the map and calls {@link FungalGround#forceSpread(Location)}
+     * on each {@link FungalGround} tile, bypassing the normal spread timer.
+     *
+     * @param map            the game map to iterate
+     * @param playerLocation unused — effect is map-wide rather than player-centred
+     */
     @Override
     public void apply(GameMap map, Location playerLocation) {
         int bloomed = 0;
@@ -35,11 +42,22 @@ public class FungalBloomEffect implements WeatherEffect {
         }
     }
 
+    /**
+     * Activates when the reported relative humidity is at or above {@value #THRESHOLD}%.
+     *
+     * @param report the current weather data snapshot
+     * @return {@code true} if the humidity threshold is met
+     */
     @Override
     public boolean shouldActivate(WeatherReport report) {
         return report.getHumidity() >= THRESHOLD;
     }
 
+    /**
+     * Returns a human-readable name for this effect.
+     *
+     * @return {@code "Fungal Bloom (all fungal tiles spread instantly)"}
+     */
     @Override
     public String getEffectName() {
         return "Fungal Bloom (all fungal tiles spread instantly)";

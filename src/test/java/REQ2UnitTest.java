@@ -122,6 +122,7 @@ public class REQ2UnitTest {
         return new ContractedWorker("Test Worker", 'W', 10, new BasicInventory());
     }
 
+    /** Verifies that a freshly created ScrapSnatcher has the expected display char, HP, abilities, and capabilities. */
     @Test
     public void typicalScrapSnatcherHasCorrectStatsAndCapabilities() {
         ScrapSnatcher snatcher = new ScrapSnatcher();
@@ -133,6 +134,7 @@ public class REQ2UnitTest {
         Assertions.assertTrue(snatcher.asCapability(Infectable.class).isPresent());
     }
 
+    /** Verifies that spawning a ScrapSnatcher drops one depositable resource on each adjacent tile. */
     @Test
     public void typicalLootExplosionDropsOneDepositableResourceOnEachAdjacentTile()
             throws GameEngineException {
@@ -152,6 +154,7 @@ public class REQ2UnitTest {
         }
     }
 
+    /** Verifies that a loot explosion at a map corner only drops items on the 3 existing adjacent tiles. */
     @Test
     public void edgeLootExplosionAtMapCornerOnlyAffectsExistingAdjacentTiles()
             throws GameEngineException {
@@ -173,6 +176,7 @@ public class REQ2UnitTest {
         }
     }
 
+    /** Verifies that the snatch behaviour moves the snatcher to the resource tile and picks up the depositable item. */
     @Test
     public void typicalSnatchBehaviourMovesToResourceTileAndPicksUpDepositableResource()
             throws GameEngineException {
@@ -203,6 +207,7 @@ public class REQ2UnitTest {
         Assertions.assertTrue(snatcher.getInventory().getItems().contains(scrap));
     }
 
+    /** Verifies that MoveSnatchResourceAction does not pick up a non-depositable item, leaving it on the tile. */
     @Test
     public void invalidMoveSnatchActionDoesNotPickUpNonDepositableItem()
             throws GameEngineException {
@@ -230,6 +235,7 @@ public class REQ2UnitTest {
         Assertions.assertTrue(result.contains("finds no depositable resource"));
     }
 
+    /** Verifies that the snatch behaviour returns null when the snatcher has no valid exits. */
     @Test
     public void edgeSnatchBehaviourReturnsNullWhenNoValidMovementExists()
             throws GameEngineException {
@@ -250,6 +256,7 @@ public class REQ2UnitTest {
         Assertions.assertNull(action);
     }
 
+    /** Verifies that InfectAction removes the Parasite from the map and adds InfectedSnatcherStatus to the target. */
     @Test
     public void typicalParasiteInfectActionRemovesParasiteAndAddsInfectedStatus()
             throws GameEngineException {
@@ -272,6 +279,7 @@ public class REQ2UnitTest {
         Assertions.assertTrue(result.contains("infects"));
     }
 
+    /** Verifies that an infected snatcher takes exactly 1 damage when the InfectedSnatcherStatus ticks. */
     @Test
     public void typicalInfectedSnatcherTakesOneDamageWhenStatusTicks()
             throws GameEngineException {
@@ -293,6 +301,7 @@ public class REQ2UnitTest {
         );
     }
 
+    /** Verifies that an infected snatcher selects AttackWorkerAction over snatching when a worker is adjacent. */
     @Test
     public void typicalInfectedSnatcherChoosesAttackWorkerActionInsteadOfSnatching()
             throws GameEngineException {
@@ -317,6 +326,7 @@ public class REQ2UnitTest {
         Assertions.assertEquals(AttackWorkerAction.class, action.getClass());
     }
 
+    /** Verifies that an infected snatcher performs DoNothingAction when no worker is adjacent. */
     @Test
     public void edgeInfectedSnatcherDoesNothingWhenNoWorkerIsAdjacent()
             throws GameEngineException {
@@ -337,6 +347,7 @@ public class REQ2UnitTest {
         Assertions.assertEquals(DoNothingAction.class, action.getClass());
     }
 
+    /** Verifies that DeprecatedFleshySprout spawns an Undead on an adjacent tile when a worker is nearby. */
     @Test
     public void typicalDeprecatedFleshySproutSpawnsUndeadWhenWorkerIsNearby()
             throws GameEngineException {
@@ -356,6 +367,7 @@ public class REQ2UnitTest {
         Assertions.assertEquals('Ѫ', expectedSpawnLocation.getActor().getDisplayChar());
     }
 
+    /** Verifies that DeprecatedFleshyMatureTree spawns a ScrapSnatcher on an adjacent tile when a worker is nearby. */
     @Test
     public void typicalDeprecatedFleshyMatureTreeSpawnsScrapSnatcherWhenWorkerIsNearby()
             throws GameEngineException {
@@ -375,6 +387,7 @@ public class REQ2UnitTest {
         Assertions.assertEquals('s', expectedSpawnLocation.getActor().getDisplayChar());
     }
 
+    /** Verifies that DeprecatedFleshySprout does not spawn anything when no worker is nearby. */
     @Test
     public void edgeDeprecatedFleshySproutDoesNotSpawnWhenNoWorkerIsNearby()
             throws GameEngineException {
@@ -390,6 +403,7 @@ public class REQ2UnitTest {
         }
     }
 
+    /** Verifies that FleshyMonolith warps an adjacent worker to a different location when it ticks. */
     @Test
     public void typicalFleshyMonolithWarpsAdjacentWorkerToDifferentLocation()
             throws GameEngineException {
@@ -408,6 +422,7 @@ public class REQ2UnitTest {
         Assertions.assertNotSame(originalWorkerLocation, map.locationOf(worker));
     }
 
+    /** Verifies that FleshyMonolith does nothing when no worker is adjacent. */
     @Test
     public void edgeFleshyMonolithDoesNothingWhenNoWorkerIsAdjacent()
             throws GameEngineException {

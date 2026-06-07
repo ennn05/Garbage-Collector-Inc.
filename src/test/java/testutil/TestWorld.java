@@ -14,12 +14,18 @@ import game.grounds.Wall;
  */
 public class TestWorld extends World {
 
+    /** Creates a TestWorld backed by a no-op Display. */
     public TestWorld() {
         super(new Display());
     }
 
     /**
-     * Creates a width x height map of Floor tiles registered with this world.
+     * Creates a {@code width × height} map of Floor tiles registered with this world.
+     *
+     * @param width  number of columns
+     * @param height number of rows
+     * @return a fully registered {@link GameMap} ready for actor placement
+     * @throws Exception if the map cannot be created
      */
     public GameMap createFloorMap(int width, int height) throws Exception {
         DefaultGroundCreator creator = new DefaultGroundCreator();

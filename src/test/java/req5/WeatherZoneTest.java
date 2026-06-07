@@ -49,6 +49,7 @@ class WeatherZoneTest {
 
     // ── AridZone: containsPlayerX ──────────────────────────────────────────────
 
+    /** Verifies that AridZone contains columns 0 through 19 (inclusive). */
     @Test
     void aridZoneContainsColumnsZeroToNineteen() {
         AridZone zone = new AridZone();
@@ -57,6 +58,7 @@ class WeatherZoneTest {
         assertTrue(zone.containsPlayerX(19));
     }
 
+    /** Verifies that AridZone rejects columns outside the 0–19 range. */
     @Test
     void aridZoneRejectsColumnsOutsideItsRange() {
         AridZone zone = new AridZone();
@@ -66,6 +68,7 @@ class WeatherZoneTest {
 
     // ── TemperateZone: containsPlayerX ────────────────────────────────────────
 
+    /** Verifies that TemperateZone contains columns 20 through 39 (inclusive). */
     @Test
     void temperateZoneContainsTwentyToThirtyNine() {
         TemperateZone zone = new TemperateZone();
@@ -74,6 +77,7 @@ class WeatherZoneTest {
         assertTrue(zone.containsPlayerX(39));
     }
 
+    /** Verifies that TemperateZone rejects columns outside the 20–39 range. */
     @Test
     void temperateZoneRejectsColumnsOutsideItsRange() {
         TemperateZone zone = new TemperateZone();
@@ -83,6 +87,7 @@ class WeatherZoneTest {
 
     // ── HumidZone: containsPlayerX ─────────────────────────────────────────────
 
+    /** Verifies that HumidZone contains columns 40 through 59 (inclusive). */
     @Test
     void humidZoneContainsFourtyToFiftyNine() {
         HumidZone zone = new HumidZone();
@@ -91,6 +96,7 @@ class WeatherZoneTest {
         assertTrue(zone.containsPlayerX(59));
     }
 
+    /** Verifies that HumidZone rejects columns outside the 40–59 range. */
     @Test
     void humidZoneRejectsColumnsOutsideItsRange() {
         HumidZone zone = new HumidZone();
@@ -100,6 +106,7 @@ class WeatherZoneTest {
 
     // ── AridZone: passive terrain effect ──────────────────────────────────────
 
+    /** Verifies that AridZone evaporates a Puddle within radius and replaces it with Floor. */
     @Test
     void aridZoneEvaporatesPuddleIntoFloor() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -115,6 +122,7 @@ class WeatherZoneTest {
                 "Evaporated tile must become Floor (implements Seedable)");
     }
 
+    /** Verifies that AridZone evaporates at most 2 Puddles when 3 are present. */
     @Test
     void aridZoneCapsPuddleEvaporationAtTwo() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -132,6 +140,7 @@ class WeatherZoneTest {
                 "3 Puddles placed; cap is 2 evaporations so exactly 1 must survive");
     }
 
+    /** Verifies that ToxicWaste tiles in the radius are diluted into either Puddle or remain ToxicWaste. */
     @Test
     void aridZoneToxicWasteDilutionProducesOnlyPuddleOrToxicWaste() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -152,6 +161,7 @@ class WeatherZoneTest {
 
     // ── TemperateZone: passive terrain effect ─────────────────────────────────
 
+    /** Verifies that TemperateZone advances a FleshySprout within radius to FleshySapling. */
     @Test
     void temperateZoneAdvancesFleshySproutToFleshySapling() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -167,6 +177,7 @@ class WeatherZoneTest {
                 "Advanced Sprout tile must become FleshySapling");
     }
 
+    /** Verifies that TemperateZone advances at most 2 FleshySprouts when 3 are present. */
     @Test
     void temperateZoneCapsSproutAdvancementAtTwo() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -184,6 +195,7 @@ class WeatherZoneTest {
                 "3 Sprouts placed; cap is 2 advances so exactly 1 must remain");
     }
 
+    /** Verifies that TemperateZone advances a FleshySapling within radius to FleshyMatureTree. */
     @Test
     void temperateZoneAdvancesFleshySaplingToFleshyMatureTree() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -199,6 +211,7 @@ class WeatherZoneTest {
                 "Advanced Sapling tile must become FleshyMatureTree");
     }
 
+    /** Verifies that TemperateZone advances at most 1 FleshySapling when 2 are present. */
     @Test
     void temperateZoneCapsSaplingAdvancementAtOne() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -218,6 +231,7 @@ class WeatherZoneTest {
 
     // ── HumidZone: passive terrain effect ─────────────────────────────────────
 
+    /** Verifies that HumidZone extinguishes a Fire within radius and restores the previous ground. */
     @Test
     void humidZoneExtinguishesFireAndRestoresPreviousGround() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -233,6 +247,7 @@ class WeatherZoneTest {
                 "Extinguished tile must restore its previous ground (Floor implements Seedable)");
     }
 
+    /** Verifies that HumidZone extinguishes at most 2 fires when 3 are present. */
     @Test
     void humidZoneCapsFireExtinguishedAtTwo() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);
@@ -250,6 +265,7 @@ class WeatherZoneTest {
                 "3 fires placed; cap is 2 extinguished so exactly 1 must remain");
     }
 
+    /** Verifies that HumidZone calls forceSpread on FungalGround tiles within the radius. */
     @Test
     void humidZoneForceSpreadsFungalGroundTileInRadius() throws Exception {
         GameMap map = new TestWorld().createFloorMap(15, 15);

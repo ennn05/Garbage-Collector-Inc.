@@ -24,7 +24,8 @@ public class Floor extends CrackableGround implements Seedable {
     private final Random rand = new Random();
 
     /**
-     * Creates a new Floor tile (display character: {@code _}).
+     * Creates a Floor tile (display character: {@code _}).
+     * Implements {@link game.interfaces.Seedable} so fungal ground can spread here.
      */
     public Floor() {
         super('_', "Floor", DEGRADATION_LEVEL);

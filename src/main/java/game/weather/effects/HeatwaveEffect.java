@@ -25,6 +25,13 @@ public class HeatwaveEffect implements WeatherEffect {
     private static final int RADIUS = 4;
     private static final int MAX_FIRES = 3;
 
+    /**
+     * Converts up to {@value #MAX_FIRES} randomly chosen {@link game.interfaces.Seedable}
+     * tiles within {@value #RADIUS} tiles of the player into {@link Fire} ground.
+     *
+     * @param map            the game map to modify
+     * @param playerLocation the player's location used as the effect centre
+     */
     @Override
     public void apply(GameMap map, Location playerLocation) {
         List<Location> floorTiles = new ArrayList<>();
@@ -44,11 +51,22 @@ public class HeatwaveEffect implements WeatherEffect {
         }
     }
 
+    /**
+     * Activates when the reported temperature is at or above {@value #THRESHOLD}°C.
+     *
+     * @param report the current weather data snapshot
+     * @return {@code true} if the temperature threshold is met
+     */
     @Override
     public boolean shouldActivate(WeatherReport report) {
         return report.getTemperature() >= THRESHOLD;
     }
 
+    /**
+     * Returns a human-readable name for this effect.
+     *
+     * @return {@code "Heatwave (fire tiles spawned near player)"}
+     */
     @Override
     public String getEffectName() {
         return "Heatwave (fire tiles spawned near player)";

@@ -28,10 +28,20 @@ public class BlightFungus extends FungalGround {
     private static final int DROP_CHANCE = 25;
     private final Random random = new Random();
 
+    /**
+     * Creates a BlightFungus tile (display character: {@code β}).
+     */
     public BlightFungus() {
         super('β', "BlightFungus");
     }
 
+    /**
+     * Infects the actor with {@link SporeInfection} if not already infected,
+     * then applies a {@value #DROP_CHANCE}% chance to force-drop one random inventory item.
+     *
+     * @param actor    the actor standing on this tile
+     * @param location the location of this tile
+     */
     @Override
     protected void onActorPresent(Actor actor, Location location) {
         if (!actor.hasStatus(SporeInfection.class)) {
@@ -47,6 +57,12 @@ public class BlightFungus extends FungalGround {
         }
     }
 
+    /**
+     * Converts one randomly chosen adjacent {@link Seedable} tile into a new BlightFungus.
+     * Called every {@code SPREAD_INTERVAL} turns by the parent {@link FungalGround#tick}.
+     *
+     * @param location the location of this tile
+     */
     @Override
     protected void spread(Location location) {
         List<Location> adjacentFloors = new ArrayList<>();

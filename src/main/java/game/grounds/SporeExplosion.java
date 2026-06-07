@@ -20,10 +20,26 @@ public class SporeExplosion extends FungalGround {
     private static final int EXPLOSION_DAMAGE = 5;
     private static final int EXPLOSION_RADIUS = 2;
 
+    /**
+     * Creates a SporeExplosion tile (display character: {@code *}).
+     */
     public SporeExplosion() {
         super('*', "SporeExplosion");
     }
 
+    /**
+     * Triggers the spore detonation sequence:
+     * <ol>
+     *   <li>Deals {@value #EXPLOSION_DAMAGE} damage to every actor within
+     *       {@value #EXPLOSION_RADIUS} tiles.</li>
+     *   <li>Converts all adjacent {@link game.interfaces.Seedable} tiles to
+     *       {@link BlightFungus}.</li>
+     *   <li>Replaces itself with a {@link Floor} tile (self-destructs).</li>
+     * </ol>
+     *
+     * @param actor    the actor that stepped on this tile and triggered the explosion
+     * @param location the location of this tile
+     */
     @Override
     protected void onActorPresent(Actor actor, Location location) {
         System.out.println("BOOM! A SporeExplosion detonates at " + location + "!");
@@ -48,6 +64,12 @@ public class SporeExplosion extends FungalGround {
         System.out.println("SporeExplosion collapses into Floor.");
     }
 
+    /**
+     * No-op: SporeExplosion does not spread passively.
+     * It detonates only when an actor steps on it (see {@link #onActorPresent}).
+     *
+     * @param location the location of this tile
+     */
     @Override
     protected void spread(Location location) {
         // SporeExplosion does not spread passively; it only detonates on contact.

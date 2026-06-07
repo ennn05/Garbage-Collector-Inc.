@@ -11,6 +11,15 @@ public class WeatherReport {
     private final double windSpeed;
     private final String condition;
 
+    /**
+     * Creates a fully populated weather snapshot. Intended to be called only by
+     * {@link WeatherReportBuilder#build()} after all extractors have run.
+     *
+     * @param temperature temperature in degrees Celsius
+     * @param humidity    relative humidity as a percentage (0–100)
+     * @param windSpeed   wind speed in metres per second
+     * @param condition   OpenWeatherMap condition label (e.g. {@code "Clear"})
+     */
     public WeatherReport(double temperature, int humidity, double windSpeed, String condition) {
         this.temperature = temperature;
         this.humidity = humidity;
@@ -30,6 +39,12 @@ public class WeatherReport {
     /** OpenWeatherMap condition label, e.g. "Clear", "Rain", "Thunderstorm". */
     public String getCondition() { return condition; }
 
+    /**
+     * Returns a compact human-readable summary of this report,
+     * shown in the console during each weather cycle.
+     *
+     * @return formatted string, e.g. {@code "25.3°C | 60% humidity | 3.2 m/s wind | Clear"}
+     */
     @Override
     public String toString() {
         return String.format("%.1f°C | %d%% humidity | %.1f m/s wind | %s",
