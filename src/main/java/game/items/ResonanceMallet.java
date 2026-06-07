@@ -122,6 +122,8 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
             }
         }
         CrackableGround ground = epicenter.getGroundAs(CrackableGround.class);
-        if (ground != null) ground.degrade();
+        if (ground != null) {
+            epicenter.setGround(ground.degrade());
+        }
     }
 }

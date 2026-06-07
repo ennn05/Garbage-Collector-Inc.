@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Undead;
 import game.interfaces.HoleGround;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,14 +76,14 @@ public class RubbleField extends CrackableGround {
     public void tick(Location location) {
         if (this.buriedActor != null) {
             this.buryCounter++;
-            if (this.buryCounter > MUMMIFIED_DURATION) {
+            if (this.buryCounter >= MUMMIFIED_DURATION) {
                 System.out.println(mummify(this.buriedActor, location));
                 this.buriedActor = null;
                 this.buryCounter = 0;
             }
         }
         if (!location.getItems().isEmpty()) {
-            for (Item item : location.getItems()) {
+            for (Item item : new ArrayList<>(location.getItems())) {
                 location.removeItem(item);
             }
         }
