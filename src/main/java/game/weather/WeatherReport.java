@@ -39,6 +39,12 @@ public class WeatherReport {
     /** OpenWeatherMap condition label, e.g. "Clear", "Rain", "Thunderstorm". */
     public String getCondition() { return condition; }
 
+    /**
+     * Returns a compact human-readable summary of this report,
+     * shown in the console during each weather cycle.
+     *
+     * @return formatted string, e.g. {@code "25.3°C | 60% humidity | 3.2 m/s wind | Clear"}
+     */
     @Override
     public String toString() {
         return String.format("%.1f°C | %d%% humidity | %.1f m/s wind | %s",
