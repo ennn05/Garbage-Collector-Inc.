@@ -17,6 +17,15 @@ import game.interfaces.Resonator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A melee weapon that delivers a shockwave to an adjacent tile, degrading ground and pushing items.
+ * <p>
+ * The ResonanceMallet targets a single adjacent tile (North/South/East/West). Its shockwave radius
+ * is {@value #SHOCKWAVE_RADIUS}, meaning only the struck tile is affected — no surrounding spread.
+ * After each use the mallet enters a {@value #COOLDOWN}-turn cooldown before it can be used again.
+ * The cooldown counter ticks up each turn while the item is in the holder's inventory.
+ * Purchase price: {@value #PURCHASE_PRICE} credits. Weight: {@value #WEIGHT}.
+ */
 public class ResonanceMallet extends Item implements Purchasable, Resonator {
     private static final int COOLDOWN = 10;
     private static final int PURCHASE_PRICE = 50;
@@ -24,6 +33,9 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
     private static final int SHOCKWAVE_RADIUS = 0;
     private static final int WEIGHT = 5;
 
+    /**
+     * Creates a new ResonanceMallet item (display character: {@code p}).
+     */
     public ResonanceMallet() {
         super("Resonance Mallet", 'p');
         this.makePortable();
@@ -31,6 +43,14 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
         this.addNewStatistic(ItemStatistics.WEIGHT, new BaseStatistic(WEIGHT));
     }
 
+    /**
+     * Provides {@link game.actions.MalletAction} options for each cardinal direction
+     * when the mallet is not on cooldown. Returns an empty list while cooling down.
+     *
+     * @param owner the actor holding this item
+     * @param map   the current game map
+     * @return actions to strike North, South, East, or West, or an empty list if on cooldown
+     */
     @Override
     public ActionList allowableActions(Actor owner, GameMap map) {
         if (!isOnCooldown()) {
@@ -49,40 +69,70 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
         return new ActionList();
     }
 
+    /**
+     * Resets the cooldown counter to zero, preventing use until the counter
+     * reaches {@value #COOLDOWN} again via {@link #tick}.
+     */
     public void applyCooldown() {
         this.modifyStatistic(ItemStatistics.COOLDOWN, StatisticOperations.UPDATE, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return a new ResonanceMallet instance
+     */
     @Override
     public ResonanceMallet createPurchasedItem() {
         return new ResonanceMallet();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #PURCHASE_PRICE}
+     */
     @Override
     public int getPurchasePrice() {
         return PURCHASE_PRICE;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #SHOCKWAVE_RADIUS} (epicenter only — no surrounding spread)
+     */
     @Override
     public int getShockwaveRadius() {
         return SHOCKWAVE_RADIUS;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #SHOCKWAVE_POWER}
+     */
     @Override
     public int getShockwavePower() {
         return SHOCKWAVE_POWER;
     }
 
+    /**
+     * Returns {@code true} if the mallet's cooldown counter has not yet reached
+     * {@value #COOLDOWN} since its last use.
+     *
+     * @return {@code true} while cooling down, {@code false} when ready to use
+     */
     public boolean isOnCooldown() {
         return this.getStatistic(ItemStatistics.COOLDOWN) < COOLDOWN;
     }
 
     /**
-     * Handle insufficient credits response.
+     * {@inheritDoc}
      *
      * @param buyer the actor attempting to buy this item
-     * @param map the map where the transaction happens
-     * @return result description
+     * @param map   the map where the transaction happens
+     * @return a message explaining the buyer cannot afford the item
      */
     @Override
     public String onInsufficientCredits(Actor buyer, GameMap map) {
@@ -91,11 +141,27 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
         return message;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param buyer            the actor purchasing this item
+     * @param map              the game map
+     * @param terminalLocation the location of the shop terminal
+     * @param wallet           the buyer's wallet
+     * @return a confirmation message
+     */
     @Override
     public String onPurchased(Actor buyer, GameMap map, Location terminalLocation, Wallet wallet) {
         return buyer + " purchased the Resonance Mallet";
     }
 
+    /**
+     * Advances the cooldown counter by 1 each turn while the item is in an actor's inventory
+     * and is still on cooldown.
+     *
+     * @param currentLocation the location of the actor holding this item
+     * @param actor           the actor holding this item
+     */
     @Override
     public void tick(Location currentLocation, Actor actor) {
         if (isOnCooldown()) {
@@ -103,12 +169,25 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
         }
     }
 
+    /**
+     * Returns the display string including the current cooldown progress.
+     *
+     * @return name with cooldown status appended
+     */
     @Override
     public String toString() {
         return super.toString() +
                 " (Cooldown: " + this.getStatistic(ItemStatistics.COOLDOWN) + "/" + COOLDOWN + ")";
     }
 
+    /**
+     * Triggers the mallet's shockwave at the struck {@code epicenter} tile only
+     * (radius 0). Pushes items at that location outward and degrades any
+     * {@link game.grounds.CrackableGround} on the tile.
+     *
+     * @param epicenter the tile struck by the mallet
+     * @param map       the game map
+     */
     @Override
     public void triggerShockwave(Location epicenter, GameMap map) {
         if (!epicenter.getItems().isEmpty()) {
