@@ -42,9 +42,13 @@ public class TeleportAction extends Action {
             return "Teleportation failed: destination is blocked or occupied.";
         }
         destinationMap.moveActor(actor, destination);
-        device.onTeleport(actor, source, destination, map);
+        String sideEffect = device.onTeleport(actor, source, destination, map);
         Location finalLocation = destinationMap.locationOf(actor);
-        return actor + " teleported to " + finalLocation;
+        String result = actor + " teleported to " + finalLocation;
+        if (sideEffect != null && !sideEffect.isEmpty()) {
+            result += "\n" + sideEffect;
+        }
+        return result;
     }
 
     @Override

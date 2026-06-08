@@ -21,6 +21,7 @@ import java.util.Random;
  */
 public class TeleportationTube extends Ground implements Teleportable {
     private static final int FIRE_DURATION = 2;
+    private static final int BURN_DAMAGE = 1;
     private static final double MALFUNCTION_CHANCE = 0.5;
 
     private final List<Location> destinations = new ArrayList<>();
@@ -65,7 +66,7 @@ public class TeleportationTube extends Ground implements Teleportable {
      * @param map the current game map
      */
     @Override
-    public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
+    public String onTeleport(Actor actor, Location source, Location destination, GameMap map) {
         Location finalDestination = destination;
 
         if (random.nextDouble() < MALFUNCTION_CHANCE) {
@@ -81,8 +82,10 @@ public class TeleportationTube extends Ground implements Teleportable {
         }
 
         fireSpawner.spawnAround(finalDestination, FIRE_DURATION);
-        actor.addStatus(new BurnStatus(FIRE_DURATION, 1));
-        System.out.println(actor + " is scorched by the teleportation blast!");
+        actor.hurt(BURN_DAMAGE);
+        actor.addStatus(new BurnStatus(Math.max(0, FIRE_DURATION - 1), BURN_DAMAGE));
+        return actor + " is scorched by the teleportation blast and takes "
+                + BURN_DAMAGE + " damage immediately!";
     }
 
     /**
