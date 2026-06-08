@@ -25,6 +25,7 @@ public interface Teleportable {
      * @param source the source location
      * @param destination the destination location
      * @param map the current game map
+     * @return a description of any side effects that occurred
      */
-    void onTeleport(Actor actor, Location source, Location destination, GameMap map);
+    String onTeleport(Actor actor, Location source, Location destination, GameMap map);
 }

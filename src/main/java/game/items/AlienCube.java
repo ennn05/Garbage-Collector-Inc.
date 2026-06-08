@@ -121,8 +121,9 @@ public class AlienCube extends Item implements Teleportable, Sellable, Cuttable 
      * @param map the current game map
      */
     @Override
-    public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
+    public String onTeleport(Actor actor, Location source, Location destination, GameMap map) {
         corruptAdjacentTiles(source, actor);
+        return "Reality tears open, corrupting nearby ground with toxic waste.";
     }
 
     /**

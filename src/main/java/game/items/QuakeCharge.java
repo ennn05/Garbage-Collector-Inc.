@@ -147,39 +147,35 @@ public class QuakeCharge extends Item implements Purchasable, Resonator {
     public ActionList allowableActions(Actor owner, GameMap map) {
         ActionList actionList = new ActionList();
         Location here = map.locationOf(owner);
-        Location throwNorth = map.at(here.x(), here.y() - THROW_RANGE);
-        Location throwSouth = map.at(here.x(), here.y() + THROW_RANGE);
-        Location throwEast = map.at(here.x() + THROW_RANGE, here.y());
-        Location throwWest = map.at(here.x() - THROW_RANGE, here.y());
-        for (int i = 1; i <= THROW_RANGE; i++) {
-            if (map.at(here.x(), here.y() - i).getGround().blocksThrownObjects()) {
-                throwNorth = map.at(here.x(), here.y() - i + 1);
-                break;
-            }
-        }
-        for (int i = 1; i <= THROW_RANGE; i++) {
-            if (map.at(here.x(), here.y() + i).getGround().blocksThrownObjects()) {
-                throwSouth = map.at(here.x(), here.y() + i - 1);
-                break;
-            }
-        }
-        for (int i = 1; i <= THROW_RANGE; i++) {
-            if (map.at(here.x() + i, here.y()).getGround().blocksThrownObjects()) {
-                throwEast = map.at(here.x() + i - 1, here.y());
-                break;
-            }
-        }
-        for (int i = 1; i <= THROW_RANGE; i++) {
-            if (map.at(here.x() - i, here.y()).getGround().blocksThrownObjects()) {
-                throwWest = map.at(here.x() - i + 1, here.y());
-                break;
-            }
-        }
+        Location throwNorth = findThrowDestination(map, here, 0, -1);
+        Location throwSouth = findThrowDestination(map, here, 0, 1);
+        Location throwEast = findThrowDestination(map, here, 1, 0);
+        Location throwWest = findThrowDestination(map, here, -1, 0);
         actionList.add(new GrenadeAction(this, "north", throwNorth));
         actionList.add(new GrenadeAction(this, "south", throwSouth));
         actionList.add(new GrenadeAction(this, "east", throwEast));
         actionList.add(new GrenadeAction(this, "west", throwWest));
         return actionList;
+    }
+
+    private Location findThrowDestination(GameMap map, Location origin, int dx, int dy) {
+        Location lastValid = origin;
+        for (int step = 1; step <= THROW_RANGE; step++) {
+            Location candidate = locationAtOrNull(map, origin.x() + dx * step, origin.y() + dy * step);
+            if (candidate == null || candidate.getGround().blocksThrownObjects()) {
+                return lastValid;
+            }
+            lastValid = candidate;
+        }
+        return lastValid;
+    }
+
+    private Location locationAtOrNull(GameMap map, int x, int y) {
+        try {
+            return map.at(x, y);
+        } catch (IndexOutOfBoundsException exception) {
+            return null;
+        }
     }
 
     @Override
