@@ -23,7 +23,12 @@
 |   | | | |   ||     |_ |   |                                                            
 |___| |_|  |__||_______||___|                                                                                                                                                                                                                         
 ```
-## REQ5: Weather System — API Key Setup
+## Contribution log
+[Contribution log link](https://docs.google.com/spreadsheets/d/1EAoeuuQ9YHIjVSB8gqZoziGPfBNeuz8M6MIWxhEWIpc/edit?usp=sharing)
+
+---
+
+## ASS3 - REQ5: Weather System — API Key Setup
 
 REQ5 integrates the **OpenWeatherMap** free-tier API to drive live weather effects inside the game. Follow these steps exactly before running the project.
 
@@ -82,8 +87,8 @@ If no API key is configured, the system prints a warning and uses safe default v
 
 ---
 
-## Contribution log
-[Contribution log link](https://docs.google.com/spreadsheets/d/1EAoeuuQ9YHIjVSB8gqZoziGPfBNeuz8M6MIWxhEWIpc/edit?usp=sharing)
+## ASS2 - REQ5: Mannequin State Machine
+
 ## About the Mannequin
 
 The Mannequin is a sophisticated, adaptive AI actor that cycles through four distinct behavioral states based on environmental conditions, inventory status, and worker proximity. It employs a **State Machine Pattern** to manage complex behavior transitions and execution.
