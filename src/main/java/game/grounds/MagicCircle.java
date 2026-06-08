@@ -79,8 +79,9 @@ public class MagicCircle extends Ground implements Teleportable, TeleportAnchor 
      * @param map the current game map
      */
     @Override
-    public void onTeleport(Actor actor, Location source, Location destination, GameMap map) {
+    public String onTeleport(Actor actor, Location source, Location destination, GameMap map) {
         spawnFlaskOnAdjacentTile(destination, actor);
+        return "The Magic Circle leaves a Flask near the destination.";
     }
 
     /**

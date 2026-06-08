@@ -56,17 +56,28 @@ public class ResonanceMallet extends Item implements Purchasable, Resonator {
         if (!isOnCooldown()) {
             ActionList actionList = new ActionList();
             Location here = map.locationOf(owner);
-            Location north = map.at(here.x(), here.y() - 1);
-            Location south = map.at(here.x(), here.y() + 1);
-            Location west = map.at(here.x() - 1, here.y());
-            Location east = map.at(here.x() + 1, here.y());
-            actionList.add(new MalletAction(north, "North", this));
-            actionList.add(new MalletAction(south, "South", this));
-            actionList.add(new MalletAction(west, "West", this));
-            actionList.add(new MalletAction(east, "East", this));
+            addStrikeAction(actionList, map, here.x(), here.y() - 1, "North");
+            addStrikeAction(actionList, map, here.x(), here.y() + 1, "South");
+            addStrikeAction(actionList, map, here.x() - 1, here.y(), "West");
+            addStrikeAction(actionList, map, here.x() + 1, here.y(), "East");
             return actionList;
         }
         return new ActionList();
+    }
+
+    private void addStrikeAction(ActionList actions, GameMap map, int x, int y, String direction) {
+        Location target = locationAtOrNull(map, x, y);
+        if (target != null) {
+            actions.add(new MalletAction(target, direction, this));
+        }
+    }
+
+    private Location locationAtOrNull(GameMap map, int x, int y) {
+        try {
+            return map.at(x, y);
+        } catch (IndexOutOfBoundsException exception) {
+            return null;
+        }
     }
 
     /**
