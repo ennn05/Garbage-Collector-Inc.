@@ -24,7 +24,7 @@ public class QuotaSystem {
     private boolean quotaMetThisCycle;
 
     private static final int STARTING_RANK = 1;
-    private static final int STARTING_BASE_QUOTA = 10;
+    private static final int STARTING_BASE_QUOTA = 100;
     private static final int STARTING_TIME_LIMIT = 200;
     private static final double QUOTA_INCREASE_PERCENTAGE = 0.05;
     private static final double TIME_LIMIT_INCREASE_PERCENTAGE = 0.10;
