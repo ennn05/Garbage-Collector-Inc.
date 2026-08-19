@@ -22,7 +22,7 @@ import java.util.List;
  * <p>This is a higher-level class that depends <em>only</em> on the
  * {@link WeatherZone} and {@link WeatherEffect} abstractions —
  * never on any concrete implementation — satisfying the Dependency Inversion
- * Principle and REQ5 Rule 3.
+ * Principle.
  *
  * <p><b>Two-phase weather cycle (every {@value #FETCH_INTERVAL} turns):</b>
  * <ol>

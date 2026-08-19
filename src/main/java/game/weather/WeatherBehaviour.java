@@ -12,7 +12,7 @@ import game.enums.Ability;
  * A game-turn-aware behaviour that periodically triggers a real-world weather
  * update for the facility map.
  *
- * <p>This is the second higher-level class required by REQ5 Rule 3. It depends
+ * <p>This is the second higher-level class in the weather pipeline. It depends
  * on {@link WeatherEffect} and {@link WeatherDataExtractor} indirectly through
  * {@link WeatherSystem}, never referencing any concrete implementation —
  * satisfying the Dependency Inversion Principle.

@@ -85,8 +85,8 @@ public class EclipseNebula extends World {
 
     /**
      * Builds and populates all game maps, places actors, items, and ground tiles,
-     * and wires up the REQ3 fungal terrain, REQ4 cracked floors and shockwave items,
-     * REQ5 Mannequins and the {@link game.weather.WeatherSystem}.
+     * and wires up the fungal terrain, cracked-floor/shockwave items,
+     * Mannequins and the {@link game.weather.WeatherSystem}.
      *
      * @throws Exception if map construction or actor placement fails
      */
@@ -103,27 +103,27 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('o', Hole::new);
         groundCreator.registerGround('!', Trap::new);
 
-        // REQ1 and REQ2 ground types
+        // Core ground types
         groundCreator.registerGround('≡', Supercomputer::new);
         groundCreator.registerGround('≈', ToxicWaste::new);
         groundCreator.registerGround('Φ', TeleportationTube::new);
         groundCreator.registerGround('◎', MagicCircle::new);
         groundCreator.registerGround('◈', Floor::new);
 
-        // REQ3 flora ground types for 20-Overflow
+        // Flora ground types for 20-Overflow
         groundCreator.registerGround('y', FleshySprout::new);
         groundCreator.registerGround('v', FleshySapling::new);
         groundCreator.registerGround('Y', FleshyMatureTree::new);
         groundCreator.registerGround('w', WarperSapling::new);
         groundCreator.registerGround('W', WarperMatureTree::new);
 
-        // REQ2 final deprecated fleshy tree stage
+        // Final deprecated fleshy tree stage
         groundCreator.registerGround('H', FleshyMonolith::new);
 
-        // REQ4 ground types
+        // Shockwave-related ground types
         groundCreator.registerGround('V', Vent::new);
 
-        // REQ3 (creative) fungal ground types
+        // Fungal ground types
         groundCreator.registerGround('β', BlightFungus::new);
         groundCreator.registerGround('*', SporeExplosion::new);
         groundCreator.registerGround('§', SporeColony::new);
@@ -188,7 +188,7 @@ public class EclipseNebula extends World {
         moon99DeprecatedMap.at(47, 8).setGround(new Trap());
         moon99DeprecatedMap.at(35, 14).setGround(new Trap());
 
-        // ass3REQ2: Populate the 99-Deprecated moon with deprecated fleshy trees.
+        // Populate the 99-Deprecated moon with deprecated fleshy trees.
         // These trees use different behaviour from the 20-Overflow fleshy trees.
         moon99DeprecatedMap.at(13, 2).setGround(new DeprecatedFleshySprout());
         moon99DeprecatedMap.at(16, 10).setGround(new DeprecatedFleshySprout());
@@ -244,11 +244,11 @@ public class EclipseNebula extends World {
             overflow20Supercomputer.initialiseQuotaSystem(overflow20Map.at(4, 2));
         }
 
-        // REQ2: Replace selected aluminium doors with higher-clearance doors.
+        // Replace selected aluminium doors with higher-clearance doors.
         overflow20Map.at(35, 4).setGround(new IronDoor());
         overflow20Map.at(34, 14).setGround(new TitaniumDoor());
 
-        // REQ4: Place vents in 20-Overflow so motion-activated spawning can occur.
+        // Place vents in 20-Overflow so motion-activated spawning can occur.
         overflow20Map.at(31, 13).setGround(new Vent());
         overflow20Map.at(54, 14).setGround(new Vent());
 
@@ -267,7 +267,7 @@ public class EclipseNebula extends World {
         // Add a cross-map destination to the ship tube in 99-deprecated.
         ship99Tube.addDestination(overflow20Map.at(6, 3));
 
-        // REQ3: Populate the 20-Overflow moon with mutated flora.
+        // Populate the 20-Overflow moon with mutated flora.
         overflow20Map.at(1, 0).setGround(new FleshySprout());
         overflow20Map.at(5, 0).setGround(new FleshySprout());
         overflow20Map.at(9, 0).setGround(new FleshySprout());
@@ -287,11 +287,11 @@ public class EclipseNebula extends World {
         overflow20Map.at(5, 19).setGround(new WarperMatureTree());
         overflow20Map.at(9, 19).setGround(new WarperMatureTree());
 
-        // REQ5: Mannequins placed in floor areas of the 20-Overflow map.
+        // Mannequins placed in floor areas of the 20-Overflow map.
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(17, 4));
         overflow20Map.addActor(new Mannequin(), overflow20Map.at(28, 8));
 
-        // REQ3 (creative): Seed initial fungal ground tiles and a SporeCanister pickup.
+        // Seed initial fungal ground tiles and a SporeCanister pickup.
         moon99DeprecatedMap.at(35, 5).setGround(new BlightFungus());
         moon99DeprecatedMap.at(46, 15).setGround(new SporeExplosion());
         moon99DeprecatedMap.at(50, 5).setGround(new SporeColony());
@@ -300,7 +300,7 @@ public class EclipseNebula extends World {
         overflow20Map.at(35, 3).setGround(new BlightFungus());
         overflow20Map.at(46, 8).setGround(new SporeColony());
 
-        // REQ5: Build and register the weather system on the 99-Deprecated map.
+        // Build and register the weather system on the 99-Deprecated map.
         // WeatherSystem depends only on the WeatherZone and WeatherEffect
         // abstractions — concrete classes are injected here (Dependency Inversion).
         WeatherSystem weatherSystem = new WeatherSystem(

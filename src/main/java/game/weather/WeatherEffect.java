@@ -8,7 +8,7 @@ import edu.monash.fit2099.engine.positions.Location;
  *
  * Each implementation decides its own activation threshold and applies a
  * concrete physical change to the game world (spawning/modifying/destroying
- * game objects), satisfying REQ5 Rule 1.
+ * game objects).
  *
  * Higher-level classes ({@link WeatherBehaviour}) depend solely on this
  * interface, never on concrete implementations (Dependency Inversion Principle).

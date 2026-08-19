@@ -32,7 +32,7 @@ public class MagicCircle extends Ground implements Teleportable, TeleportAnchor 
 
     /**
      * Get a single randomly-selected other magic circle on the map.
-     * Per REQ2, the game randomly teleports the actor, so the actor has no choice.
+     * The game randomly teleports the actor, so the actor has no choice.
      *
      * @param map the current game map
      * @return list with a single random magic circle destination, or an empty list if none exists

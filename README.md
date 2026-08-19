@@ -1,197 +1,64 @@
-# FIT2099 Assignment (Semester 1, 2026)
+# Garbage Collector Inc.
 
-```
- _______  _______  ______    _______  _______  _______  _______                          
-|       ||   _   ||    _ |  |  _    ||   _   ||       ||       |                         
-|    ___||  |_|  ||   | ||  | |_|   ||  |_|  ||    ___||    ___|                         
-|   | __ |       ||   |_||_ |       ||       ||   | __ |   |___                          
-|   ||  ||       ||    __  ||  _   | |       ||   ||  ||    ___|                         
-|   |_| ||   _   ||   |  | || |_|   ||   _   ||   |_| ||   |___                          
-|_______||__| |__||___|  |_||_______||__| |__||_______||_______|                         
- _______  _______  ___      ___      _______  _______  _______  ___   _______  __    _   
-|       ||       ||   |    |   |    |       ||       ||       ||   | |       ||  |  | |  
-|       ||   _   ||   |    |   |    |    ___||       ||_     _||   | |   _   ||   |_| |  
-|       ||  | |  ||   |    |   |    |   |___ |       |  |   |  |   | |  | |  ||       |  
-|      _||  |_|  ||   |___ |   |___ |    ___||      _|  |   |  |   | |  |_|  ||  _    |  
-|     |_ |       ||       ||       ||   |___ |     |_   |   |  |   | |       || | |   |  
-|_______||_______||_______||_______||_______||_______|  |___|  |___| |_______||_|  |__|  
- ___   __    _  _______                                                                  
-|   | |  |  | ||       |                                                                 
-|   | |   |_| ||       |                                                                 
-|   | |       ||       |                                                                 
-|   | |  _    ||      _| ___                                                             
-|   | | | |   ||     |_ |   |                                                            
-|___| |_|  |__||_______||___|                                                                                                                                                                                                                         
-```
-## Contribution log
-[Contribution log link](https://docs.google.com/spreadsheets/d/1EAoeuuQ9YHIjVSB8gqZoziGPfBNeuz8M6MIWxhEWIpc/edit?usp=sharing)
+A Java text-based survival simulation built on a custom turn-based game engine. Contracted workers scavenge a derelict off-world salvage facility — managing resource quotas, mutated flora, a fungal infection that spreads across the map, seismic terrain hazards, and a shapeshifting enemy — while a live weather feed from Earth reshapes the facility in real time.
 
----
+Built collaboratively by a 5-person team as a series of iterative feature additions to a shared engine.
 
-## ASS3 - REQ5: Weather System — API Key Setup
+## Overview
 
-REQ5 integrates the **OpenWeatherMap** free-tier API to drive live weather effects inside the game. Follow these steps exactly before running the project.
+The player manages a crew of contracted workers salvaging scrap on the moon facilities **99-Deprecated** and **20-Overflow**. Each subsystem below was designed and added independently, each demonstrating a different design pattern on top of the same core actor/action/behaviour engine:
 
-### Step 1 — Get a free API key
+- **Economy & quotas** — workers sell scrap to a `Supercomputer` terminal against a rising quota, with consequences for falling behind.
+- **Fungal infection system** — a bio-organic infection (`BlightFungus`, `SporeColony`, `SporeExplosion`) spreads across the map, infects actors, and turns them into unwitting vectors of further spread.
+- **Shockwave / terrain degradation** — seismic resonators (remote beacon, thrown charge, melee mallet) crack and collapse floor tiles into impassable rubble, burying actors who linger and resurrecting them as `Undead` after a timer.
+- **Mannequin state machine** — an adaptive enemy actor that cycles through four behavioural states (`Idle`, `Active`, `Berserk`, `Mimic`) based on worker proximity, inventory, and health.
+- **Real-world weather system** — every 15 turns the game calls the **OpenWeatherMap REST API** for the live weather of a real city, mapped to the player's position on the map, and uses it to drive both constant per-zone terrain effects and threshold-triggered hazards (heatwaves, storms, fungal blooms).
 
-1. Go to [https://openweathermap.org/api](https://openweathermap.org/api) and create a free account.
-2. Navigate to **My API keys** (top-right menu after logging in).
-3. Copy the default key (or generate a new one). The key looks like `a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4`.
-4. New keys can take **up to 2 hours** to activate after creation.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design write-up of the fungal, shockwave, and weather systems, including abstractions, class responsibilities, and how each applies SOLID principles.
 
-### Step 2 — Set the API key (choose one method)
+## Design patterns & principles
 
-**Method A — Environment variable (recommended)**
+| Pattern | Where |
+|---|---|
+| **Strategy** | `WeatherZone` / `WeatherEffect` / `WeatherDataExtractor` implementations are interchangeable, injected strategies for terrain effects, threshold reactions, and JSON parsing. |
+| **State machine** | `game.states` (`IdleState`, `ActiveState`, `BerserkState`, `MimicState`) drives the Mannequin's behaviour via a `StateManager`. |
+| **Dependency Inversion** | `WeatherSystem` and `WeatherBehaviour` depend only on the `WeatherZone`/`WeatherEffect` abstractions, injected via constructor — never on a concrete zone or effect class. |
+| **Open/Closed** | New weather zones, weather effects, or fungal ground types can be added as a single new class with zero changes to the orchestrating classes. |
 
-Set the variable in your shell before running the game:
+## Tech stack
+
+- Java 17, Maven
+- JUnit 5 (Jupiter) for unit testing
+- `HttpURLConnection` for the OpenWeatherMap REST integration (no external HTTP library dependency)
+
+## Getting started
 
 ```bash
-# macOS / Linux
-export OPENWEATHER_API_KEY=your_key_here
-
-# Windows Command Prompt
-set OPENWEATHER_API_KEY=your_key_here
-
-# Windows PowerShell
-$env:OPENWEATHER_API_KEY="your_key_here"
+mvn compile
+mvn test
 ```
 
-Or set it permanently via System Properties → Environment Variables (Windows) / `~/.bashrc` (Linux/macOS).
+Run the game via `game.Application.main()` (e.g. from your IDE, or `mvn exec:java -Dexec.mainClass=game.Application`).
 
-In IntelliJ IDEA: **Run → Edit Configurations → Environment variables** → add `OPENWEATHER_API_KEY=your_key_here`.
+### Weather API key (optional)
 
-**Method B — `.env` file**
+The weather system works out of the box with safe default values (20 °C, 50% humidity, calm wind) if no API key is configured. To pull live weather data instead:
 
-1. Create a file named `.env` in the **project root** (the same folder as `src/`, `lib/`, `README.md`).
-2. Add exactly this line (no quotes, no spaces around `=`):
+1. Get a free API key from [openweathermap.org/api](https://openweathermap.org/api) (new keys can take up to 2 hours to activate).
+2. Provide it either as an environment variable:
+   ```bash
+   export OPENWEATHER_API_KEY=your_key_here
+   ```
+   or in a `.env` file in the project root:
+   ```
+   OPENWEATHER_API_KEY=your_key_here
+   ```
+   (`.env` is git-ignored — never commit your key.)
 
+## Testing
+
+177 JUnit unit tests covering economy, items, actions, behaviours, status effects, ground/terrain mechanics, flora, and the weather system, organised in [src/test/java](src/test/java) by feature area to mirror the main source layout. Tests use a `TestWorld` fixture to build minimal, deterministic maps and actors, and seed `Random` explicitly wherever production code relies on randomness, so runs are reproducible.
+
+```bash
+mvn test
 ```
-OPENWEATHER_API_KEY=your_key_here
-```
-
-> **Security:** The `.env` file is listed in `.gitignore`. Never commit it or your API key to the repository.
-
-### Step 3 — Run the game
-
-Launch `game.Application.main()` as normal. Every 15 game turns the console will print:
-
-```
-[WeatherSystem] Querying weather for London (player x=35) → https://...?lat=51.51&lon=-0.13&units=metric&appid=***
-[WeatherSystem] Conditions: 14.3°C | 82% humidity | 9.2 m/s wind | Rain
-Weather alert: Storm (puddles spread near player). Fungal Bloom (all fungal tiles spread instantly).
-```
-
-### Step 4 — Running without a key (offline / demo mode)
-
-If no API key is configured, the system prints a warning and uses safe default values (20 °C, 50 % humidity, 5 m/s wind, "Clear"). No effects trigger and the game continues normally — the key is optional for basic testing.
-
----
-
-## ASS2 - REQ5: Mannequin State Machine
-
-## About the Mannequin
-
-The Mannequin is a sophisticated, adaptive AI actor that cycles through four distinct behavioral states based on environmental conditions, inventory status, and worker proximity. It employs a **State Machine Pattern** to manage complex behavior transitions and execution.
-
-### How the Mannequin Works
-
-The Mannequin's behavior is controlled by a **state machine** with four states: **Idle**, **Active**, **Berserk**, and **Mimic**.
-
----
-
-## State Behaviors
-
-### **1. Idle State**
-**Display Character:** 'M'
-
-**How It Works:**
-- The Mannequin stands perfectly still, indistinguishable from furniture
-- It counts the number of turns it remains idle
-- It constantly monitors nearby workers within a 3-tile radius
-
-**Transitions:**
-- **→ Berserk** — Instantly, if it detects exactly **1 worker** nearby (solo worker = easy prey)
-- **→ Active** — If it has been idle for **10+ turns** AND **0 workers** are in range (safe to move)
-- **Stays Idle** — If multiple workers (2+) are nearby (too dangerous) or during the first 10 quiet turns
-
-**Entry Effect:**
-- Drops all items from inventory onto the ground
-- Resets the idle turn counter to 0
-
----
-
-### **2. Active State**
-**Display Character:** 'M'  
-**Active Behaviors:** Seek and pick up items from the ground
-
-**How It Works:**
-- The Mannequin roams the map searching for loose items
-- Immediately upon entry, it **vacuums** items from its current tile and adjacent tiles (up to its 3-item capacity)
-- Each turn, it continues collecting items
-  - Checks current location for items
-  - Checks adjacent tiles for accessible items
-  - Scans the full map to find the nearest uncollected item and moves toward it
-
-**Transitions:**
-- **→ Berserk** — If it detects exactly **1 worker** nearby (interrupts collection; hunt mode)
-- **→ Mimic** — If its inventory is **full (3 items)** OR if **2+ workers** are nearby AND it **has items** (disguise and heal)
-- **→ Idle** — If **2+ workers** are nearby AND it has **no items** (nothing to hide, better to stay motionless)
-- **Stays Active** — If conditions favour continuing to hunt for items
-
-**Entry Effect:**
-- Displays as 'M'
-- Resets the idle turn counter
-- Vacuums all available items from current and adjacent locations
-
----
-
-### **3. Berserk State**
-**Display Character:** 'M'  
-**Active Behaviors:**
-1. Attack adjacent workers (priority)
-2. Hunt and pursue a lone worker (fallback)
-
-**How It Works:**
-- The Mannequin abandons all pretense and hunts aggressively
-- **Priority 1:** If a worker is adjacent, attack immediately
-- **Priority 2:** If no adjacent worker, chase the nearest lone target using Chebyshev distance pathfinding
-- Cannot tolerate being outnumbered; retreats if the situation becomes overwhelming
-
-**Transitions:**
-- **→ Idle** — If **2+ workers** are detected within range (outnumbered; retreat to hide)
-- **→ Mimic** — If **0 workers** are nearby AND **health ≤ 30%** AND it **has items** (escape via disguise to heal)
-- **→ Active** — If **0 workers** are nearby AND (health > 30% OR no items) (cool down; resume scavenging)
-- **Stays Berserk** — If exactly 1 worker is detected (continue the hunt)
-
-**Entry Effect:**
-- Displays as 'M'
-- Resets the idle turn counter
-- **Panic Effect:** Forces all **adjacent workers to drop their items** (ambush shock; workers panic and scatter their inventory)
-
----
-
-### **4. Mimic State**
-**Display Character:** The item's glyph (e.g., 'G' for gold coin, or '?' if empty)  
-**Active Behaviors:** Heal by manipulating adjacent workers
-
-**How It Works:**
-- The Mannequin **disguises itself** as one of its carried items
-- The display character changes to mimic the item (fooling observers into thinking it's harmless)
-- While disguised:
-  - Each turn, it checks for adjacent workers
-  - If an adjacent worker is found:
-    - The Mannequin heals **2 HP**
-- The disguise is temporary and lasts **5 turns**
-
-**Transitions:**
-- **→ Berserk** — If it detects exactly **1 worker** nearby (disguise exposed; revert to aggression)
-- **→ Idle** — If the disguise duration **expires (5 turns)** AND inventory is **empty** (nothing left to show for the effort)
-- **→ Active** — If the disguise duration **expires (5 turns)** AND inventory has **items** (resume collecting)
-- **Stays Mimic** — If the duration timer hasn't expired and no solo worker detected
-
-**Entry Effect:**
-- Sets disguise duration to 5 turns
-- **Takes the first item from inventory**, permanently removes it, and sets the display character to that item's glyph
-  - If the inventory is empty, uses a default disguise character '?'
-- **Pushes all adjacent workers away** using distance heuristics to create separation
-  - Workers are moved away from the Mannequin, unaware they've been manipulated
